@@ -38,17 +38,20 @@ test(`createElement creates element`, (assert) => {
   );
 
   assert.equal(
-    createElement(`foo`).nodeName,
-    `#text`
+    createElement(` <span foo='bar'></span> `).outerHTML,
+    `<span foo="bar"></span>`,
+    `tolerates extra whitespace`
   );
 
   assert.equal(
-    createElement(`foo`).textContent,
-    `foo`
+    createElement(`foo`),
+    null
   );
 
-  assert.ok(
-    createElement(`foo`).isEqualNode(createTextNode(`foo`))
+  assert.equal(
+    createElement(`foo <span />`).outerHTML,
+    `<span></span>`,
+    `first element is returned`
   );
 
 });

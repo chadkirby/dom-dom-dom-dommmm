@@ -52,7 +52,7 @@ function createFragment(string = ``) {
  * @return  {HTMLElement}
  */
 function createElement(html = ``) {
-  return createFragment(html).firstChild;
+  return createFragment(html).firstElementChild;
 }
 
 /**
