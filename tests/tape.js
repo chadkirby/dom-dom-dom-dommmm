@@ -1,4 +1,7 @@
 const _test = require('tape-promise/tape');
+const globalThis = require('globalthis')();
+const { JSDOM } = require('jsdom');
+globalThis.document = new JSDOM('').window.document;
 
 module.exports = function(parent, { disableYesno } = {}) {
 

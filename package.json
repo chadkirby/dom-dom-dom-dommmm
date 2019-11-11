@@ -1,12 +1,14 @@
 {
-  "name": "splice-chars",
+  "name": "@ckirby/dom-dom-dom-dommmm",
   "version": "1.0.2",
-  "description": "helper function to splice chars in a jquery/cheerio element",
+  "description": "DOM helper functions for a post-jquery world",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint .",
-    "test": "yarn test:tape && yarn lint",
-    "test:tape": "tape tests/*-test.js | tap-difflet"
+    "test": "yarn lint && yarn test:tape:difflet",
+    "test:ci": "yarn lint && yarn test:tape",
+    "test:tape": "tape `find tests -name '*-test.js'`",
+    "test:tape:difflet": "yarn test:tape | tap-difflet --pessimistic",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -15,22 +17,25 @@
   "author": "Chad Kirby",
   "license": "ISC",
   "devDependencies": {
-    "cheerio": "^0.22.0",
     "eslint": "^6.0.0",
     "eslint-plugin-turbopatent": "^4.0.0",
-    "jquery": "^3.1.1",
-    "jsdom": "^9.8.3",
+    "jsdom": "^15.2.1",
     "tap-difflet": "^0.7.1",
     "tape": "^4.10.2",
     "tape-promise": "^4.0.0",
     "tom-jumbo-grumbo": "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "globalthis": "^1.0.0"
+  },
   "bugs": {
     "url": "https://github.com/chadkirby/splice-chars/issues"
   },
   "homepage": "https://github.com/chadkirby/splice-chars#readme",
   "directories": {
     "test": "tests"
-  }
+  },
+  "files": [
+    "src"
+  ]
 }
