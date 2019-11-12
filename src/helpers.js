@@ -88,11 +88,11 @@ function* parentsUntil(childNode, target) {
     current = current.parentElement;
   }
 
-  function matches(node, comparator) {
+  function matches(el, comparator) {
     if (typeof comparator === `string`) {
-      return node.matches(comparator);
+      return el.matches(comparator);
     }
-    return node.isSameNode(comparator);
+    return el.isSameNode(comparator);
   }
 }
 
@@ -107,11 +107,10 @@ function* parentsUntil(childNode, target) {
  * @return  {HTMLElement|null}
  */
 function closest(el, selector) {
-  if (el.matches(selector)) {
-    return el;
+  while (el && !(el.matches && el.matches(selector))) {
+    el = el.parentElement;
   }
-  let child = [ ...parentsUntil(el, selector) ].pop();
-  return child && child.parentElement;
+  return el;
 }
 
 /**
