@@ -8,7 +8,8 @@
     "test:ci": "yarn lint && yarn test:tape",
     "test:tape": "tape `find tests -name '*-test.js'`",
     "test:tape:difflet": "yarn test:tape | tap-difflet --pessimistic",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "release": "tp-release"
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,7 @@
     "tap-difflet": "^0.7.1",
     "tape": "^4.10.2",
     "tape-promise": "^4.0.0",
-    "tom-jumbo-grumbo": "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.2"
+    "tom-jumbo-grumbo": "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.5"
   },
   "dependencies": {
     "globalthis": "^1.0.0"

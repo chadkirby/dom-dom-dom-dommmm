@@ -2028,9 +2028,9 @@ tmp@^0.0.33:
   dependencies:
     os-tmpdir "~1.0.2"
 
-"tom-jumbo-grumbo@git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.2":
-  version "1.0.2"
-  resolved "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#872064351e4ca6013d26b7a21d541e79af2f5937"
+"tom-jumbo-grumbo@git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.5":
+  version "1.0.5"
+  resolved "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#3ea1481199dd4332801dad3200dd190ef74f36a5"
   dependencies:
     colors "^1.1.2"
     fs-extra "^5.0.0"
