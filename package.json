@@ -8,8 +8,10 @@
     "test:ci": "yarn lint && yarn test:tape",
     "test:tape": "tape `find tests -name '*-test.js'`",
     "test:tape:difflet": "yarn test:tape | tap-difflet --pessimistic",
-    "lint": "eslint .",
-    "release": "tp-release"
+    "lint": "eslint src tests",
+    "release": "tp-release",
+    "jsdoc": "jsdoc ./src/*.js -d docs/",
+    "publish": "npm publish --access public"
   },
   "repository": {
     "type": "git",

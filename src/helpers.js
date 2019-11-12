@@ -3,16 +3,22 @@ const globalThis = require('globalthis')();
 /**
  * iterator to collect text nodes from a dom element
  *
- * @param   {HTMLElement}  el  dom element
+ * @param   {HTMLElement}  el  start element
+ * @param   {HTMLElement}  endNode  stop element
  *
- * @return  {Iterable.HTMLElement}      iterates over text nodes
+ * @return  {Iterable.HTMLElement}  iterates over text nodes
  */
-function* collectTextNodes(el) {
+function* collectTextNodes(el, endNode) {
   for (const child of el.childNodes) {
+    if (endNode && endNode.isSameNode(child)) {
+      // stop the generator if this child is the end node
+      return true;
+    }
     if (child.nodeName === `#text`) {
       yield child;
-    } else {
-      yield* collectTextNodes(child);
+    } else if (yield* collectTextNodes(child, endNode)) {
+      // stop the generator if this child contained the end node
+      return true;
     }
   }
 }
