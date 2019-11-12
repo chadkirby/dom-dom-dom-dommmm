@@ -24,6 +24,24 @@ function* collectTextNodes(el, endNode) {
 }
 
 /**
+ * collect text nodes that satisfy a filter function
+ *
+ * @param   {HTMLElement}  el
+ * @param   {Function}  filterFn
+ *
+ * @return  {Iterable.HTMLElement}  iterates over text nodes
+ */
+function* filterTextNodes(el, filterFn) {
+  let getNodes = collectTextNodes(el);
+  let tNode;
+  while ((tNode = getNodes.next().value)) {
+    if (filterFn(tNode)) {
+      yield tNode;
+    }
+  }
+}
+
+/**
  * convert a document fragment to html
  *
  * @param   {HTMLElement}  fragment  document fragment
@@ -135,6 +153,7 @@ module.exports = {
   createElement,
   createFragment,
   createTextNode,
+  filterTextNodes,
   fragmentToHtml,
   parentsUntil,
   unwrap
