@@ -5,6 +5,7 @@ let {
   createElement,
   createFragment,
   createTextNode,
+  filterTextNodes,
   fragmentToHtml,
   parentsUntil,
   unwrap
@@ -166,4 +167,21 @@ test(`closest finds the closest`, (assert) => {
     `returns null on falsy input`
   );
 
+});
+
+test(`filterTextNodes filters text nodes`, (assert) => {
+  let $p = createElement(`<p>abc<b>123<i>4<u>5</u>6</i></b></p>`);
+  assert.deepEqual(
+    Array.from(filterTextNodes($p, (n) => !closest(n, `i`)), (n) => n.textContent),
+    [ `abc`, `123` ],
+    `italic nodes are filtered out`
+  );
+
+  assert.deepEqual(
+    Array.from(filterTextNodes($p, (n) => closest(n, `b`)), (n) => n.textContent),
+    [ `123`, `4`, `5`, `6` ],
+    `bold nodes are filtered in`
+  );
+
+  assert.end();
 });
