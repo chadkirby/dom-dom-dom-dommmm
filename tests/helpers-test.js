@@ -19,6 +19,18 @@ test(`collectTextNodes collects text nodes`, (assert) => {
     Array.from(collectTextNodes($), (n) => n.textContent),
     [ '1', '2', '3', '4', '5', '6', '7', '8', '9' ]
   );
+
+  assert.deepEqual(
+    Array.from(collectTextNodes($, $.querySelector(`d`)), (n) => n.textContent),
+    [ '1', '2', '3' ],
+    `can specify endNode`
+  );
+
+  assert.deepEqual(
+    Array.from(collectTextNodes($, $.querySelector(`foo`)), (n) => n.textContent),
+    [ '1', '2', '3', '4', '5', '6', '7', '8', '9' ],
+    `non-existent endNode`
+  );
 });
 
 test(`createElement creates element`, (assert) => {
