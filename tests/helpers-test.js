@@ -154,4 +154,16 @@ test(`closest finds the closest`, (assert) => {
     null
   );
 
+  let $a = $.querySelector(`a`);
+  assert.ok(
+    closest($a.firstChild, `a`).isSameNode($a),
+    `works with text-node input`
+  );
+
+  assert.equal(
+    closest($.querySelector('foo')),
+    null,
+    `returns null on falsy input`
+  );
+
 });

@@ -10,8 +10,7 @@
     "test:tape:difflet": "yarn test:tape | tap-difflet --pessimistic",
     "lint": "eslint src tests",
     "release": "tp-release",
-    "jsdoc": "jsdoc ./src/*.js -d docs/",
-    "publish": "npm publish --access public"
+    "jsdoc": "jsdoc ./src/*.js -d docs/"
   },
   "repository": {
     "type": "git",
