@@ -9,7 +9,10 @@ const globalThis = require('globalthis')();
  * @return  {Iterable.HTMLElement}  iterates over text nodes
  */
 function* collectTextNodes(el, endNode) {
-  for (const child of el.childNodes) {
+  // get a list of the element's children in case the dom is modified between
+  // yields
+  let children = Array.from(el.childNodes);
+  for (const child of children) {
     if (endNode && endNode.isSameNode(child)) {
       // stop the generator if this child is the end node
       return true;
