@@ -13,7 +13,13 @@ const { collectTextNodes, createFragment, createElement, fragmentToHtml } = requ
 function dom(...args) {
   let $ = createFragment(assemble(...args));
   for (const node of collectTextNodes($)) {
-    node.textContent = node.textContent.replace(/^\s*\n\s*|\s*\n\s*$/g, '');
+    let trimmed = node.textContent.replace(/^\s*\n\s*|\s*\n\s*$/g, '');
+    if (node.textContent && !trimmed) {
+      // remove the node if we just emptied it out
+      node.remove();
+    } else {
+      node.textContent = trimmed;
+    }
   }
   return $;
 }
