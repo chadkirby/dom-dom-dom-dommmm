@@ -76,6 +76,15 @@ test(`dom creates fragment`, (assert) => {
     `foo <span></span> bar`
   );
 
+  let $doc = dom`
+  <span />
+  `;
+  assert.equal(
+    $doc.firstChild.nodeName,
+    `SPAN`,
+    `firstChild is not empty text node`
+  );
+
 });
 
 test(`unpretty de-formats an html string`, (assert) => {
