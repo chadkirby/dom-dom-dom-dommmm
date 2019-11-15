@@ -189,5 +189,15 @@ test(`filterTextNodes filters text nodes`, (assert) => {
     `bold nodes are filtered in`
   );
 
+  // remove nodes 123 and 6 as we iterate
+  for (const node of filterTextNodes($p, (n) => parseInt(n.textContent, 10) > 5)) {
+    node.remove();
+  }
+  assert.equal(
+    $p.outerHTML,
+    `<p>abc<b><i>4<u>5</u></i></b></p>`,
+    `can modify dom during loop`
+  );
+
   assert.end();
 });
