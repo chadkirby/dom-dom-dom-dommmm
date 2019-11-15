@@ -13,14 +13,7 @@ const { collectTextNodes, createFragment, createElement, fragmentToHtml } = requ
 function dom(...args) {
   let $ = createFragment(assemble(...args));
   for (const node of collectTextNodes($)) {
-    if (node === node.parentNode.firstChild) {
-      // remove leading newline-whitespace from first children
-      node.textContent = node.textContent.replace(/^\s*\n\s*/, '');
-    }
-    if (node === node.parentNode.lastChild) {
-      // remove trailing newline-whitespace from last children
-      node.textContent = node.textContent.replace(/\s*\n\s*$/, '');
-    }
+    node.textContent = node.textContent.replace(/^\s*\n\s*|\s*\n\s*$/g, '');
   }
   return $;
 }

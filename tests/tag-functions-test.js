@@ -103,4 +103,19 @@ test(`unpretty de-formats an html string`, (assert) => {
     `<p>Text with
       newlines</p>`
   );
+
+  assert.equal(
+    unpretty`
+    <p>
+      foo
+      <span>
+        bar
+      </span>
+      baz
+      <span>
+        bat
+      </span>
+    </p>`,
+    `<p>foo<span>bar</span>baz<span>bat</span></p>`
+  );
 });
