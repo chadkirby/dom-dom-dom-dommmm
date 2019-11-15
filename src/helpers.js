@@ -49,7 +49,9 @@ function* filterTextNodes(el, filterFn) {
  * @return  {string}
  */
 function fragmentToHtml(fragment) {
-  return [ ...fragment.childNodes ].map((n) => n.outerHTML).join(``);
+  return [ ...fragment.childNodes ].map(
+    (n) => n.nodeName === `#text` ? n.textContent : n.outerHTML
+  ).join(``);
 }
 
 /**

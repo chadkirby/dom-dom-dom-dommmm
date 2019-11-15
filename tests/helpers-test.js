@@ -88,6 +88,12 @@ test(`fragmentToHtml converts fragment to html`, (assert) => {
     html
   );
 
+  html = ` foo<a>bar</a>baz `;
+  assert.equal(
+    fragmentToHtml(createFragment(html)),
+    html
+  );
+
 });
 
 test(`collectTextNodes collects text nodes`, (assert) => {
