@@ -160,6 +160,9 @@ function unwrap(el) {
  * @return  {Object}
  */
 function attr(el) {
+  if (!el) {
+    return {};
+  }
   return Object.assign(...Array.from(
     el.attributes,
     ({ name, value }) => ({ [name]: value })

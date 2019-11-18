@@ -209,4 +209,10 @@ test(`attr returns attributes as a POJO`, (assert) => {
     attr(el`<span id='123' foo='bar' baz-bat='bot' />`),
     { foo: 'bar', 'baz-bat': 'bot', id: '123' }
   );
+
+  assert.deepEqual(
+    attr(el``),
+    {},
+    `non-existent element returns empty object`
+  );
 });
