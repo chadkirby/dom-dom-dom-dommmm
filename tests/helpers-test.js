@@ -1,15 +1,17 @@
 let test = require('./tape')(module);
 let {
+  attr,
   closest,
   collectTextNodes,
   createElement,
   createFragment,
   createTextNode,
+  el,
   filterTextNodes,
   fragmentToHtml,
   parentsUntil,
   unwrap
-} = require('../src/helpers');
+} = require('../src/index');
 
 test(`collectTextNodes collects text nodes`, (assert) => {
   let $ = createFragment(`<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`);
@@ -200,4 +202,11 @@ test(`filterTextNodes filters text nodes`, (assert) => {
   );
 
   assert.end();
+});
+
+test(`attr returns attributes as a POJO`, (assert) => {
+  assert.deepEqual(
+    attr(el`<span id='123' foo='bar' baz-bat='bot' />`),
+    { foo: 'bar', 'baz-bat': 'bot', id: '123' }
+  );
 });

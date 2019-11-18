@@ -152,7 +152,22 @@ function unwrap(el) {
   el.remove();
 }
 
+/**
+ * convert element.attributes NamedNodeMap to a POJO
+ *
+ * @param   {HTMLElement} el
+ *
+ * @return  {Object}
+ */
+function attr(el) {
+  return Object.assign(...Array.from(
+    el.attributes,
+    ({ name, value }) => ({ [name]: value })
+  ));
+}
+
 module.exports = {
+  attr,
   closest,
   collectTextNodes,
   createElement,
