@@ -1,6 +1,6 @@
 {
   "name": "@ckirby/dom-dom-dom-dommmm",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "DOM helper functions for a post-jquery world",
   "main": "src/index.js",
   "scripts": {
