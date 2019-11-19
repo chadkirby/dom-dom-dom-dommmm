@@ -169,6 +169,18 @@ function attr(el) {
   ));
 }
 
+function* previousSiblings(el) {
+  while (el && (el = el.previousSibling)) {
+    yield el;
+  }
+}
+
+function* nextSiblings(el) {
+  while (el && (el = el.nextSibling)) {
+    yield el;
+  }
+}
+
 module.exports = {
   attr,
   closest,
@@ -179,5 +191,7 @@ module.exports = {
   filterTextNodes,
   fragmentToHtml,
   parentsUntil,
+  previousSiblings,
+  nextSiblings,
   unwrap
 };

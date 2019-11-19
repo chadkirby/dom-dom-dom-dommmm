@@ -1,4 +1,4 @@
-const { collectTextNodes, createFragment, createElement, fragmentToHtml } = require('./helpers');
+const { collectTextNodes, createFragment, fragmentToHtml } = require('./helpers');
 
 /**
  * Tagged template function to convert possibly pretty html to an unpretty
@@ -34,7 +34,7 @@ function dom(...args) {
  * @return  {HTMLElement}  element
  */
 function el(...args) {
-  return createElement(assemble(...args));
+  return dom(...args).firstChild;
 }
 
 /**

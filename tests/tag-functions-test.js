@@ -1,5 +1,5 @@
-let test = require('./tape')(module);
-let { dom, el, unpretty, fragmentToHtml } = require('../src/index');
+const test = require('./tape')(module);
+const { dom, el, unpretty, fragmentToHtml } = require('../src/index');
 
 test(`el creates element`, (assert) => {
   assert.equal(
