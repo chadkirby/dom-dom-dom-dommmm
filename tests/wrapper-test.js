@@ -439,3 +439,18 @@ test(`$.not`, (assert) => {
     [ '<c>3</c>' ]
   );
 });
+
+
+test(`$.css`, (assert) => {
+  let $x = $(`<div><a style="color:blue;font-size:46px;"></a></div>`);
+  assert.deepEqual(
+    $x.query(`a`).css(`color`),
+    `blue`
+  );
+
+  assert.deepEqual(
+    $x.query(`a`).css(`font-size`),
+    `46px`
+  );
+
+});

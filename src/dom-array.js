@@ -1,3 +1,5 @@
+const globalThis = require('globalthis')();
+
 const { attr, closest, createElement, createTextNode, nextSiblings, parentsUntil, previousSiblings } = require('./helpers');
 const { cssIs, cssSelectAll, cssSelectOne } = require('./css-select');
 const { isNode } = require('./is-node');
@@ -70,6 +72,15 @@ class DOMArray extends Array {
     }
     return this.constructor.of();
   }
+
+  css(property) {
+    if (this.length) {
+      let window = globalThis.DOM_DOM_WINDOW || globalThis.window;
+      return window.getComputedStyle(this[0]).getPropertyValue(property);
+    }
+    return ``;
+  }
+
   eq(index) {
     if (index < 0) {
       index += this.length;
