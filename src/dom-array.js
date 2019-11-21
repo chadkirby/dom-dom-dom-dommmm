@@ -10,6 +10,14 @@ class DOMArray extends Array {
   after(content) {
     return each(this, `after`, content);
   }
+  ancestors() {
+    let { constructor: PROTO } = this;
+    if (this.length) {
+      return PROTO.from(parentsUntil(this[0], () => false));
+    }
+    return PROTO.of();
+  }
+
   // jq
   append(content) {
     return each(this, `append`, content);
@@ -32,11 +40,11 @@ class DOMArray extends Array {
   before(content) {
     return each(this, `before`, content);
   }
-  children(target) {
+  children(selector) {
     if (this.length) {
       let [ first ] = this;
       let children = this.constructor.from(first.children);
-      return target ? children.domFilter(target) : children;
+      return children.filterSelector(selector);
     }
     return this.constructor.of();
   }
@@ -72,16 +80,14 @@ class DOMArray extends Array {
     return this.constructor.of();
   }
 
-  domFilter(target) {
-    if (typeof target === `function`) {
-      return super.filter(target);
-    }
-    return super.filter(
-      (el) => this.constructor.of(el).is(target)
-    );
-  }
   filter(target) {
     return super.filter(target);
+  }
+  filterSelector(selector) {
+    if (!selector) {
+      return this;
+    }
+    return super.filter((el) => cssIs(el, selector));
   }
   find(target) {
     return super.find(target);
@@ -96,7 +102,7 @@ class DOMArray extends Array {
   }
   // jq
   has(selector) {
-    return this.domFilter((el) => cssSelectOne(el, selector));
+    return this.filter((el) => cssSelectOne(el, selector));
   }
   // jq
   html(str) {
@@ -108,13 +114,13 @@ class DOMArray extends Array {
   }
   // jq
   index(target) {
-    if (DOMArray.isDOMArray(target)) {
+    if (Array.isArray(target)) {
       [ target ] = target;
     }
     return this.findIndex((el) => el === target);
   }
   is(target) {
-    if (DOMArray.isDOMArray(target)) {
+    if (Array.isArray(target)) {
       [ target ] = target;
     }
     let finder = target;
@@ -133,32 +139,19 @@ class DOMArray extends Array {
    *
    * @see {@link http://api.jquery.com/next/}
    */
-  next(target) {
+  next(selector) {
     let { constructor: DArr } = this;
     let [ { nextElementSibling: nextEl } = {} ] = this;
     let next = nextEl ? DArr.of(nextEl) : DArr.of();
-    return target ? next.domFilter(target) : next;
+    return next.filterSelector(selector);
   }
   // jq
-  nextAll(target) {
+  nextAll(selector) {
     let sibs = this.constructor.from(nextSiblings(this[0]));
-    return target ? sibs.domFilter(target) : sibs;
+    return sibs.filterSelector(selector);
   }
-  not(target) {
-    if (typeof target === `string`) {
-      return this.domFilter(
-        (el) => !this.constructor.of(el).is(target)
-      );
-    }
-    if (typeof target === `function`) {
-      return this.domFilter((el) => !target(el));
-    }
-    if (DOMArray.isDOMArray(target)) {
-      [ target ] = target;
-    }
-    if (isNode(target)) {
-      return this.domFilter((el) => el !== target);
-    }
+  nextUntil(target) {
+    return this.nextAll().sliceUntil(target);
   }
   parent() {
     if (this.length) {
@@ -168,11 +161,7 @@ class DOMArray extends Array {
   }
   // jq
   parentsUntil(target) {
-    let { constructor: PROTO } = this;
-    if (this.length) {
-      return PROTO.from(parentsUntil(this[0], (el) => PROTO.of(el).is(target)));
-    }
-    return PROTO.of();
+    return this.ancestors().sliceUntil(target);
   }
 
   // jq
@@ -187,43 +176,29 @@ class DOMArray extends Array {
    *
    * @see {@link http://api.jquery.com/prev/}
    */
-  prev(target) {
+  prev(selector) {
     let { constructor: DArr } = this;
     let [ { previousElementSibling: prevEl } = {} ] = this;
     let prev = prevEl ? DArr.of(prevEl) : DArr.of();
-    return target ? prev.domFilter(target) : prev;
+    return prev.filterSelector(selector);
   }
   // jq
-  prevAll(target) {
+  prevAll(selector) {
     let sibs = this.constructor.from(previousSiblings(this[0]));
-    return target ? sibs.domFilter(target) : sibs;
-  }
-  prevUntil(target) {
-    let prevSibs = this.prevAll();
-    if (target) {
-      let stop = prevSibs.findIndex((el) => cssIs(el, target));
-      if (stop > -1) {
-        return prevSibs.slice(0, stop);
-      }
-    }
-    return prevSibs;
+    return sibs.filterSelector(selector);
   }
 
-  query(target) {
+  prevUntil(target) {
+    return this.prevAll().sliceUntil(target);
+  }
+
+  query(selector) {
     let { constructor: PROTO } = this;
-    let found = cssSelectOne(this, target);
+    let found = cssSelectOne(this, selector);
     return found ? PROTO.of(found) : PROTO.of();
   }
-  queryAll(target) {
-    return this.constructor.from(cssSelectAll(this, target));
-  }
-  queryFilter(target) {
-    if (typeof target === `function`) {
-      return super.filter(target);
-    }
-    return super.filter(
-      (el) => this.constructor.of(el).is(target)
-    );
+  queryAll(selector) {
+    return this.constructor.from(cssSelectAll(this, selector));
   }
 
   remove() {
@@ -237,11 +212,22 @@ class DOMArray extends Array {
     return each(this, `replaceWith`, content);
   }
   // jq
-  siblings(target) {
+  siblings(selector) {
     return this.constructor.from([
-      ...this.prevAll(target).reverse(),
-      ...this.nextAll(target)
+      ...this.prevAll(selector).reverse(),
+      ...this.nextAll(selector)
     ]);
+  }
+
+  sliceUntil(target) {
+    let { constructor: PROTO } = this;
+    if (target) {
+      let stop = this.findIndex((el) => PROTO.of(el).is(target));
+      if (stop > -1) {
+        return this.slice(0, stop);
+      }
+    }
+    return this;
   }
 
   text(newText) {
@@ -252,6 +238,10 @@ class DOMArray extends Array {
       });
     }
     return this.map((el) => el.textContent).join(``);
+  }
+
+  withoutSelector(selector) {
+    return this.filter((el) => !cssIs(el, selector));
   }
 
   wrap(target) {

@@ -11,7 +11,7 @@ test(`$ wraps an element`, (assert) => {
     `<span>foo</span>`
   );
   assert.equal(
-    $x.domFilter(`span`)[0],
+    $x.filterSelector(`span`)[0],
     span,
     `can filter element by selector`
   );
@@ -33,7 +33,7 @@ test(`$ wraps an html string`, (assert) => {
     `<span>foo</span>`
   );
   assert.deepEqual(
-    $x.domFilter(`span`),
+    $x.filterSelector(`span`),
     [ span ],
     `can filter element by selector`
   );
@@ -61,11 +61,11 @@ test(`$.query`, (assert) => {
     2
   );
   assert.equal(
-    $x.queryAll(`a`).domFilter((a) => a.querySelector(`c`)).length,
+    $x.queryAll(`a`).filter((a) => a.querySelector(`c`)).length,
     1
   );
   assert.equal(
-    $x.queryAll(`a`).domFilter((a) => a.querySelector(`c`)).html(),
+    $x.queryAll(`a`).filter((a) => a.querySelector(`c`)).html(),
     `bar<c></c>`
   );
   assert.equal(
@@ -131,7 +131,7 @@ test(`$.index`, (assert) => {
   );
 });
 
-test(`$.query.domFilter`, (assert) => {
+test(`$.query.filter`, (assert) => {
   let $x = $(`<div />`);
   $x.append(`<a>foo</a>`);
   $x.append(`<c>bar</c>`);
@@ -140,7 +140,7 @@ test(`$.query.domFilter`, (assert) => {
     `<a>foo</a><c>bar</c>`
   );
   assert.deepEqual(
-    $x.queryAll(`a,c`).domFilter(`c`).text(),
+    $x.queryAll(`a,c`).filterSelector(`c`).text(),
     `bar`
   );
 });
@@ -320,7 +320,7 @@ test(`$.append`, (assert) => {
     `<a>foo</a><c>bar</c>`
   );
   assert.deepEqual(
-    $x.queryAll(`a,c`).domFilter(`c`).text(),
+    $x.queryAll(`a,c`).filterSelector(`c`).text(),
     `bar`
   );
 
@@ -360,7 +360,7 @@ test(`$.before`, (assert) => {
     `<a>foo</a><c>bar</c>`
   );
   assert.deepEqual(
-    $x.queryAll(`a,c`).domFilter(`c`).text(),
+    $x.queryAll(`a,c`).filterSelector(`c`).text(),
     `bar`
   );
 });
@@ -431,11 +431,11 @@ test(`$.wrap`, (assert) => {
 test(`$.not`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   assert.deepEqual(
-    $x.queryAll(`a,b,c`).not(`a,b`).map((node) => node.outerHTML),
+    $x.queryAll(`a,b,c`).withoutSelector(`a,b`).map((node) => node.outerHTML),
     [ '<c>3</c>' ]
   );
   assert.deepEqual(
-    $x.queryAll(`a,b,c`).not((node) => node.matches(`a,b`)).map((node) => node.outerHTML),
+    $x.queryAll(`a,b,c`).filter((node) => !node.matches(`a,b`)).map((node) => node.outerHTML),
     [ '<c>3</c>' ]
   );
 });
