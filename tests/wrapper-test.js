@@ -117,6 +117,11 @@ test(`$.attr`, (assert) => {
     $x[0].outerHTML,
     `<span id="3" foo="bar"></span>`
   );
+  $x.removeAttr('id');
+  assert.equal(
+    $x[0].outerHTML,
+    `<span foo="bar"></span>`
+  );
 });
 
 test(`$.index`, (assert) => {

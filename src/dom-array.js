@@ -136,7 +136,7 @@ class DOMArray extends Array {
     }
     let finder = target;
     if (isNode(target)) {
-      finder = (el) => el === target;
+      finder = (el) => target.isEqualNode(el);
     } else if (typeof target === `string`) {
       finder = (el) => cssIs(el, target);
     }
@@ -215,6 +215,12 @@ class DOMArray extends Array {
   remove() {
     for (const el of this) {
       el.remove();
+    }
+    return this;
+  }
+  removeAttr(name) {
+    for (const el of this) {
+      el.removeAttribute(name);
     }
     return this;
   }
