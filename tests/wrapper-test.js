@@ -11,7 +11,7 @@ test(`$ wraps an element`, (assert) => {
     `<span>foo</span>`
   );
   assert.equal(
-    $x.filter(`span`)[0],
+    $x.domFilter(`span`)[0],
     span,
     `can filter element by selector`
   );
@@ -33,7 +33,7 @@ test(`$ wraps an html string`, (assert) => {
     `<span>foo</span>`
   );
   assert.deepEqual(
-    $x.filter(`span`),
+    $x.domFilter(`span`),
     [ span ],
     `can filter element by selector`
   );
@@ -41,28 +41,36 @@ test(`$ wraps an html string`, (assert) => {
   assert.equal($x.html(`bar`), `bar`, `html function sets innerHTML`);
 });
 
-test(`$.findOne`, (assert) => {
+test(`$.query`, (assert) => {
   let $x = $(`<span><a>foo</a><a>bar<c /></a></span>`);
   assert.equal(
-    $x.findOne(`a`).text(),
+    $x.query(`a`).text(),
     `foo`
   );
   assert.equal(
-    $x.findOne(`b`).length,
+    $x.query(`b`).length,
     0
   );
 
   assert.equal(
-    $x.find(`a`).length,
-    2
-  );
-  assert.equal(
-    $x.find(`a`).filter((a) => a.querySelector(`c`)).length,
+    $x.queryAll(`c`).length,
     1
   );
   assert.equal(
-    $x.find(`a`).filter((a) => a.querySelector(`c`)).html(),
+    $x.queryAll(`a`).length,
+    2
+  );
+  assert.equal(
+    $x.queryAll(`a`).domFilter((a) => a.querySelector(`c`)).length,
+    1
+  );
+  assert.equal(
+    $x.queryAll(`a`).domFilter((a) => a.querySelector(`c`)).html(),
     `bar<c></c>`
+  );
+  assert.equal(
+    $x.queryAll(`a`).first().queryAll(`a`).length,
+    0
   );
 });
 
@@ -84,20 +92,30 @@ test(`$.attr`, (assert) => {
     $x[0].outerHTML,
     `<span id="3" foo="bar"></span>`
   );
+  assert.equal(
+    $x.is(`[id]`),
+    $x[0]
+  );
+  assert.equal(
+    $x.is(`[id=3]`),
+    $x[0]
+  );
+  assert.equal(
+    $x.is(`[foo^=b]`),
+    $x[0]
+  );
 });
 
-test(`$.attribs`, (assert) => {
+test(`$.attr`, (assert) => {
   let $x = $(`<span id='2' foo='bar' />`);
-  let { attribs } = $x;
   assert.deepEqual(
-    attribs,
+    $x.attr(),
     { id: '2', foo: 'bar' }
   );
-  attribs.id = 3;
-  Object.assign(attribs, { foo: 'BAR', baz: 'bat' });
+  $x.attr('id', 3);
   assert.equal(
     $x[0].outerHTML,
-    `<span id="3" foo="BAR" baz="bat"></span>`
+    `<span id="3" foo="bar"></span>`
   );
 });
 
@@ -113,7 +131,7 @@ test(`$.index`, (assert) => {
   );
 });
 
-test(`$.find.filter`, (assert) => {
+test(`$.query.domFilter`, (assert) => {
   let $x = $(`<div />`);
   $x.append(`<a>foo</a>`);
   $x.append(`<c>bar</c>`);
@@ -122,7 +140,7 @@ test(`$.find.filter`, (assert) => {
     `<a>foo</a><c>bar</c>`
   );
   assert.deepEqual(
-    $x.find(`a,c`).filter(`c`).text(),
+    $x.queryAll(`a,c`).domFilter(`c`).text(),
     `bar`
   );
 });
@@ -130,14 +148,14 @@ test(`$.find.filter`, (assert) => {
 test(`$.closest`, (assert) => {
   let $x = $(`<div><a><b /></a></div>`);
   assert.equal(
-    $x.find(`b`).closest(`a`)[0],
-    $x.find(`a`)[0]
+    $x.queryAll(`b`).closest(`a`)[0],
+    $x.queryAll(`a`)[0]
   );
   assert.ok(
-    $x.find(`b`).closest(`a`).is($x.find(`a`))
+    $x.queryAll(`b`).closest(`a`).is($x.queryAll(`a`))
   );
   assert.equal(
-    $x.find(`b`).closest(`foo`).length,
+    $x.queryAll(`b`).closest(`foo`).length,
     0
   );
 });
@@ -145,72 +163,82 @@ test(`$.closest`, (assert) => {
 test(`$.parentsUntil`, (assert) => {
   let $x = $(`<div><a><b><c /></b></a></div>`);
   assert.deepEqual(
-    $x.find(`c`).parentsUntil(`a`).map(({ outerHTML }) => outerHTML),
+    $x.queryAll(`c`).parentsUntil(`a`).map(({ outerHTML }) => outerHTML),
     [ '<b><c></c></b>' ]
   );
   assert.deepEqual(
-    $x.find(`c`).parentsUntil(`div`).map(({ outerHTML }) => outerHTML),
+    $x.queryAll(`c`).parentsUntil(`div`).map(({ outerHTML }) => outerHTML),
     [ '<b><c></c></b>', '<a><b><c></c></b></a>' ]
   );
+  let $a = $x.queryAll('a');
+  assert.deepEqual(
+    $x.queryAll(`c`).parentsUntil($a).map(({ outerHTML }) => outerHTML),
+    [ '<b><c></c></b>' ]
+  );
+
 });
 
 test(`$.next $.nextAll`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   assert.equal(
-    $x.find(`a`).next().text(),
+    $x.queryAll(`a`).next().text(),
     '2'
   );
   assert.equal(
-    $x.find(`c`).next().length,
+    $x.queryAll(`c`).next().length,
     0
   );
   assert.deepEqual(
-    $x.find(`a`).nextAll().map(({ textContent }) => textContent),
+    $x.queryAll(`a`).nextAll().map(({ textContent }) => textContent),
     [ '2', '3' ]
   );
   assert.deepEqual(
-    $x.find(`a`).nextAll('c').map(({ textContent }) => textContent),
+    $x.queryAll(`a`).nextAll('c').map(({ textContent }) => textContent),
     [ '3' ]
   );
 });
 
-test(`$.prev $.prevAll`, (assert) => {
+test(`$.prev $.prevAll $.prevUntil`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   assert.equal(
-    $x.find(`c`).prev().text(),
+    $x.queryAll(`c`).prev().text(),
     '2'
   );
   assert.equal(
-    $x.find(`a`).prev().length,
+    $x.queryAll(`a`).prev().length,
     0
   );
   assert.deepEqual(
-    $x.find(`c`).prevAll().map(({ textContent }) => textContent),
+    $x.queryAll(`c`).prevAll().map(({ textContent }) => textContent),
     [ '2', '1' ]
   );
   assert.deepEqual(
-    $x.find(`c`).prevAll('a').map(({ textContent }) => textContent),
+    $x.queryAll(`c`).prevAll('a').map(({ textContent }) => textContent),
     [ '1' ]
+  );
+  assert.deepEqual(
+    $x.queryAll(`c`).prevUntil('a').map(({ textContent }) => textContent),
+    [ '2' ]
   );
 });
 
 test(`$.siblings`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   assert.deepEqual(
-    $x.find(`a`).siblings().map(({ textContent }) => textContent),
+    $x.queryAll(`a`).siblings().map(({ textContent }) => textContent),
     [ '2', '3' ]
   );
   assert.deepEqual(
-    $x.find(`b`).siblings().map(({ textContent }) => textContent),
+    $x.queryAll(`b`).siblings().map(({ textContent }) => textContent),
     [ '1', '3' ]
   );
   assert.deepEqual(
-    $x.find(`c`).siblings().map(({ textContent }) => textContent),
+    $x.queryAll(`c`).siblings().map(({ textContent }) => textContent),
     [ '1', '2' ]
   );
 
   assert.deepEqual(
-    $x.find(`a`).siblings(`c`).map(({ textContent }) => textContent),
+    $x.queryAll(`a`).siblings(`c`).map(({ textContent }) => textContent),
     [ '3' ]
   );
 });
@@ -218,7 +246,7 @@ test(`$.siblings`, (assert) => {
 test(`$.has`, (assert) => {
   let $x = $(`<div><a><b><c /></b></a></div>`);
   assert.deepEqual(
-    $x.find(`a,b,c`).has(`c`).map(({ outerHTML }) => outerHTML),
+    $x.queryAll(`a,b,c`).has(`c`).map(({ outerHTML }) => outerHTML),
     [ '<a><b><c></c></b></a>', '<b><c></c></b>' ]
   );
 });
@@ -226,33 +254,188 @@ test(`$.has`, (assert) => {
 test(`$.toArray`, (assert) => {
   let $x = $(`<div><a><b><c /></b></a></div>`);
   assert.deepEqual(
-    $x.find(`b,c`).toArray().map(({ outerHTML }) => outerHTML),
+    $x.queryAll(`b,c`).toArray().map(({ outerHTML }) => outerHTML),
     [ '<b><c></c></b>', '<c></c>' ]
   );
   assert.ok(
-    Array.isArray($x.find(`b,c`).toArray())
+    Array.isArray($x.queryAll(`b,c`).toArray())
   );
   assert.notOk(
-    $x.find(`b,c`).toArray().closest
+    $x.queryAll(`b,c`).toArray().closest
   );
 });
 
 test(`$.replaceWith`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
-  $x.find(`a,c`).replaceWith(`<e></e>`);
+  $x.queryAll(`a,c`).replaceWith(`<e></e>`);
   assert.deepEqual(
     $x.html(),
     `<e></e><b>2</b><e></e>`
+  );
+
+  $x = $(`<div><a>1</a><b>2</b></div>`);
+  $x.queryAll(`a`).replaceWith($(`<e></e>`));
+  assert.deepEqual(
+    $x.html(),
+    `<e></e><b>2</b>`
   );
 });
 
 test(`$.first/last`, (assert) => {
   let $x = $(`<span><a>foo</a><a>bar<c /></a></span>`);
   assert.notOk(
-    $x.find(`a`).first().has(`c`).length
+    $x.queryAll(`a`).first().has(`c`).length
   );
   assert.ok(
-    $x.find(`a`).last().has(`c`).length
+    $x.queryAll(`a`).last().has(`c`).length
   );
 });
 
+test(`:has()`, (assert) => {
+  let $x = $(`<div><a></a><a><c /></a></div>`);
+  assert.deepEqual(
+    $x.query(`a:has(c)`)[0].outerHTML,
+    `<a><c></c></a>`
+  );
+});
+
+test(`$.html`, (assert) => {
+  assert.equal(
+    $.html(el`<span><a>foo</a><a>bar</a></span>`),
+    `<span><a>foo</a><a>bar</a></span>`
+  );
+  assert.equal(
+    $.html($(`<span><a>foo</a><a>bar</a></span>`)),
+    `<span><a>foo</a><a>bar</a></span>`
+  );
+});
+
+test(`$.append`, (assert) => {
+  let $x = $(`<div />`);
+  let $a = $(`<a>foo</a>`);
+  let $c = $(`<c>bar</c>`);
+  $x.append($a).append($c);
+  assert.equal(
+    $x.html(),
+    `<a>foo</a><c>bar</c>`
+  );
+  assert.deepEqual(
+    $x.queryAll(`a,c`).domFilter(`c`).text(),
+    `bar`
+  );
+
+  $x = $(`<div />`);
+  let $y = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
+  $x.append($y.children());
+  assert.equal(
+    $x.html(),
+    `<a>1</a><b>2</b><c>3</c>`
+  );
+  assert.equal(
+    $y.html(),
+    ``
+  );
+
+});
+
+test(`set text`, (assert) => {
+  let $x = $(`<div />`);
+  let $a = $(`<a></a>`);
+  $x.append($a);
+  $a.text('foo');
+  assert.equal(
+    $x.html(),
+    `<a>foo</a>`
+  );
+});
+
+test(`$.before`, (assert) => {
+  let $x = $(`<div />`);
+  let $a = $(`<a>foo</a>`);
+  let $c = $(`<c>bar</c>`);
+  $x.append($c);
+  $c.before($a);
+  assert.equal(
+    $x.html(),
+    `<a>foo</a><c>bar</c>`
+  );
+  assert.deepEqual(
+    $x.queryAll(`a,c`).domFilter(`c`).text(),
+    `bar`
+  );
+});
+
+test(`$.parent`, (assert) => {
+  let $x = $(`<div />`);
+  let $a = $(`<a>foo</a>`);
+  let $c = $(`<c>bar</c>`);
+  $x.append($a);
+  $a.append($c);
+  assert.equal(
+    $x.html(),
+    `<a>foo<c>bar</c></a>`
+  );
+  assert.deepEqual(
+    $c.parent()[0].outerHTML,
+    `<a>foo<c>bar</c></a>`
+  );
+});
+
+test(`$.remove`, (assert) => {
+  let $x = $(`<div><a>foo<c>bar</c></a></div>`);
+  $x.query(`c`).remove();
+  assert.equal(
+    $x.html(),
+    `<a>foo</a>`
+  );
+  $x.queryAll(`a`).remove();
+  assert.equal(
+    $x.html(),
+    ``
+  );
+});
+
+test(`$.children`, (assert) => {
+  let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
+  assert.deepEqual(
+    $x.first().children().map((node) => node.outerHTML),
+    [ '<a>1</a>', '<b>2</b>', '<c>3</c>' ]
+  );
+});
+
+test(`$.wrap`, (assert) => {
+  let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
+  $x.queryAll(`a,b`).wrap(`<xx />`);
+  assert.deepEqual(
+    $x.html(),
+    `<xx><a>1</a></xx><xx><b>2</b></xx><c>3</c>`
+  );
+});
+
+test(`$.wrap`, (assert) => {
+  let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
+  assert.deepEqual(
+    $x.queryAll(`a,b`).eq(0).text(),
+    `1`
+  );
+  assert.deepEqual(
+    $x.queryAll(`a,b`).eq(1).text(),
+    `2`
+  );
+  assert.deepEqual(
+    $x.queryAll(`a,b`).eq(2).text(),
+    ``
+  );
+});
+
+test(`$.not`, (assert) => {
+  let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
+  assert.deepEqual(
+    $x.queryAll(`a,b,c`).not(`a,b`).map((node) => node.outerHTML),
+    [ '<c>3</c>' ]
+  );
+  assert.deepEqual(
+    $x.queryAll(`a,b,c`).not((node) => node.matches(`a,b`)).map((node) => node.outerHTML),
+    [ '<c>3</c>' ]
+  );
+});

@@ -274,5 +274,4 @@ test(`nextSiblings iterates over next siblings`, (assert) => {
     Array.from(nextSiblings($.querySelector('foobar')), (n) => n.textContent),
     []
   );
-
 });

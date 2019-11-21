@@ -1,5 +1,5 @@
 const globalThis = require('globalthis')();
-
+const globalDocument = globalThis.document || globalThis.DOM_DOM_DOCUMENT;
 /**
  * iterator to collect text nodes from a dom element
  *
@@ -65,12 +65,12 @@ function fragmentToHtml(fragment) {
  *
  * @return  {HTMLElement}  Document Fragment
  */
-function createFragment(string = ``) {
+function createFragment(string = ``, document = globalDocument) {
   // the HTMLTemplateElement has a content property, which is a read-only
   // DocumentFragment containing the DOM subtree that the template represents.
-  const template = globalThis.document.createElement(`template`);
+  const template = document.createElement(`template`);
   template.innerHTML = string;
-  return template.content;
+  return template.content || template;
 }
 
 /**
@@ -80,8 +80,8 @@ function createFragment(string = ``) {
  *
  * @return  {HTMLElement}
  */
-function createElement(html = ``) {
-  return createFragment(html).firstElementChild;
+function createElement(string = ``, document = globalDocument) {
+  return createFragment(string, document).firstElementChild;
 }
 
 /**
@@ -91,8 +91,8 @@ function createElement(html = ``) {
  *
  * @return  {HTMLElement}
  */
-function createTextNode(text) {
-  return globalThis.document.createTextNode(text);
+function createTextNode(text, document = globalDocument) {
+  return document.createTextNode(text);
 }
 
 /**
@@ -110,13 +110,22 @@ function* parentsUntil(childNode, target) {
     yield current;
     current = current.parentElement;
   }
+}
 
-  function matches(el, comparator) {
-    if (typeof comparator === `string`) {
-      return el.matches(comparator);
-    }
-    return el.isSameNode(comparator);
+function matches(el, comparator) {
+  if (!el) {
+    return false;
   }
+  if (typeof comparator === `function`) {
+    return comparator(el);
+  }
+  if (typeof comparator === `string`) {
+    return el.matches && el.matches(comparator);
+  }
+  if (Array.isArray(comparator)) {
+    [ comparator ] = comparator;
+  }
+  return el.isSameNode(comparator);
 }
 
 /**
@@ -130,7 +139,7 @@ function* parentsUntil(childNode, target) {
  * @return  {HTMLElement|null}
  */
 function closest(el, selector) {
-  while (el && !(el.matches && el.matches(selector))) {
+  while (el && !matches(el, selector)) {
     el = el.parentElement;
   }
   return el;
