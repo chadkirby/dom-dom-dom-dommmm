@@ -39,6 +39,7 @@
     "test": "tests"
   },
   "files": [
+    "browser",
     "src",
     "node"
   ]

@@ -1,34 +1,54 @@
 const { DOMArray } = require('./dom-array');
-const { createElement } = require('./helpers');
-const { isNode } = require('./is-node');
+const { createFragment, fragmentToText, fragmentToHtml } = require('./helpers');
+const { isTextNode, isEl } = require('./is-node');
 
 module.exports = function(document) {
   function $(arg) {
     if (!arg) {
       return DOMArray.of();
     }
+    if (arg.cheerio === `[cheerio object]`) {
+      // adopt a cheerio instance, but we need the outerHTML & that's not easy to
+      // get...
+      arg = arg.clone().wrap(`<div />`).parent().html();
+    }
     if (Array.isArray(arg)) {
       return DOMArray.from(arg);
     }
-    if (isNode(arg)) {
+    if (isEl(arg) || isTextNode(arg)) {
       return DOMArray.of(arg);
     }
     if (typeof arg === `string`) {
-      if (/</.test(arg)) {
-        return DOMArray.of(createElement(arg, document));
+      if (isHtml(arg)) {
+        let doc = createFragment(arg, document);
+        return DOMArray.from(doc.childNodes);
       }
       return DOMArray.from(document.querySelectorAll(arg));
     }
   }
 
   Object.assign($, {
-    html(thing) {
-      if (Array.isArray(thing)) {
-        return thing.map((el) => el.outerHTML).join(``);
+    html(selector) {
+      if (typeof selector === `string`) {
+        return DOMArray.from(document.querySelectorAll(selector)).outerHtml();
       }
-      return thing.outerHTML;
+      if (DOMArray.isDOMArray(selector)) {
+        // goddamn cheerio
+        return selector.outerHtml();
+      }
+      return fragmentToHtml(document);
+    },
+    text(selector) {
+      if (typeof selector === `string`) {
+        return DOMArray.from(document.querySelectorAll(selector)).text();
+      }
+      return fragmentToText(document);
     }
   });
 
   return $;
 };
+
+function isHtml(string) {
+  return /<.+?>/.test(string);
+}

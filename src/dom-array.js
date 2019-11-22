@@ -1,8 +1,8 @@
 const globalThis = require('globalthis')();
 
-const { attr, closest, createElement, createTextNode, nextSiblings, parentsUntil, previousSiblings } = require('./helpers');
+const { attr, closest, createElement, createTextNode, hasDescendant, nextSiblings, nodeToSelector, parentsUntil, previousSiblings, unwrap } = require('./helpers');
 const { cssIs, cssSelectAll, cssSelectOne } = require('./css-select');
-const { isNode } = require('./is-node');
+const { isTextNode, isEl } = require('./is-node');
 
 class DOMArray extends Array {
   get DOMArray() {
@@ -98,7 +98,7 @@ class DOMArray extends Array {
     if (!selector) {
       return this;
     }
-    return super.filter((el) => cssIs(el, selector));
+    return this.filter((el) => cssIs(el, selector));
   }
   find(target) {
     return super.find(target);
@@ -111,8 +111,16 @@ class DOMArray extends Array {
   last() {
     return this.slice(-1);
   }
-  // jq
-  has(selector) {
+  // Filters the list to those with the given dom node as a descendant
+  hasNode(node) {
+    if (Array.isArray(node)) {
+      [ node ] = node;
+    }
+    return this.filter((el) => hasDescendant(el, node));
+  }
+  // Filters the list to those with a descendant that matches the given
+  // selector.
+  hasSelector(selector) {
     return this.filter((el) => cssSelectOne(el, selector));
   }
   // jq
@@ -120,8 +128,12 @@ class DOMArray extends Array {
     let [ el ] = this;
     if (el && str) {
       el.innerHTML = str;
+      return this;
     }
     return el ? el.innerHTML : ``;
+  }
+  outerHtml() {
+    return this.map((el) => el.outerHTML).join(``);
   }
   // jq
   index(target) {
@@ -135,12 +147,15 @@ class DOMArray extends Array {
       [ target ] = target;
     }
     let finder = target;
-    if (isNode(target)) {
+    if (isEl(target) || isTextNode(target)) {
       finder = (el) => target.isEqualNode(el);
     } else if (typeof target === `string`) {
       finder = (el) => cssIs(el, target);
     }
     return super.find(finder);
+  }
+  get isTextNode() {
+    return this.length && isTextNode(this[0]);
   }
   /**
    * Gets the next sibling of the first selected element, optionally filtered by
@@ -248,13 +263,20 @@ class DOMArray extends Array {
   }
 
   text(newText) {
-    if (newText !== undefined) {
-      this.forEach((el) => {
-        el.innerHTML = ``;
-        el.append(createTextNode(newText, el.ownerDocument));
-      });
+    if (newText || newText === ``) {
+      for (const el of this) {
+        el.textContent = newText;
+      }
+      return this;
     }
     return this.map((el) => el.textContent).join(``);
+  }
+
+  unwrap() {
+    for (const el of this) {
+      unwrap(el);
+    }
+    return this;
   }
 
   withoutSelector(selector) {
@@ -271,6 +293,10 @@ class DOMArray extends Array {
 
   toArray() {
     return Array.from(this);
+  }
+
+  toSelector() {
+    return this.map(nodeToSelector).join(`,`);
   }
 
   static isDOMArray(thing) {
@@ -301,11 +327,11 @@ function thingToNode(thing, document) {
   if (Array.isArray(thing)) {
     [ thing ] = thing;
   }
-  if (isNode(thing)) {
+  if (isEl(thing) || isTextNode(thing)) {
     return thing;
   }
   if (typeof thing === `string`) {
-    return createElement(thing, document);
+    return createElement(thing, document) || createTextNode(thing, document);
   }
   if (typeof thing === `function`) {
     return thing(document);

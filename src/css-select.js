@@ -1,9 +1,10 @@
 const CSSselect = require('css-select');
-const { isNode: isTag } = require('./is-node');
 
 const adapter = {
   // is the node a tag?
-  isTag,
+  isTag(elem) {
+    return elem.nodeType === 1;
+  },
 
   // does at least one of passed element nodes pass the test predicate?
   existsOne(test, elems) {
@@ -56,6 +57,9 @@ const adapter = {
   // whose ancestors are also in the array
   removeSubsets(nodes) {
     return [ ...new Set(nodes) ].filter((node, i, uniques) => {
+      if (!adapter.isTag(node)) {
+        return false;
+      }
       while ((node = node.parentElement)) {
         if (uniques.includes(node)) {
           return false;
@@ -103,11 +107,12 @@ module.exports = {
     if (!Array.isArray(nodes)) {
       nodes = [ nodes ];
     }
-    return [].concat(...nodes.map(
-      (node) => CSSselect(selector, node, {
-        adapter,
-        xmlMode: isXml(node)
-      }))
+    return [].concat(
+      ...adapter.removeSubsets(nodes).map(
+        (node) => CSSselect(selector, node, {
+          adapter,
+          xmlMode: isXml(node)
+        }))
     );
   },
 
@@ -115,7 +120,7 @@ module.exports = {
     if (!Array.isArray(nodes)) {
       nodes = [ nodes ];
     }
-    for (const node of nodes) {
+    for (const node of adapter.removeSubsets(nodes)) {
       let result = CSSselect.selectOne(selector, node, {
         adapter,
         xmlMode: isXml(node)

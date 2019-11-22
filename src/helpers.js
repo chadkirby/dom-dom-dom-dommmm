@@ -58,6 +58,19 @@ function fragmentToHtml(fragment) {
 }
 
 /**
+ * convert a document fragment to html
+ *
+ * @param   {HTMLElement}  fragment  document fragment
+ *
+ * @return  {string}
+ */
+function fragmentToText(fragment) {
+  return [ ...fragment.childNodes ].map(
+    (n) => n.textContent
+  ).join(``);
+}
+
+/**
  * create a document fragment from an html string
  * copied from JSDOM
  *
@@ -190,6 +203,29 @@ function* nextSiblings(el) {
   }
 }
 
+function nodeToSelector(node) {
+  return [
+    node.nodeName.toLowerCase(),
+    ...Array.from(node.attributes).map(
+      ({ name, value }) => value ? `[${name}="${value}"]` : ``
+    )
+  ].join(``);
+}
+
+function hasDescendant(parent, target) {
+  // traverse breadth-first
+  const queue = Array.from(parent.childNodes);
+  let current;
+  while ((current = queue.shift())) {
+    if (current === target) {
+      return true;
+    }
+    if (current.childNodes) {
+      queue.push(...current.childNodes);
+    }
+  }
+}
+
 module.exports = {
   attr,
   closest,
@@ -199,8 +235,11 @@ module.exports = {
   createTextNode,
   filterTextNodes,
   fragmentToHtml,
+  fragmentToText,
+  hasDescendant,
   parentsUntil,
   previousSiblings,
   nextSiblings,
+  nodeToSelector,
   unwrap
 };

@@ -1,5 +1,5 @@
 const test = require('./tape')(module);
-const { $, el } = require('../src/index');
+const { $, el, createTextNode } = require('../src/index');
 
 test(`$ wraps an element`, (assert) => {
   let $x = $(el`<span>foo</span>`);
@@ -16,7 +16,8 @@ test(`$ wraps an element`, (assert) => {
     `can filter element by selector`
   );
   assert.equal($x.html(), `foo`, `html function exists & returns innerHTML`);
-  assert.equal($x.html(`bar`), `bar`, `html function sets innerHTML`);
+  $x.html(`bar`);
+  assert.equal($x.html(), `bar`, `html function sets innerHTML & returns the domarray`);
 
   assert.ok(
     $x.first().is(span)
@@ -38,7 +39,8 @@ test(`$ wraps an html string`, (assert) => {
     `can filter element by selector`
   );
   assert.equal($x.html(), `foo`, `html function exists & returns innerHTML`);
-  assert.equal($x.html(`bar`), `bar`, `html function sets innerHTML`);
+  $x.html(`bar`);
+  assert.equal($x.html(), `bar`, `html function sets innerHTML`);
 });
 
 test(`$.query`, (assert) => {
@@ -104,6 +106,7 @@ test(`$.attr`, (assert) => {
     $x.is(`[foo^=b]`),
     $x[0]
   );
+  assert.equal($x.toSelector(), `span[id="3"][foo="bar"]`);
 });
 
 test(`$.attr`, (assert) => {
@@ -248,10 +251,19 @@ test(`$.siblings`, (assert) => {
   );
 });
 
-test(`$.has`, (assert) => {
+test(`$.hasSelector`, (assert) => {
   let $x = $(`<div><a><b><c /></b></a></div>`);
   assert.deepEqual(
-    $x.queryAll(`a,b,c`).has(`c`).map(({ outerHTML }) => outerHTML),
+    $x.queryAll(`a,b,c`).hasSelector(`c`).map(({ outerHTML }) => outerHTML),
+    [ '<a><b><c></c></b></a>', '<b><c></c></b>' ]
+  );
+});
+
+test(`$.hasNode`, (assert) => {
+  let $x = $(`<div><a><b><c /></b></a><a /></div>`);
+  let $c = $x.query(`c`);
+  assert.deepEqual(
+    $x.queryAll(`a,b,c`).hasNode($c).map(({ outerHTML }) => outerHTML),
     [ '<a><b><c></c></b></a>', '<b><c></c></b>' ]
   );
 });
@@ -289,10 +301,10 @@ test(`$.replaceWith`, (assert) => {
 test(`$.first/last`, (assert) => {
   let $x = $(`<span><a>foo</a><a>bar<c /></a></span>`);
   assert.notOk(
-    $x.queryAll(`a`).first().has(`c`).length
+    $x.queryAll(`a`).first().hasSelector(`c`).length
   );
   assert.ok(
-    $x.queryAll(`a`).last().has(`c`).length
+    $x.queryAll(`a`).last().hasSelector(`c`).length
   );
 });
 
@@ -304,13 +316,13 @@ test(`:has()`, (assert) => {
   );
 });
 
-test(`$.html`, (assert) => {
+test(`$.outerHtml`, (assert) => {
   assert.equal(
-    $.html(el`<span><a>foo</a><a>bar</a></span>`),
+    $(el`<span><a>foo</a><a>bar</a></span>`).outerHtml(),
     `<span><a>foo</a><a>bar</a></span>`
   );
   assert.equal(
-    $.html($(`<span><a>foo</a><a>bar</a></span>`)),
+    $(`<span><a>foo</a><a>bar</a></span>`).outerHtml(),
     `<span><a>foo</a><a>bar</a></span>`
   );
 });
@@ -351,6 +363,16 @@ test(`set text`, (assert) => {
   assert.equal(
     $x.html(),
     `<a>foo</a>`
+  );
+  $x = $(createTextNode('')).text('foo');
+  assert.equal(
+    $x.text(),
+    `foo`
+  );
+  $x = $(`<div />`).text('foo');
+  assert.equal(
+    $x[0].outerHTML,
+    `<div>foo</div>`
   );
 });
 
@@ -445,7 +467,6 @@ test(`$.not`, (assert) => {
   );
 });
 
-
 test(`$.css`, (assert) => {
   let $x = $(`<div><a style="color:blue;font-size:46px;"></a></div>`);
   assert.deepEqual(
@@ -458,4 +479,36 @@ test(`$.css`, (assert) => {
     `46px`
   );
 
+});
+
+test(`$.contents`, (assert) => {
+  let $x = $(`<div>abc<a>1</a>def</div>`);
+  assert.deepEqual(
+    $x.contents().map((node) => $(node).text()),
+    [ 'abc', '1', 'def' ]
+  );
+  assert.deepEqual(
+    $x.contents().filterSelector('a').map((node) => $(node).text()),
+    [  '1' ]
+  );
+  assert.deepEqual(
+    $x.contents().filter((node) => $(node).is('a')).map((node) => $(node).text()),
+    [ '1' ]
+  );
+  assert.deepEqual(
+    $x.contents().filter((node) => $(node).isTextNode).map((node) => $(node).text()),
+    [ 'abc', 'def' ]
+  );
+});
+
+test(`$.query with text nodes`, (assert) => {
+  let $x = $(`<div><a></a>foo</div>bar`);
+  assert.equal(
+    $x.query(`a`).length,
+    1
+  );
+  assert.equal(
+    $x.queryAll(`a`).length,
+    1
+  );
 });

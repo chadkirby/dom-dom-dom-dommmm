@@ -1,4 +1,23 @@
+const globalThis = require('globalthis')();
+const globalDocument = globalThis.document || globalThis.DOM_DOM_DOCUMENT;
 const { collectTextNodes, createFragment, createTextNode, fragmentToHtml } = require('./helpers');
+
+function makeDom(document) {
+  return function(...args) {
+    let $ = createFragment(assemble(...args), document);
+    for (const node of collectTextNodes($)) {
+      let trimmed = node.textContent.replace(/^\s*\n\s*|\s*\n\s*$/g, '');
+      if (node.textContent && !trimmed) {
+        // remove the node if we just emptied it out
+        node.remove();
+      } else {
+        node.textContent = trimmed;
+      }
+    }
+    return $;
+  };
+
+}
 
 /**
  * Tagged template function to convert possibly pretty html to an unpretty
@@ -10,19 +29,7 @@ const { collectTextNodes, createFragment, createTextNode, fragmentToHtml } = req
  *
  * @return  {HTMLElement}  document fragment
  */
-function dom(...args) {
-  let $ = createFragment(assemble(...args));
-  for (const node of collectTextNodes($)) {
-    let trimmed = node.textContent.replace(/^\s*\n\s*|\s*\n\s*$/g, '');
-    if (node.textContent && !trimmed) {
-      // remove the node if we just emptied it out
-      node.remove();
-    } else {
-      node.textContent = trimmed;
-    }
-  }
-  return $;
-}
+let dom = makeDom(globalDocument);
 
 /**
  * Tagged template function to convert html to an element. E.g.
@@ -66,6 +73,24 @@ function unpretty(...args) {
   return fragmentToHtml($);
 }
 
+function unprettyx(...args) {
+  let document;
+  let xml = `<?xml version="1.0" encoding="utf-8" ?><root />`;
+  if (globalThis.DOMParser) {
+    document = new globalThis.DOMParser().parseFromString(
+      xml,
+      "text/xml"
+    );
+  } else if (globalThis.DOM_DOM_JSDOM) {
+    document = new globalThis.DOM_DOM_JSDOM(xml, {
+      contentType: "text/xml"
+    }).window.document;
+  }
+
+  let $ = makeDom(document)(...args);
+  return fragmentToHtml($);
+}
+
 /**
  * assemble a template literal into a string
  */
@@ -79,5 +104,6 @@ module.exports = {
   dom,
   el,
   text,
-  unpretty
+  unpretty,
+  unprettyx
 };
