@@ -131,10 +131,12 @@ class DOMArray extends Array {
       }
       return this;
     }
-    return el ? el.innerHTML : ``;
+    return this.map((el) => el.innerHTML || el.textContent).join(``);
   }
   outerHtml() {
-    return this.map((el) => el.outerHTML).join(``);
+    return this.map(
+      (el) => el.outerHTML || el.textContent
+    ).join(``);
   }
   // jq
   index(target) {
