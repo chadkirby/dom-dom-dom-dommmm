@@ -125,9 +125,10 @@ class DOMArray extends Array {
   }
   // jq
   html(str) {
-    let [ el ] = this;
-    if (el && str) {
-      el.innerHTML = str;
+    if (str !== undefined) {
+      for (const el of this) {
+        el.innerHTML = str;
+      }
       return this;
     }
     return el ? el.innerHTML : ``;
