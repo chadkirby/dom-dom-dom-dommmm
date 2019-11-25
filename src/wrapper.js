@@ -19,15 +19,19 @@ module.exports = function(document) {
       return DOMArray.of(arg);
     }
     if (typeof arg === `string`) {
-      if (isHtml(arg)) {
-        let doc = createFragment(arg, document);
-        return DOMArray.from(doc.childNodes);
-      }
-      return DOMArray.from(document.querySelectorAll(arg));
+      let doc = createFragment(arg, document);
+      return DOMArray.from(doc.childNodes);
     }
   }
 
   Object.assign($, {
+    query(selector) {
+      let found = document.querySelector(selector);
+      return found ? DOMArray.of(found) : DOMArray.of();
+    },
+    queryAll(selector) {
+      return DOMArray.from(document.querySelectorAll(selector));
+    },
     html(selector) {
       if (typeof selector === `string`) {
         return DOMArray.from(document.querySelectorAll(selector)).outerHtml();
