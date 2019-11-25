@@ -26,10 +26,10 @@ class DOMArray extends Array {
   }
   // jq
   attr(name, value) {
-    if (!this.length) {
-      return null;
-    }
     let [ first ] = this;
+    if (!(first && first.getAttribute)) {
+      return {};
+    }
     if (!name) {
       return attr(first);
     }
