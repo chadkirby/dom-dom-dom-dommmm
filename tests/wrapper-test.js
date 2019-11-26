@@ -458,7 +458,7 @@ test(`$.wrap`, (assert) => {
 test(`$.not`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   assert.deepEqual(
-    $x.queryAll(`a,b,c`).withoutSelector(`a,b`).map((node) => node.outerHTML),
+    $x.queryAll(`a,b,c`).without(`a,b`).map((node) => node.outerHTML),
     [ '<c>3</c>' ]
   );
   assert.deepEqual(

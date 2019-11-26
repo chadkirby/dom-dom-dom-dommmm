@@ -282,7 +282,7 @@ class DOMArray extends Array {
     return this;
   }
 
-  withoutSelector(selector) {
+  without(selector) {
     return this.filter((el) => !cssIs(el, selector));
   }
 
