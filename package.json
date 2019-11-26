@@ -19,7 +19,7 @@
   "author": "Chad Kirby",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^6.0.0",
+    "eslint": "^6.6.0",
     "eslint-plugin-turbopatent": "^4.0.0",
     "jsdom": "^15.2.1",
     "tap-difflet": "^0.7.1",
@@ -29,7 +29,9 @@
   },
   "dependencies": {
     "css-select": "^2.1.0",
-    "globalthis": "^1.0.0"
+    "globalthis": "^1.0.0",
+    "is-electron": "^2.2.0",
+    "is-node": "^1.0.2"
   },
   "bugs": {
     "url": "https://github.com/chadkirby/splice-chars/issues"
