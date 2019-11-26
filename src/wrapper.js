@@ -54,7 +54,7 @@ let CHEERIO_OUTER_HTML;
 function getCheerioHtml($html) {
   if (!CHEERIO_OUTER_HTML) {
     if (globalThis.DOM_DOM_CHEERIO) {
-      CHEERIO_OUTER_HTML = globalThis.DOM_DOM_CHEERIO.load().html;
+      CHEERIO_OUTER_HTML = globalThis.DOM_DOM_CHEERIO.load(``).html;
     } else {
       CHEERIO_OUTER_HTML = ($ht) => $ht.clone().wrap(`<div />`).parent().html();
     }
