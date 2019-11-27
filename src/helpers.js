@@ -79,11 +79,18 @@ function fragmentToText(fragment) {
  * @return  {HTMLElement}  Document Fragment
  */
 function createFragment(string = ``, document = globalDocument) {
-  // the HTMLTemplateElement has a content property, which is a read-only
-  // DocumentFragment containing the DOM subtree that the template represents.
   const template = document.createElement(`template`);
   template.innerHTML = string;
-  return template.content || template;
+  if (template.content) {
+    // the HTMLTemplateElement has a content property, which is a read-only
+    // DocumentFragment containing the DOM subtree that the template represents.
+    return template.content;
+  }
+  let fragment = document.createDocumentFragment();
+  while (template.firstChild) {
+    fragment.append(template.firstChild);
+  }
+  return fragment;
 }
 
 /**
