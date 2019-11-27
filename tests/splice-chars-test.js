@@ -1,5 +1,5 @@
-let test = require('./tape')(module);
-let { spliceChars, createElement, createFragment, fragmentToHtml } = require('../src/index');
+const test = require('./tape')(module);
+const { spliceChars, createElement, createFragment, fragmentToHtml } = require('../src/index');
 
 test('spliceChars exports something', function(assert) {
   assert.equal(typeof spliceChars, `function`, `spliceChars function exists`);

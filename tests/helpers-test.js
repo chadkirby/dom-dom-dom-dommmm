@@ -1,5 +1,5 @@
-let test = require('./tape')(module);
-let {
+const test = require('./tape')(module);
+const {
   attr,
   closest,
   collectTextNodes,
@@ -10,6 +10,8 @@ let {
   filterTextNodes,
   fragmentToHtml,
   parentsUntil,
+  previousSiblings,
+  nextSiblings,
   unwrap
 } = require('../src/index');
 
@@ -214,5 +216,62 @@ test(`attr returns attributes as a POJO`, (assert) => {
     attr(el``),
     {},
     `non-existent element returns empty object`
+  );
+});
+
+test(`previousSiblings iterates over previous siblings`, (assert) => {
+  let $ = el`<h3>
+    <a>1</a>
+    2<c>3</c>
+    <d>4<e>5</e></d>
+    <f>6</f>
+  </h3>`;
+  assert.deepEqual(
+    Array.from(previousSiblings($.querySelector('f')), (n) => n.textContent),
+    [ '45', '3', '2', '1' ]
+  );
+
+  assert.deepEqual(
+    Array.from(previousSiblings($.querySelector('e')), (n) => n.textContent),
+    [ '4' ]
+  );
+
+  assert.deepEqual(
+    Array.from(previousSiblings($.querySelector('a')), (n) => n.textContent),
+    []
+  );
+
+  assert.deepEqual(
+    Array.from(previousSiblings($.querySelector('foobar')), (n) => n.textContent),
+    []
+  );
+
+});
+
+test(`nextSiblings iterates over next siblings`, (assert) => {
+  let $ = el`<h3>
+    <a>1</a>
+    2<c>3</c>
+    <d>4<e>5</e></d>
+    <f>6</f>
+  </h3>`;
+  assert.deepEqual(
+    Array.from(nextSiblings($.querySelector('a')), (n) => n.textContent),
+    [ '2', '3', '45', '6' ]
+  );
+
+  assert.deepEqual(
+    Array.from(nextSiblings($.querySelector('d').firstChild), (n) => n.textContent),
+    [ '5' ]
+  );
+
+  assert.deepEqual(
+    Array.from(nextSiblings($.querySelector('f')), (n) => n.textContent),
+    []
+  );
+
+  assert.deepEqual(
+    Array.from(nextSiblings($.querySelector('foobar')), (n) => n.textContent),
+    []
   );
 });

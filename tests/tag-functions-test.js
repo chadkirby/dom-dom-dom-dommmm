@@ -1,5 +1,5 @@
-let test = require('./tape')(module);
-let { dom, el, unpretty, fragmentToHtml } = require('../src/index');
+const test = require('./tape')(module);
+const { dom, el, text, unpretty, fragmentToHtml } = require('../src/index');
 
 test(`el creates element`, (assert) => {
   assert.equal(
@@ -126,5 +126,29 @@ test(`unpretty de-formats an html string`, (assert) => {
       </span>
     </p>`,
     `<p>foo<span>bar</span>baz<span>bat</span></p>`
+  );
+});
+
+test(`text creates text node`, (assert) => {
+  assert.equal(
+    text`<span />`.textContent,
+    `<span />`
+  );
+
+  assert.equal(
+    text`<span />`.nodeName,
+    `#text`
+  );
+
+  assert.equal(
+    text`
+    123
+    `.textContent,
+    `\n    123\n    `
+  );
+
+  assert.equal(
+    text``.textContent,
+    ``
   );
 });
