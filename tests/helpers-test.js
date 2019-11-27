@@ -10,10 +10,24 @@ const {
   filterTextNodes,
   fragmentToHtml,
   parentsUntil,
+  parse,
   previousSiblings,
   nextSiblings,
   unwrap
 } = require('../src/index');
+
+test(`createFragment creates fragment`, (assert) => {
+  let $ = createFragment(`Hello<span> </span>World`);
+  assert.equal($.nodeName, `#document-fragment`);
+  assert.equal($.ownerDocument.contentType, `text/html`);
+  assert.equal(fragmentToHtml($), `Hello<span> </span>World`);
+
+  let xmlDoc = parse(`<root />`, `text/xml`);
+  $ = createFragment(`Hello<span> </span>World`, xmlDoc);
+  assert.equal($.nodeName, `#document-fragment`);
+  assert.equal($.ownerDocument.contentType, `text/xml`);
+  assert.equal(fragmentToHtml($), `Hello<span> </span>World`);
+});
 
 test(`collectTextNodes collects text nodes`, (assert) => {
   let $ = createFragment(`<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`);
