@@ -34,13 +34,13 @@ module.exports = function(document) {
       return DOMArray.from(document.querySelectorAll(selector));
     },
     html(selector) {
-      if (typeof selector === `string`) {
+      if (selector) {
         return DOMArray.from(document.querySelectorAll(selector)).outerHtml();
       }
       return fragmentToHtml(document);
     },
     text(selector) {
-      if (typeof selector === `string`) {
+      if (selector) {
         return DOMArray.from(document.querySelectorAll(selector)).text();
       }
       return fragmentToText(document);

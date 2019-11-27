@@ -29,9 +29,7 @@
   },
   "dependencies": {
     "css-select": "^2.1.0",
-    "globalthis": "^1.0.0",
-    "is-electron": "^2.2.0",
-    "is-node": "^1.0.2"
+    "globalthis": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/chadkirby/splice-chars/issues"
@@ -41,9 +39,7 @@
     "test": "tests"
   },
   "files": [
-    "browser",
     "setup",
-    "src",
-    "node"
+    "src"
   ]
 }
