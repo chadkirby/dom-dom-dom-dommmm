@@ -1,7 +1,7 @@
-const globalThis = require('globalthis')();
 const { DOMArray } = require('./dom-array');
 const { createFragment, fragmentToText, fragmentToHtml } = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
+const { cheerio } = require('./dom');
 
 module.exports = function(document) {
   function $(arg) {
@@ -53,8 +53,8 @@ module.exports = function(document) {
 let CHEERIO_OUTER_HTML;
 function getCheerioHtml($html) {
   if (!CHEERIO_OUTER_HTML) {
-    if (globalThis.DOM_DOM_CHEERIO) {
-      CHEERIO_OUTER_HTML = globalThis.DOM_DOM_CHEERIO.load(``).html;
+    if (cheerio) {
+      CHEERIO_OUTER_HTML = cheerio.load(``).html;
     } else {
       CHEERIO_OUTER_HTML = ($ht) => $ht.clone().wrap(`<div />`).parent().html();
     }

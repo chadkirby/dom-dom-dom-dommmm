@@ -1,24 +1,16 @@
-const globalThis = require('globalthis')();
-
 const wrapper = require('./wrapper');
+const { parse } = require('./helpers');
+const { document } = require('./dom');
 
-exports.document = globalThis.DOM_DOM_DOCUMENT || globalThis.document;
-exports.window = globalThis.DOM_DOM_WINDOW || globalThis.window;
+exports.loadHtml = (html = ``) => wrapper(parse(html, "text/html"));
 
-const DOMParser = exports.window.DOMParser;
-exports.parse = (string, contentType) => new DOMParser().parseFromString(
-  string,
-  contentType
-);
+exports.loadXml = (xml = `<root />`) => wrapper(parse(xml, "text/xml"));
 
-exports.loadHtml = (html = ``) => wrapper(exports.parse(html, "text/html"));
-
-exports.loadXml = (xml = `<root />`) => wrapper(exports.parse(xml, "text/xml"));
-
-exports.$ = wrapper(exports.document);
+exports.$ = wrapper(document);
 
 Object.assign(
   exports,
+  require('./dom'),
   require('./helpers'),
   require('./splice-chars'),
   require('./tag-functions')

@@ -1,5 +1,4 @@
-const globalThis = require('globalthis')();
-const globalDocument = globalThis.document || globalThis.DOM_DOM_DOCUMENT;
+const { window, document: globalDocument } = require('./dom');
 const { collectTextNodes, createFragment, createTextNode, fragmentToHtml } = require('./helpers');
 
 function makeDom(document) {
@@ -76,16 +75,10 @@ function unpretty(...args) {
 function unprettyx(...args) {
   let document;
   let xml = `<?xml version="1.0" encoding="utf-8" ?><root />`;
-  if (globalThis.DOMParser) {
-    document = new globalThis.DOMParser().parseFromString(
-      xml,
-      "text/xml"
-    );
-  } else if (globalThis.DOM_DOM_JSDOM) {
-    document = new globalThis.DOM_DOM_JSDOM(xml, {
-      contentType: "text/xml"
-    }).window.document;
-  }
+  document = new window.DOMParser().parseFromString(
+    xml,
+    "text/xml"
+  );
 
   let $ = makeDom(document)(...args);
   return fragmentToHtml($);
