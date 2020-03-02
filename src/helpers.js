@@ -1,5 +1,4 @@
-const globalThis = require('globalthis')();
-const globalDocument = globalThis.document || globalThis.DOM_DOM_DOCUMENT;
+const { window, document: globalDocument } = require('./dom');
 /**
  * iterator to collect text nodes from a dom element
  *
@@ -233,6 +232,14 @@ function hasDescendant(parent, target) {
   }
 }
 
+function parse(string, contentType) {
+  return new window.DOMParser().parseFromString(
+    string,
+    contentType
+  );
+}
+
+
 module.exports = {
   attr,
   closest,
@@ -245,6 +252,7 @@ module.exports = {
   fragmentToText,
   hasDescendant,
   parentsUntil,
+  parse,
   previousSiblings,
   nextSiblings,
   nodeToSelector,
