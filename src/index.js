@@ -1,17 +1,26 @@
 const wrapper = require('./wrapper');
 const { parse } = require('./helpers');
-const { document } = require('./dom');
+const DOM = require('./dom');
 
-exports.loadHtml = (html = ``) => wrapper(parse(html, "text/html"));
+let $;
 
-exports.loadXml = (xml = `<root />`) => wrapper(parse(xml, "text/xml"));
+module.exports = {
+  loadHtml: (html = ``) => wrapper(parse(html, "text/html")),
 
-exports.$ = wrapper(document);
+  loadXml: (xml = `<root />`) => wrapper(parse(xml, "text/xml")),
 
-Object.assign(
-  exports,
-  require('./dom'),
-  require('./helpers'),
-  require('./splice-chars'),
-  require('./tag-functions')
-);
+  get $() {
+    if (!$) {
+      $ = wrapper(DOM.document);
+    }
+    return $;
+  },
+
+  ...DOM,
+  ...require('./helpers'),
+  ...require('./splice-chars'),
+  ...require('./tag-functions')
+
+};
+
+

@@ -15,8 +15,8 @@ module.exports = function(document) {
       return DOMArray.of(arg);
     }
     if (arg.cheerio === `[cheerio object]`) {
-      // adopt a cheerio instance, but we need the outerHTML & that's not easy to
-      // get...
+      // adopt a cheerio instance, but we need the outerHTML & that's
+      // not easy to get...
       arg = getCheerioHtml(arg);
     }
     if (typeof arg === `string`) {

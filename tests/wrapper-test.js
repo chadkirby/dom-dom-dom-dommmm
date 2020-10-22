@@ -11,7 +11,7 @@ test(`$ wraps an element`, (assert) => {
     `<span>foo</span>`
   );
   assert.equal(
-    $x.filterSelector(`span`)[0],
+    $x.filter(`span`)[0],
     span,
     `can filter element by selector`
   );
@@ -34,7 +34,7 @@ test(`$ wraps an html string`, (assert) => {
     `<span>foo</span>`
   );
   assert.deepEqual(
-    $x.filterSelector(`span`),
+    $x.filter(`span`),
     [ span ],
     `can filter element by selector`
   );
@@ -63,11 +63,11 @@ test(`$.query`, (assert) => {
     2
   );
   assert.equal(
-    $x.queryAll(`a`).filter((a) => a.querySelector(`c`)).length,
+    $x.queryAll(`a`).filter((i, a) => a.querySelector(`c`)).length,
     1
   );
   assert.equal(
-    $x.queryAll(`a`).filter((a) => a.querySelector(`c`)).html(),
+    $x.queryAll(`a`).filter((i, a) => a.querySelector(`c`)).html(),
     `bar<c></c>`
   );
   assert.equal(
@@ -96,15 +96,15 @@ test(`$.attr`, (assert) => {
   );
   assert.equal(
     $x.is(`[id]`),
-    $x[0]
+    true
   );
   assert.equal(
     $x.is(`[id=3]`),
-    $x[0]
+    true
   );
   assert.equal(
     $x.is(`[foo^=b]`),
-    $x[0]
+    true
   );
   assert.equal($x.toSelector(), `span[id="3"][foo="bar"]`);
 });
@@ -148,7 +148,7 @@ test(`$.query.filter`, (assert) => {
     `<a>foo</a><c>bar</c>`
   );
   assert.deepEqual(
-    $x.queryAll(`a,c`).filterSelector(`c`).text(),
+    $x.queryAll(`a,c`).filter(`c`).text(),
     `bar`
   );
 });
@@ -337,7 +337,7 @@ test(`$.append`, (assert) => {
     `<a>foo</a><c>bar</c>`
   );
   assert.deepEqual(
-    $x.queryAll(`a,c`).filterSelector(`c`).text(),
+    $x.queryAll(`a,c`).filter(`c`).text(),
     `bar`
   );
 
@@ -387,7 +387,7 @@ test(`$.before`, (assert) => {
     `<a>foo</a><c>bar</c>`
   );
   assert.deepEqual(
-    $x.queryAll(`a,c`).filterSelector(`c`).text(),
+    $x.queryAll(`a,c`).filter(`c`).text(),
     `bar`
   );
 });
@@ -403,7 +403,7 @@ test(`$.parent`, (assert) => {
     `<a>foo<c>bar</c></a>`
   );
   assert.deepEqual(
-    $c.parent()[0].outerHTML,
+    $c.parent().outerHtml(),
     `<a>foo<c>bar</c></a>`
   );
 });
@@ -462,7 +462,7 @@ test(`$.not`, (assert) => {
     [ '<c>3</c>' ]
   );
   assert.deepEqual(
-    $x.queryAll(`a,b,c`).filter((node) => !node.matches(`a,b`)).map((node) => node.outerHTML),
+    $x.queryAll(`a,b,c`).filter((i, node) => !node.matches(`a,b`)).map((node) => node.outerHTML),
     [ '<c>3</c>' ]
   );
 });
@@ -488,15 +488,15 @@ test(`$.contents`, (assert) => {
     [ 'abc', '1', 'def' ]
   );
   assert.deepEqual(
-    $x.contents().filterSelector('a').map((node) => $(node).text()),
+    $x.contents().filter('a').map((node) => $(node).text()),
     [  '1' ]
   );
   assert.deepEqual(
-    $x.contents().filter((node) => $(node).is('a')).map((node) => $(node).text()),
+    $x.contents().filter((i, node) => $(node).is('a')).map((node) => $(node).text()),
     [ '1' ]
   );
   assert.deepEqual(
-    $x.contents().filter((node) => $(node).isTextNode).map((node) => $(node).text()),
+    $x.contents().filter((i, node) => $(node).isTextNode).map((node) => $(node).text()),
     [ 'abc', 'def' ]
   );
 });
