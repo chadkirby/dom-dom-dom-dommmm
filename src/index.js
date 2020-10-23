@@ -5,9 +5,9 @@ const DOM = require('./dom');
 let $;
 
 module.exports = {
-  loadHtml: (html = ``) => wrapper(parse(html, "text/html")),
+  loadHtml: (html = ``, { toHtml } = {}) => wrapper(parse(html, "text/html"), toHtml),
 
-  loadXml: (xml = `<root />`) => wrapper(parse(xml, "text/xml")),
+  loadXml: (xml = `<root />`, { toHtml } = {}) => wrapper(parse(xml, "text/xml"), toHtml),
 
   get $() {
     if (!$) {
