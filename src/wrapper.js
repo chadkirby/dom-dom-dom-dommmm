@@ -1,10 +1,8 @@
 const { DOMArray } = require('./dom-array');
 const { createFragment, fragmentToText, fragmentToHtml, isHtml } = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
-const { cheerio } = require('./dom');
-let cheerio$;
 
-module.exports = function(document) {
+module.exports = function(document, toHtml = () => false) {
   function $(arg) {
     if (!arg) {
       return DOMArray.of();
@@ -25,18 +23,7 @@ module.exports = function(document) {
       }
       return DOMArray.from(document.querySelectorAll(arg));
     }
-    let html;
-    if (arg.cheerio === `[cheerio object]`) {
-      // adopt a cheerio instance, but we need the outerHTML & that's
-      // not easy to get...
-      html = getCheerioHtml(arg);
-    } else if (cheerio && [ 'type', 'name', 'attribs', 'parent' ].every(
-      (p) => arg.hasOwnProperty(p) // eslint-disable-line no-prototype-builtins
-    )) {
-      // adopt a cheerio DOM object
-      cheerio$ = cheerio$ || cheerio.load('<html />');
-      html = cheerio$.html(arg);
-    }
+    let html = toHtml(arg);
     if (html) {
       return DOMArray.from(createFragment(html, document).childNodes);
     }
@@ -69,15 +56,3 @@ module.exports = function(document) {
 
   return $;
 };
-
-let CHEERIO_OUTER_HTML;
-function getCheerioHtml($html) {
-  if (!CHEERIO_OUTER_HTML) {
-    if (cheerio) {
-      CHEERIO_OUTER_HTML = cheerio.load(``).html;
-    } else {
-      CHEERIO_OUTER_HTML = ($ht) => $ht.clone().wrap(`<div />`).parent().html();
-    }
-  }
-  return CHEERIO_OUTER_HTML($html);
-}
