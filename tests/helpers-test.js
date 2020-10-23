@@ -13,6 +13,7 @@ const {
   parse,
   previousSiblings,
   nextSiblings,
+  splitSearch,
   unwrap
 } = require('../src/index');
 
@@ -288,4 +289,38 @@ test(`nextSiblings iterates over next siblings`, (assert) => {
     Array.from(nextSiblings($.querySelector('foobar')), (n) => n.textContent),
     []
   );
+});
+
+test(`splitSearch splits & searches`, (assert) => {
+  let $ = createFragment(`<h3><a>1<b> 2<c>3 <d> 4 <e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`);
+
+  assert.deepEqual(
+    splitSearch($.querySelector('h3'), /1/),
+    [ $.querySelector('a').childNodes[0] ]
+  );
+  assert.deepEqual(
+    splitSearch($.querySelector('h3'), /2/),
+    [ $.querySelector('b').childNodes[1] ]
+  );
+  assert.deepEqual(
+    splitSearch($.querySelector('h3'), /3/),
+    [ $.querySelector('c').childNodes[0] ]
+  );
+  assert.deepEqual(
+    [ ...$.querySelector('c').childNodes ].map((x) => x.textContent),
+    [ "3", " ", " 4 5678", "9" ],
+    'first text node is split in two'
+  );
+  assert.deepEqual(
+    splitSearch($.querySelector('h3'), /567/),
+    [ ...collectTextNodes($.querySelector('e')) ]
+  );
+
+  assert.deepEqual(
+    splitSearch($.querySelector('h3'), /\d{2}/g).map(
+      (res) => res.map((x) => x.textContent)
+    ),
+    [ [ '2', '3' ], [ '5', '6' ], [ '7', '8' ] ]
+  );
+
 });
