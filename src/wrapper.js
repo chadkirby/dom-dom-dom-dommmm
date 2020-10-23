@@ -1,12 +1,16 @@
 const { DOMArray } = require('./dom-array');
-const { createFragment, fragmentToText, fragmentToHtml } = require('./helpers');
+const { createFragment, fragmentToText, fragmentToHtml, isHtml } = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
 const { cheerio } = require('./dom');
+let cheerio$;
 
 module.exports = function(document) {
   function $(arg) {
     if (!arg) {
       return DOMArray.of();
+    }
+    if (arg.isDOMArray) {
+      return arg;
     }
     if (Array.isArray(arg)) {
       return DOMArray.from(arg);
@@ -14,14 +18,27 @@ module.exports = function(document) {
     if (isEl(arg) || isTextNode(arg)) {
       return DOMArray.of(arg);
     }
+    if (typeof arg === `string`) {
+      if (isHtml(arg)) {
+        let fragment = createFragment(arg, document);
+        return DOMArray.from(fragment.childNodes);
+      }
+      return DOMArray.from(document.querySelectorAll(arg));
+    }
+    let html;
     if (arg.cheerio === `[cheerio object]`) {
       // adopt a cheerio instance, but we need the outerHTML & that's
       // not easy to get...
-      arg = getCheerioHtml(arg);
+      html = getCheerioHtml(arg);
+    } else if (cheerio && [ 'type', 'name', 'attribs', 'parent' ].every(
+      (p) => arg.hasOwnProperty(p) // eslint-disable-line no-prototype-builtins
+    )) {
+      // adopt a cheerio DOM object
+      cheerio$ = cheerio$ || cheerio.load('<html />');
+      html = cheerio$.html(arg);
     }
-    if (typeof arg === `string`) {
-      let doc = createFragment(arg, document);
-      return DOMArray.from(doc.childNodes);
+    if (html) {
+      return DOMArray.from(createFragment(html, document).childNodes);
     }
   }
 
@@ -33,9 +50,12 @@ module.exports = function(document) {
     queryAll(selector) {
       return DOMArray.from(document.querySelectorAll(selector));
     },
-    html(selector) {
-      if (selector) {
-        return DOMArray.from(document.querySelectorAll(selector)).outerHtml();
+    html(thing) {
+      if (typeof thing === 'string') {
+        return DOMArray.from(document.querySelectorAll(thing)).outerHtml();
+      }
+      if (DOMArray.isDOMArray(thing)) {
+        return thing.outerHtml();
       }
       return fragmentToHtml(document);
     },

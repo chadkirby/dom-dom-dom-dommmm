@@ -1,9 +1,9 @@
 
 module.exports = {
   isTextNode(thing) {
-    return thing && thing.nodeType === 3;
+    return thing && thing.ownerDocument && thing.nodeType === 3;
   },
   isEl(thing) {
-    return thing && thing.nodeType === 1;
+    return thing && thing.ownerDocument && thing.nodeType === 1;
   }
 };

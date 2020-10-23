@@ -1,4 +1,5 @@
 const { window, document: globalDocument } = require('./dom');
+const { isTextNode } = require('./is-node');
 /**
  * iterator to collect text nodes from a dom element
  *
@@ -16,7 +17,7 @@ function* collectTextNodes(el, endNode) {
       // stop the generator if this child is the end node
       return true;
     }
-    if (child.nodeName === `#text`) {
+    if (isTextNode(child)) {
       yield child;
     } else if (yield* collectTextNodes(child, endNode)) {
       // stop the generator if this child contained the end node
@@ -52,7 +53,7 @@ function* filterTextNodes(el, filterFn) {
  */
 function fragmentToHtml(fragment) {
   return [ ...fragment.childNodes ].map(
-    (n) => n.nodeName === `#text` ? n.textContent : n.outerHTML
+    (n) => isTextNode(n) ? n.textContent : n.outerHTML
   ).join(``);
 }
 
@@ -203,8 +204,20 @@ function* previousSiblings(el) {
   }
 }
 
+function* previousElementSiblings(el) {
+  while (el && (el = el.previousElementSibling)) {
+    yield el;
+  }
+}
+
 function* nextSiblings(el) {
   while (el && (el = el.nextSibling)) {
+    yield el;
+  }
+}
+
+function* nextElementSiblings(el) {
+  while (el && (el = el.nextElementSibling)) {
     yield el;
   }
 }
@@ -239,6 +252,12 @@ function parse(string, contentType) {
   );
 }
 
+function isSelector(thing) {
+  return typeof thing === 'string' && !isHtml(thing);
+}
+function isHtml(thing) {
+  return typeof thing === 'string' && /^\s*<\w.*?>/.test(thing);
+}
 
 module.exports = {
   attr,
@@ -251,9 +270,13 @@ module.exports = {
   fragmentToHtml,
   fragmentToText,
   hasDescendant,
+  isHtml,
+  isSelector,
   parentsUntil,
   parse,
+  previousElementSiblings,
   previousSiblings,
+  nextElementSiblings,
   nextSiblings,
   nodeToSelector,
   unwrap
