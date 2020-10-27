@@ -104,7 +104,7 @@ test(`$.attr`, (assert) => {
     true
   );
   assert.equal(
-    $x.is(`[id=3]`),
+    $x.is(`[id="3"]`),
     true
   );
   assert.equal(
@@ -318,14 +318,6 @@ test(`$.first/last`, (assert) => {
   );
   assert.ok(
     $x.queryAll(`a`).last().has(`c`).length
-  );
-});
-
-test(`:has()`, (assert) => {
-  let $x = $(`<div><a></a><a><c /></a></div>`);
-  assert.deepEqual(
-    $x.query(`a:has(c)`)[0].outerHTML,
-    `<a><c></c></a>`
   );
 });
 
