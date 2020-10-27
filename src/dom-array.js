@@ -1,8 +1,9 @@
-const { window, document } = require('./dom');
+const DOM = require('./dom');
+const CSS = require('./css-adapter');
 
 const { attr, closest, createElement, createFragment, createTextNode, hasDescendant, isHtml, isSelector, nextElementSiblings, nextSiblings, nodeToSelector, parentsUntil, previousElementSiblings, previousSiblings, unwrap } = require('./helpers');
-const { cssIs, cssSelectAll, cssSelectOne } = require('./css-select');
 const { isTextNode, isEl } = require('./is-node');
+const { removeSubsets } = require('./remove-subsets');
 
 class DOMArray extends Array {
   get DOMArray() {
@@ -11,11 +12,11 @@ class DOMArray extends Array {
   // jq
   add(content) {
     if (isSelector(content)) {
-      let newElems = cssSelectAll(document.body, content);
+      let newElems = this.constructor.cssSelectAll([ DOM.document.body ], content);
       return this.concat(newElems);
     }
     if (isHtml(content)) {
-      let newElems = [ ...createFragment(content, document).childNodes ];
+      let newElems = [ ...createFragment(content, DOM.document).childNodes ];
       return this.concat(newElems);
     }
     if (isEl(content) || Array.isArray(content)) {
@@ -103,7 +104,7 @@ class DOMArray extends Array {
 
   css(property) {
     if (this.length) {
-      return window.getComputedStyle(this[0]).getPropertyValue(property);
+      return DOM.window.getComputedStyle(this[0]).getPropertyValue(property);
     }
     return ``;
   }
@@ -137,7 +138,7 @@ class DOMArray extends Array {
       return this;
     }
     if (isSelector(target)) {
-      return this.arrayFilter((el) => cssIs(el, target));
+      return this.arrayFilter((el) => this.constructor.cssIs(el, target));
     }
     if (typeof target === 'function') {
       return this.arrayFilter((el, i) => target.bind(el)(i, el));
@@ -170,7 +171,8 @@ class DOMArray extends Array {
     if (isSelector(thing)) {
       // Filter the list to those with a descendant that matches the
       // given selector.
-      return this.filter((i, el) => cssSelectOne(el, thing));
+      let { constructor: PROTO } = this;
+      return this.filter((i, el) => PROTO.cssSelectOne([ el ], thing));
     }
     if (Array.isArray(thing)) {
       [ thing ] = thing;
@@ -207,7 +209,7 @@ class DOMArray extends Array {
     if (isEl(target) || isTextNode(target)) {
       finder = (el) => target === el;
     } else if (isSelector(target)) {
-      finder = (el) => cssIs(el, target);
+      finder = (el) => this.constructor.cssIs(el, target);
     } else {
       throw new Error('unknown is target');
     }
@@ -258,7 +260,7 @@ class DOMArray extends Array {
   }
   not(target) {
     if (isSelector(target)) {
-      return this.arrayFilter((el) => !cssIs(el, target));
+      return this.arrayFilter((el) => !this.constructor.cssIs(el, target));
     }
     if (typeof target === 'function') {
       return this.arrayFilter((el, i) => !target.bind(el)(i, el));
@@ -319,11 +321,11 @@ class DOMArray extends Array {
 
   query(selector) {
     let { constructor: PROTO } = this;
-    let found = cssSelectOne(this, selector);
+    let found = PROTO.cssSelectOne(this, selector);
     return found ? PROTO.of(found) : PROTO.of();
   }
   queryAll(selector) {
-    return this.constructor.from(cssSelectAll(this, selector));
+    return this.constructor.from(this.constructor.cssSelectAll(this, selector));
   }
 
   remove() {
@@ -380,7 +382,7 @@ class DOMArray extends Array {
   }
 
   without(selector) {
-    return this.arrayFilter((el) => !cssIs(el, selector));
+    return this.arrayFilter((el) => !this.constructor.cssIs(el, selector));
   }
 
   wrap(target) {
@@ -401,6 +403,16 @@ class DOMArray extends Array {
 
   static isDOMArray(thing) {
     return thing instanceof DOMArray;
+  }
+
+  static cssSelectAll(nodes, selector) {
+    return CSS.cssSelectAll(removeSubsets(nodes), selector);
+  }
+  static cssSelectOne(nodes, selector) {
+    return CSS.cssSelectOne(removeSubsets(nodes), selector);
+  }
+  static cssIs(node, selector) {
+    return CSS.cssIs(node, selector);
   }
 }
 
