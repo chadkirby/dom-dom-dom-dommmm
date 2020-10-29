@@ -42,7 +42,7 @@ function spliceChars($el, startIndex, deleteCount, ...insertions) {
       let $parent = $node.parentNode;
       $node.remove();
       // remove empty parent elements (if any)
-      while (!$parent.innerHTML && !$parent.isSameNode($el)) {
+      while (!$parent.innerHTML && $parent !== $el) {
         let $grandparent = $parent.parentNode;
         $parent.remove();
         $parent = $grandparent;

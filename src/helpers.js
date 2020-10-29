@@ -1,4 +1,5 @@
 const { window, document: globalDocument } = require('./dom');
+const { isTextNode } = require('./is-node');
 /**
  * iterator to collect text nodes from a dom element
  *
@@ -16,7 +17,7 @@ function* collectTextNodes(el, endNode) {
       // stop the generator if this child is the end node
       return true;
     }
-    if (child.nodeName === `#text`) {
+    if (isTextNode(child)) {
       yield child;
     } else if (yield* collectTextNodes(child, endNode)) {
       // stop the generator if this child contained the end node
@@ -52,7 +53,7 @@ function* filterTextNodes(el, filterFn) {
  */
 function fragmentToHtml(fragment) {
   return [ ...fragment.childNodes ].map(
-    (n) => n.nodeName === `#text` ? n.textContent : n.outerHTML
+    (n) => isTextNode(n) ? n.textContent : n.outerHTML
   ).join(``);
 }
 
@@ -197,14 +198,96 @@ function attr(el) {
   ));
 }
 
+/**
+ * seach for text in an element
+ *
+ * @param   {HTMLElement}  el  element to search
+ *
+ * @param   {RegExp}  pattern  search pattern
+ *
+ * @return  {Array}
+ */
+function splitSearch(el, pattern) {
+  let { textContent } = el;
+  let textNodes = collectTextNodes(el);
+  let textMap = [];
+  let counter = 0;
+  for (const node of textNodes) {
+    if (node.textContent) {
+      textMap.push({
+        start: counter,
+        end: counter + node.textContent.length,
+        node
+      });
+    }
+    counter += node.textContent.length;
+  }
+  let out = [];
+  let result;
+  while ((result = pattern.exec(textContent))) {
+    let found = [];
+    let { index, 0: match } = result;
+    let nodeIndex = textMap.findIndex(({ end }) => end > index);
+    while (match) {
+      let { start, node } = textMap[nodeIndex];
+      let localOffset = index - start;
+      splitTextNode(node, localOffset + match.length);
+      found.push(splitTextNode(node, localOffset));
+      match = match.slice(node.textContent.length);
+      index += node.textContent.length;
+      nodeIndex += 1;
+    }
+    if (!pattern.global) {
+      return found;
+    }
+    out.push(found);
+  }
+  return out;
+}
+
+
+// split a text node at the given char offset
+function splitTextNode(node, offset) {
+  let { textContent } = node;
+  if (offset < 0) {
+    offset += textContent.length;
+  }
+  if (offset === 0) {
+    return node;
+  }
+  if (offset < 0 || offset >= textContent.length) {
+    return;
+  }
+  // crop the text content of the existing text node
+  node.textContent = textContent.slice(0, offset);
+  // insert a new text node with the remaining text (if any)
+  let newNode = createTextNode(textContent.slice(offset));
+  node.after(newNode);
+  // return the text node we just inserted
+  return newNode;
+}
+
+
 function* previousSiblings(el) {
   while (el && (el = el.previousSibling)) {
     yield el;
   }
 }
 
+function* previousElementSiblings(el) {
+  while (el && (el = el.previousElementSibling)) {
+    yield el;
+  }
+}
+
 function* nextSiblings(el) {
   while (el && (el = el.nextSibling)) {
+    yield el;
+  }
+}
+
+function* nextElementSiblings(el) {
+  while (el && (el = el.nextElementSibling)) {
     yield el;
   }
 }
@@ -239,6 +322,12 @@ function parse(string, contentType) {
   );
 }
 
+function isSelector(thing) {
+  return typeof thing === 'string' && !isHtml(thing);
+}
+function isHtml(thing) {
+  return typeof thing === 'string' && /^\s*<\w.*?>/.test(thing);
+}
 
 module.exports = {
   attr,
@@ -251,10 +340,15 @@ module.exports = {
   fragmentToHtml,
   fragmentToText,
   hasDescendant,
+  isHtml,
+  isSelector,
   parentsUntil,
   parse,
+  previousElementSiblings,
   previousSiblings,
+  nextElementSiblings,
   nextSiblings,
   nodeToSelector,
+  splitSearch,
   unwrap
 };
