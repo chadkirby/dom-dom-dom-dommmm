@@ -231,8 +231,27 @@ function splitSearch(el, pattern) {
     while (match) {
       let { start, node } = textMap[nodeIndex];
       let localOffset = index - start;
-      splitTextNode(node, localOffset + match.length);
-      found.push(splitTextNode(node, localOffset));
+      let trailingNode = splitTextNode(node, localOffset + match.length);
+      if (trailingNode) {
+        textMap[nodeIndex].end = start + node.textContent.length;
+        textMap.splice(nodeIndex + 1, 0, {
+          start: textMap[nodeIndex].end,
+          end: textMap[nodeIndex].end + trailingNode.textContent.length,
+          node: trailingNode
+        });
+      }
+
+      let resultNode = splitTextNode(node, localOffset);
+      textMap[nodeIndex].end = start + node.textContent.length;
+      found.push(resultNode);
+      if (resultNode !== node) {
+        textMap.splice(nodeIndex + 1, 0, {
+          start: textMap[nodeIndex].end,
+          end: textMap[nodeIndex].end + resultNode.textContent.length,
+          node: resultNode
+        });
+        nodeIndex += 1;
+      }
       match = match.slice(node.textContent.length);
       index += node.textContent.length;
       nodeIndex += 1;

@@ -292,16 +292,21 @@ test(`nextSiblings iterates over next siblings`, (assert) => {
 });
 
 test(`splitSearch splits & searches`, (assert) => {
-  let $ = createFragment(`<h3><a>1<b> 2<c>3 <d> 4 <e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`);
+  function makeFragment() {
+    return createFragment(`<h3><a>1<b> 2<c>3 <d> 4 <e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`);
+  }
 
+  let $ = makeFragment();
   assert.deepEqual(
     splitSearch($.querySelector('h3'), /1/),
     [ $.querySelector('a').childNodes[0] ]
   );
+  $ = makeFragment();
   assert.deepEqual(
     splitSearch($.querySelector('h3'), /2/),
     [ $.querySelector('b').childNodes[1] ]
   );
+  $ = makeFragment();
   assert.deepEqual(
     splitSearch($.querySelector('h3'), /3/),
     [ $.querySelector('c').childNodes[0] ]
@@ -311,16 +316,31 @@ test(`splitSearch splits & searches`, (assert) => {
     [ "3", " ", " 4 5678", "9" ],
     'first text node is split in two'
   );
+  $ = makeFragment();
   assert.deepEqual(
     splitSearch($.querySelector('h3'), /567/),
     [ ...collectTextNodes($.querySelector('e')) ]
   );
 
+  $ = makeFragment();
   assert.deepEqual(
     splitSearch($.querySelector('h3'), /\d{2}/g).map(
       (res) => res.map((x) => x.textContent)
     ),
     [ [ '2', '3' ], [ '5', '6' ], [ '7', '8' ] ]
+  );
+
+  $ = makeFragment();
+  assert.deepEqual(
+    splitSearch($.querySelector('h3'), /[1-3 ]/g).map(
+      (res) => res.map((x) => x.textContent)
+    ),
+    [ [ '1' ], [ ' ' ], [ '2' ], [ '3' ], [ ' ' ], [ ' ' ], [ ' ' ] ]
+  );
+
+  assert.deepEqual(
+    splitSearch(createFragment(`<h3>12345</h3>`).querySelector('h3'), /.{1,2}/g).map(([ x ]) => x.textContent),
+    [ '12', '34', '5' ]
   );
 
 });
