@@ -28,7 +28,6 @@
     "tom-jumbo-grumbo": "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.5"
   },
   "dependencies": {
-    "css-select": "^2.1.0",
     "globalthis": "^1.0.0"
   },
   "bugs": {

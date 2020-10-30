@@ -1,5 +1,5 @@
 const test = require('./tape')(module);
-const { $, el, createTextNode } = require('../src/index');
+const { $, el, createTextNode, loadHtml } = require('../src/index');
 const { document } = require('../src/dom');
 
 test(`$ wraps an element`, (assert) => {
@@ -598,7 +598,6 @@ test(`$.add`, (assert) => {
 
 });
 
-
 test(`$.empty`, (assert) => {
   let $x = $(`<div><a>1<b>2<c>3</c></b></a></div>`);
   let $a = $x.find('a');
@@ -621,5 +620,57 @@ test(`$.empty`, (assert) => {
   assert.equal(
     $x.html(),
     '<a></a>'
+  );
+});
+
+test(`$.setHtmlAdapter`, (assert) => {
+  // eslint-disable-next-line no-shadow
+  let $ = loadHtml(`<html />`);
+  // any truthy thing we wrap should be interpreted as <div><a>...
+  $.setHtmlAdapter(() => `<div><a>1<b>2<c>3</c></b></a></div>`);
+  let $x = $(true);
+  let $a = $x.find('a');
+
+  assert.equal(
+    $a.html(),
+    '1<b>2<c>3</c></b>'
+  );
+
+  // unset the adapter
+  $.setHtmlAdapter();
+  assert.deepLooseEqual(
+    $('<div>foo</div>').contents().map((i, x) => x.textContent),
+    [ 'foo' ]
+  );
+});
+
+test(`$.setCssAdapter`, (assert) => {
+  // eslint-disable-next-line no-shadow
+  let $ = loadHtml(`<html><body></body></html>`);
+  let cssCalled = 0;
+  $.setCssAdapter({ cssSelectAll(nodes, selector) {
+    cssCalled += 1;
+    // always find 'b'
+    return nodes[0].querySelectorAll('b');
+  } });
+  let $x = $(`<div><a>1<b>2<c>3</c></b></a></div>`);
+  let $a = $x.find('a');
+
+  assert.equal(cssCalled, 1, `custom css adapter called once`);
+
+  assert.equal(
+    $a.html(),
+    '2<c>3</c>'
+  );
+
+  // unset the adapter
+  $.setCssAdapter();
+  $a = $x.find('a');
+
+  assert.equal(cssCalled, 1, `custom css adapter not called again`);
+
+  assert.equal(
+    $a.html(),
+    '1<b>2<c>3</c></b>'
   );
 });
