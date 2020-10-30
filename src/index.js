@@ -20,7 +20,7 @@ function loadXml(
   return wrapper(parse(xml, "text/xml"), { toHtml, cssAdapter });
 }
 
-function wrapper(document, { toHtml = () => false, cssAdapter } = {}) {
+function wrapper(document, { toHtml, cssAdapter } = {}) {
   class DOMList extends DOMArray {
     static cssSelectAll(nodes, selector) {
       if (cssAdapter) {
@@ -59,7 +59,7 @@ function wrapper(document, { toHtml = () => false, cssAdapter } = {}) {
       }
       return DOMList.from(document.querySelectorAll(arg));
     }
-    let html = toHtml(arg);
+    let html = toHtml && toHtml(arg);
     if (html) {
       return DOMList.from(createFragment(html, document).childNodes);
     }
@@ -87,6 +87,12 @@ function wrapper(document, { toHtml = () => false, cssAdapter } = {}) {
         return DOMList.from(document.querySelectorAll(selector)).text();
       }
       return fragmentToText(document);
+    },
+    setHtmlAdapter(adapter) {
+      toHtml = adapter;
+    },
+    setCssAdapter(adapter) {
+      cssAdapter = adapter;
     }
   });
 
