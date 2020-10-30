@@ -172,7 +172,7 @@ test(`closest finds the closest`, (assert) => {
   );
 
   assert.ok(
-    closest($f, `f`).isSameNode($f)
+    closest($f, `f`) === $f
   );
 
   assert.equal(
@@ -182,7 +182,7 @@ test(`closest finds the closest`, (assert) => {
 
   let $a = $.querySelector(`a`);
   assert.ok(
-    closest($a.firstChild, `a`).isSameNode($a),
+    closest($a.firstChild, `a`) === $a,
     `works with text-node input`
   );
 
@@ -341,6 +341,11 @@ test(`splitSearch splits & searches`, (assert) => {
   assert.deepEqual(
     splitSearch(createFragment(`<h3>12345</h3>`).querySelector('h3'), /.{1,2}/g).map(([ x ]) => x.textContent),
     [ '12', '34', '5' ]
+  );
+
+  assert.deepEqual(
+    splitSearch(createFragment(`<h3>12345</h3>`).querySelector('h3'), /6/g),
+    []
   );
 
 });

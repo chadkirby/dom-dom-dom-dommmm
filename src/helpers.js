@@ -13,7 +13,7 @@ function* collectTextNodes(el, endNode) {
   // yields
   let children = Array.from(el.childNodes);
   for (const child of children) {
-    if (endNode && endNode.isSameNode(child)) {
+    if (endNode && endNode === child) {
       // stop the generator if this child is the end node
       return true;
     }
@@ -145,7 +145,7 @@ function matches(el, comparator) {
   if (Array.isArray(comparator)) {
     [ comparator ] = comparator;
   }
-  return el.isSameNode(comparator);
+  return el === comparator;
 }
 
 /**
