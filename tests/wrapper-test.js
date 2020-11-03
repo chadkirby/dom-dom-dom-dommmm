@@ -329,6 +329,13 @@ test(`$.replaceWith`, (assert) => {
     $x.html(),
     `<e></e><b>2</b>`
   );
+
+  $x = $(`<div><a>1</a><b>2</b></div>`);
+  $x.queryAll(`a,b`).replaceWith(`<e></e><f></f>`);
+  assert.deepEqual(
+    $x.html(),
+    `<e></e><f></f><e></e><f></f>`
+  );
 });
 
 test(`$.first/last`, (assert) => {
@@ -349,6 +356,24 @@ test(`$.outerHtml`, (assert) => {
   assert.equal(
     $(`<span><a>foo</a><a>bar</a></span>`).outerHtml(),
     `<span><a>foo</a><a>bar</a></span>`
+  );
+});
+
+test(`$.after`, (assert) => {
+  let $x = $(`<div><a>foo</a></div>`);
+  let $c = $(`<c>bar</c>`);
+  $x.find('a').after($c);
+  assert.equal(
+    $x.html(),
+    `<a>foo</a><c>bar</c>`
+  );
+
+
+  $x = $(`<div><a>1</a></div>`);
+  $x.find('a').after(`<b>2</b><c>3</c>`);
+  assert.equal(
+    $x.html(),
+    `<a>1</a><b>2</b><c>3</c>`
   );
 });
 
@@ -378,6 +403,12 @@ test(`$.append`, (assert) => {
     ``
   );
 
+  $x = $(`<div />`);
+  $x.append(`<a>1</a><b>2</b><c>3</c>`);
+  assert.equal(
+    $x.html(),
+    `<a>1</a><b>2</b><c>3</c>`
+  );
 });
 
 test(`set text`, (assert) => {

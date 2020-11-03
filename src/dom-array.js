@@ -447,8 +447,17 @@ class DOMArray extends Array {
   }
 }
 
-function each(domArray, op, content) {
+function each(domArray, op, val) {
   for (const el of domArray) {
+    let content = val;
+    if (isHtml(content)) {
+      let fragment = createFragment(content, el.ownerDocument);
+      if (fragment.childElementCount === 1) {
+        content = fragment.firstElementChild;
+      } else {
+        content = Array.from(fragment.children);
+      }
+    }
     if (Array.isArray(content)) {
       el[op](
         ...Array.from(content)
@@ -472,8 +481,11 @@ function thingToNode(thing, doc) {
   if (isEl(thing) || isTextNode(thing)) {
     return thing;
   }
+  if (isHtml(thing)) {
+    return createElement(thing, doc);
+  }
   if (typeof thing === `string`) {
-    return createElement(thing, doc) || createTextNode(thing, doc);
+    return createTextNode(thing, doc);
   }
   if (typeof thing === `function`) {
     return thing(doc);
