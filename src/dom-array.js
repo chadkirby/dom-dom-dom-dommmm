@@ -42,8 +42,18 @@ class DOMArray extends Array {
   }
 
   // jq
-  append(content) {
-    return each(this, `append`, content);
+  append(...contents) {
+    for (const content of contents) {
+      each(this, `append`, content);
+    }
+    return this;
+  }
+  // jq
+  prepend(...contents) {
+    for (const content of contents) {
+      each(this, `prepend`, content);
+    }
+    return this;
   }
 
   arrayFilter(...args) {
@@ -303,10 +313,6 @@ class DOMArray extends Array {
     return this.ancestors().sliceUntil(target);
   }
 
-  // jq
-  prepend(content) {
-    return each(this, `prepend`, content);
-  }
   /**
    * Get the immediately preceding sibling of each element
    * in the set of matched elements. If a selector is

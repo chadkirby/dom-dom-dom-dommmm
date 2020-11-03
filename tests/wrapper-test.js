@@ -391,6 +391,11 @@ test(`$.append`, (assert) => {
     `bar`
   );
 
+  assert.equal(
+    $(`<div />`).append($(`<a>foo</a>`), $(`<c>bar</c>`)).html(),
+    `<a>foo</a><c>bar</c>`
+  );
+
   $x = $(`<div />`);
   let $y = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   $x.append($y.children());
@@ -408,6 +413,60 @@ test(`$.append`, (assert) => {
   assert.equal(
     $x.html(),
     `<a>1</a><b>2</b><c>3</c>`
+  );
+
+  $x = $(`<div><a>1</a><b>2</b></div>`);
+  $x.find('a,b').append(`<c>3</c><d>4</d>`);
+  assert.equal(
+    $x.html(),
+    `<a>1<c>3</c><d>4</d></a><b>2<c>3</c><d>4</d></b>`
+  );
+
+});
+
+test(`$.prepend`, (assert) => {
+  let $x = $(`<div />`);
+  let $a = $(`<a>foo</a>`);
+  let $c = $(`<c>bar</c>`);
+  $x.prepend($c).prepend($a);
+  assert.equal(
+    $x.html(),
+    `<a>foo</a><c>bar</c>`
+  );
+  assert.deepEqual(
+    $x.queryAll(`a,c`).filter(`c`).text(),
+    `bar`
+  );
+
+  assert.equal(
+    $(`<div />`).prepend($(`<c>bar</c>`), $(`<a>foo</a>`)).html(),
+    `<a>foo</a><c>bar</c>`
+  );
+
+  $x = $(`<div />`);
+  let $y = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
+  $x.prepend($y.children());
+  assert.equal(
+    $x.html(),
+    `<a>1</a><b>2</b><c>3</c>`
+  );
+  assert.equal(
+    $y.html(),
+    ``
+  );
+
+  $x = $(`<div />`);
+  $x.prepend(`<a>1</a><b>2</b><c>3</c>`);
+  assert.equal(
+    $x.html(),
+    `<a>1</a><b>2</b><c>3</c>`
+  );
+
+  $x = $(`<div><a>1</a><b>2</b></div>`);
+  $x.find('a,b').prepend(`<c>3</c><d>4</d>`);
+  assert.equal(
+    $x.html(),
+    `<a><c>3</c><d>4</d>1</a><b><c>3</c><d>4</d>2</b>`
   );
 });
 
