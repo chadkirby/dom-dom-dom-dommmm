@@ -24,6 +24,11 @@ class DOMArray extends Array {
     }
     throw new Error(`can't add content`);
   }
+  addClass(_class) {
+    for (const el of this) {
+      el.classList.add(_class);
+    }
+  }
   // jq
   after(content) {
     return each(this, `after`, content);
@@ -110,7 +115,7 @@ class DOMArray extends Array {
   }
 
   each(fn) {
-    super.forEach((el, i, arr) => fn.bind(this)(i, el, arr));
+    super.forEach((el, i, arr) => fn.call(el, i, el, arr));
     return this;
   }
 
@@ -141,7 +146,7 @@ class DOMArray extends Array {
       return this.arrayFilter((el) => this.constructor.cssIs(el, target));
     }
     if (typeof target === 'function') {
-      return this.arrayFilter((el, i) => target.bind(el)(i, el));
+      return this.arrayFilter((el, i) => target.call(el, i, el));
     }
     throw new Error('unknown filter target');
   }
@@ -152,7 +157,7 @@ class DOMArray extends Array {
     }
     if (typeof target === 'function') {
       return this.constructor.of(
-        this.arrayFind((el, i) => target.bind(el)(i, el))
+        this.arrayFind((el, i) => target.call(el, i, el))
       );
     }
     throw new Error('unknown find target');
@@ -220,7 +225,7 @@ class DOMArray extends Array {
   }
 
   map(callback) {
-    return this.arrayMap((el, i) => callback.bind(el)(i, el));
+    return this.arrayMap((el, i) => callback.call(el, i, el));
   }
 
   /**
@@ -263,7 +268,7 @@ class DOMArray extends Array {
       return this.arrayFilter((el) => !this.constructor.cssIs(el, target));
     }
     if (typeof target === 'function') {
-      return this.arrayFilter((el, i) => !target.bind(el)(i, el));
+      return this.arrayFilter((el, i) => !target.call(el, i, el));
     }
     throw new Error('unknown not target');
   }
