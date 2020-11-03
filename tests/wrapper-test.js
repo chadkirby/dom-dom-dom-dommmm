@@ -674,3 +674,34 @@ test(`$.setCssAdapter`, (assert) => {
     '1<b>2<c>3</c></b>'
   );
 });
+
+test(`$.addClass`, (assert) => {
+  let $x = $(`<div><a>1<b>2<c>3</c></b></a></div>`);
+  let $a = $x.find('a');
+  $a.addClass('foo');
+  $a.addClass('foo');
+  assert.equal($a.attr('class'), 'foo');
+  $x.find('b,c').addClass('bar');
+  assert.equal(
+    $x.html(),
+    `<a class="foo">1<b class="bar">2<c class="bar">3</c></b></a>`
+  );
+
+});
+
+test(`$.html`, (assert) => {
+  let $x = $(`<div><a>1<b>2<c>3</c></b></a></div>`);
+  assert.equal(
+    $.html('c'),
+    `<c>3</c>`
+  );
+  assert.equal(
+    $.html($x.find('c')),
+    `<c>3</c>`
+  );
+  assert.equal(
+    $.html($x.find('c')[0]),
+    `<c>3</c>`
+  );
+
+});

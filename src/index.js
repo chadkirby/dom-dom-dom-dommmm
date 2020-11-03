@@ -80,6 +80,9 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
       if (DOMList.isDOMArray(thing)) {
         return thing.outerHtml();
       }
+      if (isEl(thing)) {
+        return thing.outerHTML;
+      }
       return fragmentToHtml(document);
     },
     text(selector) {
