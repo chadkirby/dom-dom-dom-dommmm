@@ -688,3 +688,20 @@ test(`$.addClass`, (assert) => {
   );
 
 });
+
+test(`$.html`, (assert) => {
+  let $x = $(`<div><a>1<b>2<c>3</c></b></a></div>`);
+  assert.equal(
+    $.html('c'),
+    `<c>3</c>`
+  );
+  assert.equal(
+    $.html($x.find('c')),
+    `<c>3</c>`
+  );
+  assert.equal(
+    $.html($x.find('c')[0]),
+    `<c>3</c>`
+  );
+
+});
