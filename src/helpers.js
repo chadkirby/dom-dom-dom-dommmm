@@ -1,3 +1,4 @@
+const { Error } = require('globalthis/implementation');
 const { window, document: globalDocument } = require('./dom');
 const { isTextNode } = require('./is-node');
 /**
@@ -335,10 +336,14 @@ function hasDescendant(parent, target) {
 }
 
 function parse(string, contentType) {
-  return new window.DOMParser().parseFromString(
+  let dom = new window.DOMParser().parseFromString(
     string,
     contentType
   );
+  if (dom.firstElementChild.matches('parsererror')) {
+    throw new Error(dom.firstElementChild.textContent);
+  }
+  return dom;
 }
 
 function isSelector(thing) {
