@@ -42,8 +42,18 @@ class DOMArray extends Array {
   }
 
   // jq
-  append(content) {
-    return each(this, `append`, content);
+  append(...contents) {
+    for (const content of contents) {
+      each(this, `append`, content);
+    }
+    return this;
+  }
+  // jq
+  prepend(...contents) {
+    for (const content of contents) {
+      each(this, `prepend`, content);
+    }
+    return this;
   }
 
   arrayFilter(...args) {
@@ -84,7 +94,7 @@ class DOMArray extends Array {
     }
     return this.constructor.of();
   }
-  clone(deep = true) {
+  clone({ deep = true } = {}) {
     return this.constructor.from(
       this,
       (el) => el.cloneNode(deep)
@@ -107,11 +117,23 @@ class DOMArray extends Array {
     return this.constructor.of();
   }
 
-  css(property) {
-    if (this.length) {
-      return DOM.window.getComputedStyle(this[0]).getPropertyValue(property);
+  // Get the value of a computed style property for the
+  // first element in the set of matched elements or set one
+  // or more CSS properties for every matched element.
+  css(propertyName, value) {
+    if (!propertyName) {
+      return this[0].style;
     }
-    return ``;
+    if (value) {
+      for (const { style } of this) {
+        style[propertyName] = value;
+      }
+      return this;
+    }
+    if (!this.length) {
+      return ``;
+    }
+    return this[0].style.getPropertyValue(propertyName);
   }
 
   each(fn) {
@@ -126,6 +148,7 @@ class DOMArray extends Array {
         el.firstChild.remove();
       }
     }
+    return this;
   }
 
   eq(index) {
@@ -290,10 +313,6 @@ class DOMArray extends Array {
     return this.ancestors().sliceUntil(target);
   }
 
-  // jq
-  prepend(content) {
-    return each(this, `prepend`, content);
-  }
   /**
    * Get the immediately preceding sibling of each element
    * in the set of matched elements. If a selector is
@@ -434,8 +453,17 @@ class DOMArray extends Array {
   }
 }
 
-function each(domArray, op, content) {
+function each(domArray, op, val) {
   for (const el of domArray) {
+    let content = val;
+    if (isHtml(content)) {
+      let fragment = createFragment(content, el.ownerDocument);
+      if (fragment.childElementCount === 1) {
+        content = fragment.firstElementChild;
+      } else {
+        content = Array.from(fragment.children);
+      }
+    }
     if (Array.isArray(content)) {
       el[op](
         ...Array.from(content)
@@ -459,8 +487,11 @@ function thingToNode(thing, doc) {
   if (isEl(thing) || isTextNode(thing)) {
     return thing;
   }
+  if (isHtml(thing)) {
+    return createElement(thing, doc);
+  }
   if (typeof thing === `string`) {
-    return createElement(thing, doc) || createTextNode(thing, doc);
+    return createTextNode(thing, doc);
   }
   if (typeof thing === `function`) {
     return thing(doc);

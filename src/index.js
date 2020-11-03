@@ -10,6 +10,9 @@ function loadHtml(
   html = `<!DOCTYPE html><body></body></html>`,
   { toHtml, cssAdapter } = {}
 ) {
+  if (Buffer.isBuffer(html)) {
+    html = html.toString();
+  }
   return wrapper(parse(html, "text/html"), { toHtml, cssAdapter });
 }
 
@@ -17,6 +20,9 @@ function loadXml(
   xml = `<?xml version="1.0" ?><root />`,
   { toHtml, cssAdapter } = {}
 ) {
+  if (Buffer.isBuffer(xml)) {
+    xml = xml.toString();
+  }
   return wrapper(parse(xml, "text/xml"), { toHtml, cssAdapter });
 }
 
