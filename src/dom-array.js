@@ -138,6 +138,7 @@ class DOMArray extends Array {
         el.firstChild.remove();
       }
     }
+    return this;
   }
 
   eq(index) {

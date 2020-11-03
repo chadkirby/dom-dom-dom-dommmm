@@ -636,9 +636,8 @@ test(`$.empty`, (assert) => {
     '<a>1<b></b></a>'
   );
 
-  $a.empty();
   assert.equal(
-    $x.html(),
+    $a.empty().outerHtml(),
     '<a></a>'
   );
 });
