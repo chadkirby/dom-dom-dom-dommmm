@@ -209,6 +209,16 @@ test(`$.next $.nextAll`, (assert) => {
     $x.queryAll(`a`).nextAll('c').map((i, { textContent }) => textContent),
     [ '3' ]
   );
+  assert.equal(
+    $x.queryAll(`a,b`).next().text(),
+    '23'
+  );
+  $x = $(`<div><a>1</a><b>2</b><c>3</c></div><div><a>A</a><b>B</b><c>C</c></div>`);
+  assert.deepEqual(
+    $x.queryAll(`a`).nextAll().map((i, { textContent }) => textContent),
+    [ '2', '3', 'B', 'C' ]
+  );
+
 });
 
 test(`$.prev $.prevAll $.prevUntil`, (assert) => {
@@ -220,6 +230,10 @@ test(`$.prev $.prevAll $.prevUntil`, (assert) => {
   assert.equal(
     $x.queryAll(`a`).prev().length,
     0
+  );
+  assert.equal(
+    $x.queryAll(`b,c`).prev().length,
+    2
   );
   assert.deepEqual(
     $x.queryAll(`c`).prevAll().map((i, { textContent }) => textContent),
@@ -233,6 +247,12 @@ test(`$.prev $.prevAll $.prevUntil`, (assert) => {
     $x.queryAll(`c`).prevUntil('a').map((i, { textContent }) => textContent),
     [ '2' ]
   );
+  $x = $(`<div><a>1</a><b>2</b><c>3</c></div><div><a>A</a><b>B</b><c>C</c></div>`);
+  assert.deepEqual(
+    $x.queryAll(`c`).prevAll().map((i, { textContent }) => textContent),
+    [ '2', '1', 'B', 'A' ]
+  );
+
 });
 
 test(`$.siblings`, (assert) => {
