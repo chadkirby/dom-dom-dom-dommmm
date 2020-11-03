@@ -107,11 +107,23 @@ class DOMArray extends Array {
     return this.constructor.of();
   }
 
-  css(property) {
-    if (this.length) {
-      return DOM.window.getComputedStyle(this[0]).getPropertyValue(property);
+  // Get the value of a computed style property for the
+  // first element in the set of matched elements or set one
+  // or more CSS properties for every matched element.
+  css(propertyName, value) {
+    if (!propertyName) {
+      return this[0].style;
     }
-    return ``;
+    if (value) {
+      for (const { style } of this) {
+        style[propertyName] = value;
+      }
+      return this;
+    }
+    if (!this.length) {
+      return ``;
+    }
+    return this[0].style.getPropertyValue(propertyName);
   }
 
   each(fn) {
