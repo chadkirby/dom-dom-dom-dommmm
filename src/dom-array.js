@@ -229,18 +229,21 @@ class DOMArray extends Array {
   }
 
   /**
-   * Gets the next sibling of the first selected element, optionally filtered by
-   * a selector.
+   *  Get the immediately following sibling of each element
+   *  in the set of matched elements. If a selector is
+   *  provided, it retrieves the next sibling only if it
+   *  matches that selector.
    *
-   * @param {string} [selector] - If specified filter for sibling.
+   * @param {string} [selector] - If specified filter for
+   * sibling.
    *
    * @see {@link http://api.jquery.com/next/}
    */
   next(selector) {
-    let { constructor: PROTO } = this;
-    let [ { nextElementSibling: nextEl } = {} ] = this;
-    let next = nextEl ? PROTO.of(nextEl) : PROTO.of();
-    return next.filter(selector);
+    return this
+      .arrayMap((el) => el.nextElementSibling)
+      .arrayFilter((el) => el)
+      .filter(selector);
   }
   nextSibling(selector) {
     let [ { nextSibling } ] = this;
@@ -254,10 +257,14 @@ class DOMArray extends Array {
     let sibs = this.constructor.from(nextSiblings(this[0]));
     return sibs.filter(selector);
   }
-  // jq
+  // jq: Get all following siblings of each element in the
+  // set of matched elements, optionally filtered by a
+  // selector.
   nextAll(selector) {
-    let sibs = this.constructor.from(nextElementSiblings(this[0]));
-    return sibs.filter(selector);
+    let sibsList = this.constructor.of().concat(
+      ...this.arrayMap((el) => [ ...nextElementSiblings(el) ])
+    );
+    return sibsList.arrayFilter((el) => el).filter(selector);
   }
 
   nextUntil(target) {
@@ -288,18 +295,21 @@ class DOMArray extends Array {
     return each(this, `prepend`, content);
   }
   /**
-   * Gets the prev sibling of the first selected element, optionally filtered by
-   * a selector.
+   * Get the immediately preceding sibling of each element
+   * in the set of matched elements. If a selector is
+   * provided, it retrieves the previous sibling only if it
+   * matches that selector.
    *
-   * @param {string} [selector] - If specified filter for sibling.
+   * @param {string} [selector] - If specified filter for
+   * sibling.
    *
    * @see {@link http://api.jquery.com/prev/}
    */
   prev(selector) {
-    let { constructor: PROTO } = this;
-    let [ { previousElementSibling: prevEl } = {} ] = this;
-    let prev = prevEl ? PROTO.of(prevEl) : PROTO.of();
-    return prev.filter(selector);
+    return this
+      .arrayMap((el) => el.previousElementSibling)
+      .arrayFilter((el) => el)
+      .filter(selector);
   }
   previousSiblings(selector) {
     let sibs = this.constructor.from(previousSiblings(this[0]));
@@ -314,10 +324,13 @@ class DOMArray extends Array {
     return this.constructor.from([]);
   }
 
-  // jq
+  // Get all preceding siblings of each element in the set
+  // of matched elements, optionally filtered by a selector.
   prevAll(selector) {
-    let sibs = this.constructor.from(previousElementSiblings(this[0]));
-    return sibs.filter(selector);
+    let sibsList = this.constructor.of().concat(
+      ...this.arrayMap((el) => [ ...previousElementSiblings(el) ])
+    );
+    return sibsList.arrayFilter((el) => el).filter(selector);
   }
 
   prevUntil(target) {
