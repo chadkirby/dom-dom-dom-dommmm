@@ -84,7 +84,7 @@ class DOMArray extends Array {
     }
     return this.constructor.of();
   }
-  clone(deep = true) {
+  clone({ deep = true } = {}) {
     return this.constructor.from(
       this,
       (el) => el.cloneNode(deep)

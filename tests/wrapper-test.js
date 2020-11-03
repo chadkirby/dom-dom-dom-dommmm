@@ -725,3 +725,16 @@ test(`$.html`, (assert) => {
   );
 
 });
+
+test(`$.clone`, (assert) => {
+  let $x = $(`<div><a>1<b>2<c>3</c></b></a></div>`);
+  assert.equal(
+    $x.find('c').clone().outerHtml(),
+    `<c>3</c>`
+  );
+  assert.equal(
+    $x.find('c').clone({ deep: false }).outerHtml(),
+    `<c></c>`
+  );
+
+});
