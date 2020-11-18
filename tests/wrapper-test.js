@@ -96,6 +96,16 @@ test(`$.attr`, (assert) => {
     '3'
   );
   assert.equal(
+    $x.attr('doesnotexist'),
+    null,
+    'attr does not exist'
+  );
+  assert.equal(
+    $x.find('nonexistant').attr('nonexistant'),
+    null,
+    'empty Domlist'
+  );
+  assert.equal(
     $x[0].outerHTML,
     `<span id="3" foo="bar"></span>`
   );
@@ -824,6 +834,15 @@ test(`$.clone`, (assert) => {
   assert.equal(
     $x.find('c').clone({ deep: false }).outerHtml(),
     `<c></c>`
+  );
+
+});
+
+test(`$.find :scope`, (assert) => {
+  let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
+  assert.equal(
+    $x.find('a').find(':scope > b').outerHtml(),
+    $x.find('a > b').outerHtml()
   );
 
 });

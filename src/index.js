@@ -1,33 +1,15 @@
 const { parse } = require('./helpers');
 const DOM = require('./dom');
-const { DOMArray } = require('./dom-array');
-const { createFragment, fragmentToText, fragmentToHtml, isHtml } = require('./helpers');
+const { DOMArray, contentTypes } = require('./dom-array');
+const { fragmentToText, fragmentToHtml, isHtml } = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
 const { removeSubsets } = require('./remove-subsets');
 
-
-function loadHtml(
-  html = `<!DOCTYPE html><body></body></html>`,
-  { toHtml, cssAdapter } = {}
-) {
-  if (Buffer.isBuffer(html)) {
-    html = html.toString();
-  }
-  return wrapper(parse(html, "text/html"), { toHtml, cssAdapter });
-}
-
-function loadXml(
-  xml = `<?xml version="1.0" ?><root />`,
-  { toHtml, cssAdapter } = {}
-) {
-  if (Buffer.isBuffer(xml)) {
-    xml = xml.toString();
-  }
-  return wrapper(parse(xml, "text/xml"), { toHtml, cssAdapter });
-}
-
 function wrapper(document, { toHtml, cssAdapter } = {}) {
   class DOMList extends DOMArray {
+    static get document() {
+      return document;
+    }
     static cssSelectAll(nodes, selector) {
       if (cssAdapter) {
         return cssAdapter.cssSelectAll(removeSubsets(nodes), selector);
@@ -60,14 +42,13 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
     }
     if (typeof arg === `string`) {
       if (isHtml(arg)) {
-        let fragment = createFragment(arg, document);
-        return DOMList.from(fragment.childNodes);
+        return DOMList.fromHtml(arg);
       }
       return DOMList.from(document.querySelectorAll(arg));
     }
     let html = toHtml && toHtml(arg);
     if (html) {
-      return DOMList.from(createFragment(html, document).childNodes);
+      return DOMList.fromHtml(html);
     }
   }
 
@@ -111,8 +92,23 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
 let $;
 
 module.exports = {
-  loadHtml,
-  loadXml,
+  loadHtml(
+    html = `<!DOCTYPE html><body></body></html>`,
+    { toHtml, cssAdapter } = {}
+  ) {
+    let document = parse(html, contentTypes.html);
+    return wrapper(document, { toHtml, cssAdapter });
+  },
+  loadXml(
+    xml = `<?xml version="1.0" ?><root />`,
+    { toHtml, cssAdapter } = {}
+  ) {
+    let document = parse(xml, contentTypes.xml);
+    return wrapper(document, { toHtml, cssAdapter });
+  },
+  new(document, { toHtml, cssAdapter } = {}) {
+    return wrapper(document, { toHtml, cssAdapter });
+  },
 
   get $() {
     if (!$) {
