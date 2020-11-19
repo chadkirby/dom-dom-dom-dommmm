@@ -1,23 +1,47 @@
 const DOM = require('./dom');
 const CSS = require('./css-adapter');
 
-const { attr, closest, createElement, createFragment, createTextNode, hasDescendant, isHtml, isSelector, nextElementSiblings, nextSiblings, nodeToSelector, parentsUntil, previousElementSiblings, previousSiblings, unwrap } = require('./helpers');
+const { attr, closest, createTextNode, hasDescendant, isHtml, isSelector, nextElementSiblings, nextSiblings, nodeToSelector, parentsUntil, previousElementSiblings, previousSiblings, unwrap } = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
 const { removeSubsets } = require('./remove-subsets');
+
+const contentTypes = {
+  xml: 'text/xml',
+  html: 'text/html'
+};
 
 class DOMArray extends Array {
   get DOMArray() {
     return true;
   }
+  static get document() {
+    return DOM.document;
+  }
+  get document() {
+    return this.length ? this[0].ownerDocument : this.constructor.document;
+  }
+  static fromHtml(html, document = this.document) {
+    let div = document.createElement('div');
+    try {
+      if (document.contentType === contentTypes.xml) {
+        // add the div to the DOM so it will inherit the
+        // document's namespaces
+        document.firstElementChild.append(div);
+      }
+      div.innerHTML = html;
+      return this.from(div.childNodes);
+    } finally {
+      div.remove();
+    }
+  }
   // jq
   add(content) {
     if (isSelector(content)) {
-      let newElems = this.constructor.cssSelectAll([ DOM.document.body ], content);
+      let newElems = this.constructor.cssSelectAll([ this.document.body ], content);
       return this.concat(newElems);
     }
     if (isHtml(content)) {
-      let newElems = [ ...createFragment(content, DOM.document).childNodes ];
-      return this.concat(newElems);
+      return this.concat(this.constructor.fromHtml(content));
     }
     if (isEl(content) || Array.isArray(content)) {
       return this.concat(content);
@@ -72,7 +96,7 @@ class DOMArray extends Array {
   attr(name, value) {
     let [ first ] = this;
     if (!(first && first.getAttribute)) {
-      return {};
+      return name ? null : {};
     }
     if (!name) {
       return attr(first);
@@ -424,7 +448,7 @@ class DOMArray extends Array {
 
   wrap(target) {
     for (const el of this) {
-      let wrapper = thingToNode(target, el.ownerDocument);
+      let wrapper = thingToNode(target, this);
       el.replaceWith(wrapper);
       wrapper.append(el);
     }
@@ -457,21 +481,19 @@ function each(domArray, op, val) {
   for (const el of domArray) {
     let content = val;
     if (isHtml(content)) {
-      let fragment = createFragment(content, el.ownerDocument);
-      if (fragment.childElementCount === 1) {
-        content = fragment.firstElementChild;
-      } else {
-        content = Array.from(fragment.children);
+      content = domArray.constructor.fromHtml(content);
+      if (content.length === 1) {
+        [ content ] = content;
       }
     }
     if (Array.isArray(content)) {
       el[op](
         ...Array.from(content)
-          .map((item) => thingToNode(item, el.ownerDocument))
+          .map((item) => thingToNode(item, domArray))
           .filter((x) => x)
       );
     } else {
-      let node = thingToNode(content, el.ownerDocument);
+      let node = thingToNode(content, domArray);
       if (node) {
         el[op](node);
       }
@@ -480,7 +502,7 @@ function each(domArray, op, val) {
   return domArray;
 }
 
-function thingToNode(thing, doc) {
+function thingToNode(thing, domArray) {
   if (Array.isArray(thing)) {
     [ thing ] = thing;
   }
@@ -488,16 +510,17 @@ function thingToNode(thing, doc) {
     return thing;
   }
   if (isHtml(thing)) {
-    return createElement(thing, doc);
+    return domArray.constructor.fromHtml(thing)[0];
   }
   if (typeof thing === `string`) {
-    return createTextNode(thing, doc);
+    return createTextNode(thing, domArray.document);
   }
   if (typeof thing === `function`) {
-    return thing(doc);
+    return thing(domArray.document);
   }
 }
 
 module.exports = {
-  DOMArray
+  DOMArray,
+  contentTypes
 };

@@ -1,4 +1,3 @@
-const { Error } = require('globalthis/implementation');
 const { window, document: globalDocument } = require('./dom');
 const { isTextNode } = require('./is-node');
 /**
@@ -336,6 +335,10 @@ function hasDescendant(parent, target) {
 }
 
 function parse(string, contentType) {
+  if (Buffer.isBuffer(string)) {
+    string = string.toString();
+  }
+
   let dom = new window.DOMParser().parseFromString(
     string,
     contentType
