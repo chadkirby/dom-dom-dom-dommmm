@@ -844,5 +844,12 @@ test(`$.find :scope`, (assert) => {
     $x.find('a').find(':scope > b').outerHtml(),
     $x.find('a > b').outerHtml()
   );
+});
 
+test(`$.xml`, (assert) => {
+  let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
+  assert.equal(
+    $x.find('a').find(':scope > b').outerHtml(),
+    $x.find('a > b').outerHtml()
+  );
 });

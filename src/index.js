@@ -53,6 +53,7 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
   }
 
   Object.assign($, {
+    document,
     query(selector) {
       let found = document.querySelector(selector);
       return found ? DOMList.of(found) : DOMList.of();
@@ -71,6 +72,10 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
         return thing.outerHTML;
       }
       return fragmentToHtml(document);
+    },
+    xml() {
+      let s = new DOM.window.XMLSerializer();
+      return s.serializeToString(document);
     },
     text(selector) {
       if (selector) {
