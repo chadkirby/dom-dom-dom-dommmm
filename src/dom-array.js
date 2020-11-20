@@ -104,12 +104,13 @@ class DOMArray extends Array {
     return each(this, `before`, content);
   }
   children(selector) {
-    if (this.length) {
-      let [ first ] = this;
-      let children = this.constructor.from(first.children);
-      return children.filter(selector);
+    let children = new Set();
+    for (const el of this) {
+      for (const child of el.children) {
+        children.add(child);
+      }
     }
-    return this.constructor.of();
+    return this.constructor.from(children).filter(selector);
   }
   clone({ deep = true } = {}) {
     return this.constructor.from(
@@ -240,10 +241,10 @@ class DOMArray extends Array {
       return s.serializeToString(el);
     }).join(delimiter);
   }
-  outerHtml() {
+  outerHtml(delimiter = '') {
     return this.arrayMap(
       (el) => el.outerHTML || el.textContent
-    ).join(``);
+    ).join(delimiter);
   }
   // jq
   index(target) {

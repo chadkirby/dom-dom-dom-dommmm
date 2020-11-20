@@ -569,10 +569,19 @@ test(`$.remove`, (assert) => {
 });
 
 test(`$.children`, (assert) => {
-  let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
+  let $x = $(`<div><a>1</a><b>2</b><c>3<d>4</d></c></div>`);
   assert.deepEqual(
     $x.first().children().map((i, node) => node.outerHTML),
-    [ '<a>1</a>', '<b>2</b>', '<c>3</c>' ]
+    [ '<a>1</a>', '<b>2</b>', '<c>3<d>4</d></c>' ]
+  );
+  assert.deepEqual(
+    $x.children().children(),
+    $x.find('d')
+  );
+  $x.find('a').append('<e>5</e>');
+  assert.deepEqual(
+    $x.children().children(),
+    $x.find('e,d')
   );
 });
 
