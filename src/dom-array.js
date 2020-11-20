@@ -48,10 +48,20 @@ class DOMArray extends Array {
     }
     throw new Error(`can't add content`);
   }
-  addClass(_class) {
+  addClass(className) {
     for (const el of this) {
-      el.classList.add(_class);
+      el.classList.add(className);
     }
+    return this;
+  }
+  removeClass(className) {
+    for (const el of this) {
+      el.classList.remove(className);
+      if (!el.classList.length) {
+        el.removeAttribute('class');
+      }
+    }
+    return this;
   }
   // jq
   after(content) {
