@@ -57,13 +57,6 @@ class DOMArray extends Array {
   after(content) {
     return each(this, `after`, content);
   }
-  ancestors() {
-    let { constructor: PROTO } = this;
-    if (this.length) {
-      return PROTO.from(parentsUntil(this[0], () => false));
-    }
-    return PROTO.of();
-  }
 
   // jq
   append(...contents) {
@@ -333,8 +326,24 @@ class DOMArray extends Array {
     return this.constructor.of();
   }
   // jq
-  parentsUntil(target) {
-    return this.ancestors().sliceUntil(target);
+  parents(selector) {
+    let parents = new Set();
+    for (const el of this) {
+      for (const parent of parentsUntil(el, () => false)) {
+        parents.add(parent);
+      }
+    }
+    return this.constructor.from(parents).filter(selector);
+  }
+  // jq
+  parentsUntil(target, filter) {
+    let parents = new Set();
+    for (const el of this) {
+      for (const parent of parentsUntil(el, target)) {
+        parents.add(parent);
+      }
+    }
+    return this.constructor.from(parents).filter(filter);
   }
 
   /**

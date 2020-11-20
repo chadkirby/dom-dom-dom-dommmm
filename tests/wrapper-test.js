@@ -19,6 +19,7 @@ test(`$ wraps an element`, (assert) => {
   assert.equal($x.html(), `foo`, `html function exists & returns innerHTML`);
   $x.html(`bar`);
   assert.equal($x.html(), `bar`, `html function sets innerHTML & returns the domarray`);
+  assert.equal($x.serialize(), `<span xmlns="http://www.w3.org/1999/xhtml">bar</span>`, `serialize function serializes`);
 
   assert.ok(
     $x.first().is(span)
@@ -527,9 +528,29 @@ test(`$.parent`, (assert) => {
     $x.html(),
     `<a>foo<c>bar</c></a>`
   );
+  assert.equal(
+    $c.parent()[0],
+    $a[0]
+  );
   assert.deepEqual(
-    $c.parent().outerHtml(),
-    `<a>foo<c>bar</c></a>`
+    $c.parentsUntil('div').length,
+    1
+  );
+  assert.deepEqual(
+    $c.parentsUntil('div'),
+    [ $a[0] ]
+  );
+  assert.deepEqual(
+    $c.parents().length,
+    3
+  );
+  assert.deepEqual(
+    $c.parents(),
+    [ $a[0], $x[0], $x.parent()[0] ]
+  );
+  assert.deepEqual(
+    $x.find('a,c').parents(),
+    [ $a[0], $x[0], $x.parent()[0] ]
   );
 });
 
