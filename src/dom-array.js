@@ -57,13 +57,6 @@ class DOMArray extends Array {
   after(content) {
     return each(this, `after`, content);
   }
-  ancestors() {
-    let { constructor: PROTO } = this;
-    if (this.length) {
-      return PROTO.from(parentsUntil(this[0], () => false));
-    }
-    return PROTO.of();
-  }
 
   // jq
   append(...contents) {
@@ -111,12 +104,13 @@ class DOMArray extends Array {
     return each(this, `before`, content);
   }
   children(selector) {
-    if (this.length) {
-      let [ first ] = this;
-      let children = this.constructor.from(first.children);
-      return children.filter(selector);
+    let children = new Set();
+    for (const el of this) {
+      for (const child of el.children) {
+        children.add(child);
+      }
     }
-    return this.constructor.of();
+    return this.constructor.from(children).filter(selector);
   }
   clone({ deep = true } = {}) {
     return this.constructor.from(
@@ -241,10 +235,16 @@ class DOMArray extends Array {
     }
     return this.arrayMap((el) => el.innerHTML || el.textContent).join(``);
   }
-  outerHtml() {
+  xml({ delimiter = '' } = {}) {
+    return this.arrayMap((el) => {
+      let s = new DOM.window.XMLSerializer();
+      return s.serializeToString(el);
+    }).join(delimiter);
+  }
+  outerHtml(delimiter = '') {
     return this.arrayMap(
       (el) => el.outerHTML || el.textContent
-    ).join(``);
+    ).join(delimiter);
   }
   // jq
   index(target) {
@@ -333,8 +333,24 @@ class DOMArray extends Array {
     return this.constructor.of();
   }
   // jq
-  parentsUntil(target) {
-    return this.ancestors().sliceUntil(target);
+  parents(selector) {
+    let parents = new Set();
+    for (const el of this) {
+      for (const parent of parentsUntil(el, () => false)) {
+        parents.add(parent);
+      }
+    }
+    return this.constructor.from(parents).filter(selector);
+  }
+  // jq
+  parentsUntil(target, filter) {
+    let parents = new Set();
+    for (const el of this) {
+      for (const parent of parentsUntil(el, target)) {
+        parents.add(parent);
+      }
+    }
+    return this.constructor.from(parents).filter(filter);
   }
 
   /**

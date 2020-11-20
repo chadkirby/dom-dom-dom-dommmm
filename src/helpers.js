@@ -189,13 +189,13 @@ function unwrap(el) {
  * @return  {Object}
  */
 function attr(el) {
-  if (!el) {
-    return {};
+  let attrs = Object.create(null);
+  if (el) {
+    for (const { name, value } of el.attributes) {
+      attrs[name] = value;
+    }
   }
-  return Object.assign(...Array.from(
-    el.attributes,
-    ({ name, value }) => ({ [name]: value })
-  ));
+  return attrs;
 }
 
 /**

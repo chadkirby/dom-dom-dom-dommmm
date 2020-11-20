@@ -19,6 +19,7 @@ test(`$ wraps an element`, (assert) => {
   assert.equal($x.html(), `foo`, `html function exists & returns innerHTML`);
   $x.html(`bar`);
   assert.equal($x.html(), `bar`, `html function sets innerHTML & returns the domarray`);
+  assert.equal($x.xml(), `<span xmlns="http://www.w3.org/1999/xhtml">bar</span>`, `serialize function serializes`);
 
   assert.ok(
     $x.first().is(span)
@@ -527,9 +528,29 @@ test(`$.parent`, (assert) => {
     $x.html(),
     `<a>foo<c>bar</c></a>`
   );
+  assert.equal(
+    $c.parent()[0],
+    $a[0]
+  );
   assert.deepEqual(
-    $c.parent().outerHtml(),
-    `<a>foo<c>bar</c></a>`
+    $c.parentsUntil('div').length,
+    1
+  );
+  assert.deepEqual(
+    $c.parentsUntil('div'),
+    [ $a[0] ]
+  );
+  assert.deepEqual(
+    $c.parents().length,
+    3
+  );
+  assert.deepEqual(
+    $c.parents(),
+    [ $a[0], $x[0], $x.parent()[0] ]
+  );
+  assert.deepEqual(
+    $x.find('a,c').parents(),
+    [ $a[0], $x[0], $x.parent()[0] ]
   );
 });
 
@@ -548,10 +569,19 @@ test(`$.remove`, (assert) => {
 });
 
 test(`$.children`, (assert) => {
-  let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
+  let $x = $(`<div><a>1</a><b>2</b><c>3<d>4</d></c></div>`);
   assert.deepEqual(
     $x.first().children().map((i, node) => node.outerHTML),
-    [ '<a>1</a>', '<b>2</b>', '<c>3</c>' ]
+    [ '<a>1</a>', '<b>2</b>', '<c>3<d>4</d></c>' ]
+  );
+  assert.deepEqual(
+    $x.children().children(),
+    $x.find('d')
+  );
+  $x.find('a').append('<e>5</e>');
+  assert.deepEqual(
+    $x.children().children(),
+    $x.find('e,d')
   );
 });
 
@@ -844,5 +874,12 @@ test(`$.find :scope`, (assert) => {
     $x.find('a').find(':scope > b').outerHtml(),
     $x.find('a > b').outerHtml()
   );
+});
 
+test(`$.xml`, (assert) => {
+  let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
+  assert.equal(
+    $x.find('a').find(':scope > b').outerHtml(),
+    $x.find('a > b').outerHtml()
+  );
 });

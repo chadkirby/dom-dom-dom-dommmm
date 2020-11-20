@@ -232,6 +232,11 @@ test(`attr returns attributes as a POJO`, (assert) => {
     {},
     `non-existent element returns empty object`
   );
+  assert.deepEqual(
+    attr(el`<p>foo</p>`),
+    {},
+    `no attributes returns empty object`
+  );
 });
 
 test(`previousSiblings iterates over previous siblings`, (assert) => {
