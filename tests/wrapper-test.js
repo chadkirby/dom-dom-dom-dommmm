@@ -19,7 +19,7 @@ test(`$ wraps an element`, (assert) => {
   assert.equal($x.html(), `foo`, `html function exists & returns innerHTML`);
   $x.html(`bar`);
   assert.equal($x.html(), `bar`, `html function sets innerHTML & returns the domarray`);
-  assert.equal($x.serialize(), `<span xmlns="http://www.w3.org/1999/xhtml">bar</span>`, `serialize function serializes`);
+  assert.equal($x.xml(), `<span xmlns="http://www.w3.org/1999/xhtml">bar</span>`, `serialize function serializes`);
 
   assert.ok(
     $x.first().is(span)

@@ -234,6 +234,12 @@ class DOMArray extends Array {
     }
     return this.arrayMap((el) => el.innerHTML || el.textContent).join(``);
   }
+  xml({ delimiter = '' } = {}) {
+    return this.arrayMap((el) => {
+      let s = new DOM.window.XMLSerializer();
+      return s.serializeToString(el);
+    }).join(delimiter);
+  }
   outerHtml() {
     return this.arrayMap(
       (el) => el.outerHTML || el.textContent
