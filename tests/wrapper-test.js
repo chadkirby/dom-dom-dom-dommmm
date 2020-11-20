@@ -835,6 +835,11 @@ test(`$.addClass`, (assert) => {
     $x.html(),
     `<a class="foo">1<b class="bar">2<c class="bar">3</c></b></a>`
   );
+  $x.find('b,c').removeClass('bar');
+  assert.equal(
+    $x.html(),
+    `<a class="foo">1<b>2<c>3</c></b></a>`
+  );
 
 });
 
