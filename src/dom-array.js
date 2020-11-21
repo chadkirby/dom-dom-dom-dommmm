@@ -114,13 +114,7 @@ class DOMArray extends Array {
     return each(this, `before`, content);
   }
   children(selector) {
-    let children = new Set();
-    for (const el of this) {
-      for (const child of el.children) {
-        children.add(child);
-      }
-    }
-    return this.constructor.from(children).filter(selector);
+    return getSet(this, (el) => el.children).filter(selector);
   }
   clone({ deep = true } = {}) {
     return this.constructor.from(
@@ -130,19 +124,12 @@ class DOMArray extends Array {
   }
   // jq
   closest(target) {
-    let { constructor: PROTO } = this;
-    if (this.length) {
-      let ancestor = closest(this[0], (el) => PROTO.of(el).is(target));
-      return ancestor ? PROTO.of(ancestor) : PROTO.of();
-    }
-    return PROTO.of();
+    let matcher = (el) => this.constructor.of(el).is(target);
+    return getSet(this, (item) => closest(item, matcher));
   }
   // jq
   contents() {
-    if (this.length) {
-      return this.constructor.from(this[0].childNodes);
-    }
-    return this.constructor.of();
+    return getSet(this, (el) => el.childNodes);
   }
 
   // Get the value of a computed style property for the
@@ -297,22 +284,13 @@ class DOMArray extends Array {
    * @see {@link http://api.jquery.com/next/}
    */
   next(selector) {
-    return this
-      .arrayMap((el) => el.nextElementSibling)
-      .arrayFilter((el) => el)
-      .filter(selector);
+    return getSet(this, (el) => el.nextElementSibling).filter(selector);
   }
   nextSibling(selector) {
-    let [ { nextSibling } ] = this;
-    if (nextSibling) {
-      let sib = this.constructor.of(nextSibling);
-      return sib.filter(selector);
-    }
-    return this.constructor.from([]);
+    return getSet(this, (el) => el.nextSibling).filter(selector);
   }
   nextSiblings(selector) {
-    let sibs = this.constructor.from(nextSiblings(this[0]));
-    return sibs.filter(selector);
+    return getSet(this, nextSiblings).filter(selector);
   }
   // jq: Get all following siblings of each element in the
   // set of matched elements, optionally filtered by a
@@ -331,36 +309,27 @@ class DOMArray extends Array {
     if (isSelector(target)) {
       return this.arrayFilter((el) => !this.constructor.cssIs(el, target));
     }
+    if (isEl(target)) {
+      return this.arrayFilter((el) => el !== target);
+    }
+    if (Array.isArray(target)) {
+      return this.arrayFilter((el) => !target.includes(el));
+    }
     if (typeof target === 'function') {
       return this.arrayFilter((el, i) => !target.call(el, i, el));
     }
     throw new Error('unknown not target');
   }
-  parent() {
-    if (this.length) {
-      return this.constructor.of(this[0].parentNode);
-    }
-    return this.constructor.of();
+  parent(selector) {
+    return getSet(this, (el) => el.parentElement).filter(selector);
   }
   // jq
   parents(selector) {
-    let parents = new Set();
-    for (const el of this) {
-      for (const parent of parentsUntil(el, () => false)) {
-        parents.add(parent);
-      }
-    }
-    return this.constructor.from(parents).filter(selector);
+    return getSet(this, (el) => parentsUntil(el, () => false)).filter(selector);
   }
   // jq
   parentsUntil(target, filter) {
-    let parents = new Set();
-    for (const el of this) {
-      for (const parent of parentsUntil(el, target)) {
-        parents.add(parent);
-      }
-    }
-    return this.constructor.from(parents).filter(filter);
+    return getSet(this, (el) => parentsUntil(el, target)).filter(filter);
   }
 
   /**
@@ -375,22 +344,13 @@ class DOMArray extends Array {
    * @see {@link http://api.jquery.com/prev/}
    */
   prev(selector) {
-    return this
-      .arrayMap((el) => el.previousElementSibling)
-      .arrayFilter((el) => el)
-      .filter(selector);
+    return getSet(this, (el) => el.previousElementSibling).filter(selector);
   }
   previousSiblings(selector) {
-    let sibs = this.constructor.from(previousSiblings(this[0]));
-    return sibs.filter(selector);
+    return getSet(this, previousSiblings).filter(selector);
   }
   previousSibling(selector) {
-    let [ { previousSibling } ] = this;
-    if (previousSibling) {
-      let sib = this.constructor.of(previousSibling);
-      return sib.filter(selector);
-    }
-    return this.constructor.from([]);
+    return getSet(this, (el) => el.previousSibling).filter(selector);
   }
 
   // Get all preceding siblings of each element in the set
@@ -501,6 +461,23 @@ class DOMArray extends Array {
   static cssIs(node, selector) {
     return CSS.cssIs(node, selector);
   }
+}
+
+function getSet(domArray, getter) {
+  let set = new Set();
+  for (const el of domArray) {
+    let result = getter(el);
+    if (result) {
+      if (!result[Symbol.iterator] || typeof result === 'string') {
+        result = [ result ];
+      }
+      for (const item of result) {
+        set.add(item);
+      }
+    }
+  }
+  return domArray.constructor.from(set);
+
 }
 
 function each(domArray, op, val) {

@@ -46,7 +46,7 @@ test(`dom creates fragment`, (assert) => {
 
   assert.equal(
     dom`<span />`.nodeName,
-    `#document-fragment`
+    `DIV`
   );
 
   assert.equal(
