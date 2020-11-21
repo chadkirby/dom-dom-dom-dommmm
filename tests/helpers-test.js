@@ -9,6 +9,7 @@ const {
   el,
   filterTextNodes,
   fragmentToHtml,
+  lookupNamespaceURI,
   parentsUntil,
   parse,
   previousSiblings,
@@ -353,4 +354,15 @@ test(`splitSearch splits & searches`, (assert) => {
     []
   );
 
+});
+
+test(`lookupNamespaceURI knows well known URIs`, (assert) => {
+  assert.equal(
+    lookupNamespaceURI('xml'),
+    'http://www.w3.org/XML/1998/namespace'
+  );
+  assert.equal(
+    lookupNamespaceURI('xmlns'),
+    'http://www.w3.org/2000/xmlns/'
+  );
 });

@@ -175,6 +175,10 @@ test(`$.closest`, (assert) => {
     $x.queryAll(`b`).closest(`a`)[0],
     $x.queryAll(`a`)[0]
   );
+  assert.equal(
+    $x.queryAll(`a,b`).closest(`div`)[0],
+    $x[0]
+  );
   assert.ok(
     $x.queryAll(`b`).closest(`a`).is($x.queryAll(`a`))
   );
@@ -886,5 +890,25 @@ test(`$.xml`, (assert) => {
   assert.equal(
     $x.find('a').find(':scope > b').outerHtml(),
     $x.find('a > b').outerHtml()
+  );
+});
+
+test(`$.not`, (assert) => {
+  let $x = $(`<div><a/><b/><c/></div>`);
+  assert.deepEqual(
+    $x.find('a,b,c').not('b'),
+    $x.find('a,c')
+  );
+  assert.deepEqual(
+    $x.find('a,b,c').not($x.find('a,b')),
+    $x.find('c')
+  );
+  assert.deepEqual(
+    $x.find('a,b,c').not($x.find('a')[0]),
+    $x.find('b,c')
+  );
+  assert.deepEqual(
+    $x.find('a,b,c').not((i) => i === 1),
+    $x.find('a,c')
   );
 });

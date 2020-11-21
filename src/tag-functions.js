@@ -1,10 +1,21 @@
 const { window, document: globalDocument } = require('./dom');
-const { collectTextNodes, createFragment, createTextNode, fragmentToHtml } = require('./helpers');
+const { collectTextNodes, createTextNode } = require('./helpers');
 
 function makeDom(document) {
   return function(...args) {
-    let $ = createFragment(assemble(...args), document);
-    for (const node of collectTextNodes($)) {
+    let div = document.createElement('div');
+    try {
+      if (document.contentType.toLowerCase().endsWith('xml')) {
+        // add the div to the DOM so it will inherit the
+        // document's namespaces
+        document.firstElementChild.append(div);
+      }
+      div.innerHTML = assemble(...args);
+    } finally {
+      div.remove();
+    }
+
+    for (const node of collectTextNodes(div)) {
       let trimmed = node.textContent.replace(/^\s*\n\s*|\s*\n\s*$/g, '');
       if (node.textContent && !trimmed) {
         // remove the node if we just emptied it out
@@ -13,7 +24,7 @@ function makeDom(document) {
         node.textContent = trimmed;
       }
     }
-    return $;
+    return div;
   };
 
 }
@@ -68,20 +79,27 @@ function text(...args) {
  * @return  {string}  de-formatted html
  */
 function unpretty(...args) {
-  let $ = dom(...args);
-  return fragmentToHtml($);
+  return dom(...args).innerHTML;
 }
 
-function unprettyx(...args) {
-  let document;
-  let xml = `<?xml version="1.0" encoding="utf-8" ?><root />`;
-  document = new window.DOMParser().parseFromString(
+function unprettyns(namespaces = {}) {
+  let xml = `<?xml version="1.0" encoding="utf-8" ?><root`;
+  for (const [ prefix, ns ] of Object.entries(namespaces)) {
+    xml += ` xmlns:${prefix}="${ns}"`;
+  }
+  xml += ' />';
+  let document = new window.DOMParser().parseFromString(
     xml,
     "text/xml"
   );
+  if (document.firstElementChild.matches('parsererror')) {
+    throw new Error(document.firstElementChild.textContent);
+  }
+  function unprettyx(...args) {
+    return makeDom(document)(...args).innerHTML;
+  }
 
-  let $ = makeDom(document)(...args);
-  return fragmentToHtml($);
+  return unprettyx;
 }
 
 /**
@@ -98,5 +116,6 @@ module.exports = {
   el,
   text,
   unpretty,
-  unprettyx
+  unprettyns,
+  unprettyx: unprettyns()
 };
