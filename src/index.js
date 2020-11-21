@@ -1,4 +1,4 @@
-const { parse } = require('./helpers');
+const { parse, lookupNamespaceURI } = require('./helpers');
 const DOM = require('./dom');
 const { DOMArray, contentTypes } = require('./dom-array');
 const { fragmentToText, fragmentToHtml, isHtml } = require('./helpers');
@@ -54,6 +54,11 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
 
   Object.assign($, {
     document,
+    createElementNS(tagName) {
+      let [ prefix ] = tagName.split(':');
+      let uri = lookupNamespaceURI(prefix, document);
+      return DOMList.of(document.createElementNS(uri, tagName));
+    },
     query(selector) {
       let found = document.querySelector(selector);
       return found ? DOMList.of(found) : DOMList.of();

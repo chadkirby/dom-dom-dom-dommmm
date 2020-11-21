@@ -1,14 +1,14 @@
 const DOM = require('./dom');
 const CSS = require('./css-adapter');
 
-const { attr, closest, createTextNode, hasDescendant, isHtml, isSelector, nextElementSiblings, nextSiblings, nodeToSelector, parentsUntil, previousElementSiblings, previousSiblings, unwrap } = require('./helpers');
+const { attr, closest, createTextNode, hasDescendant, isHtml, isSelector, lookupNamespaceURI, nextElementSiblings, nextSiblings, nodeToSelector, parentsUntil, previousElementSiblings, previousSiblings, unwrap } = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
 const { removeSubsets } = require('./remove-subsets');
 
-const contentTypes = {
+const contentTypes = Object.assign(Object.create(null), {
   xml: 'text/xml',
   html: 'text/html'
-};
+});
 
 class DOMArray extends Array {
   get DOMArray() {
@@ -105,9 +105,32 @@ class DOMArray extends Array {
       return attr(first);
     }
     if (value !== undefined) {
+      if (/\w+:\w+/.test(name)) {
+        throw new Error('use setAttrNS() to set namespaced attributes');
+      }
       this.forEach((el) => el.setAttribute(name, value));
     }
     return first.getAttribute(name);
+  }
+  setAttrNS(name, value) {
+    let [ prefix ] = name.split(':');
+    let { document } = this;
+    let uri = lookupNamespaceURI(prefix, document);
+    for (const el of this) {
+      if (el) {
+        el.setAttributeNS(uri, name, value);
+      }
+    }
+    return this;
+  }
+  defineNamespace(prefix, uri) {
+    for (const el of this) {
+      if (el) {
+        let name = `xmlns:${prefix}`;
+        el.setAttributeNS(lookupNamespaceURI(name), name, uri);
+      }
+    }
+    return this;
   }
   // jq
   before(content) {

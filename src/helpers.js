@@ -356,6 +356,15 @@ function isHtml(thing) {
   return typeof thing === 'string' && /^\s*<\w.*?>/.test(thing);
 }
 
+const NAMESPACES = Object.assign(Object.create(null), {
+  xml: 'http://www.w3.org/XML/1998/namespace',
+  xmlns: 'http://www.w3.org/2000/xmlns/'
+});
+function lookupNamespaceURI(prefix, document) {
+  [ prefix ] = prefix.split(':');
+  return NAMESPACES[prefix.toLowerCase()] || (document && document.lookupNamespaceURI(prefix));
+}
+
 module.exports = {
   attr,
   closest,
@@ -369,6 +378,7 @@ module.exports = {
   hasDescendant,
   isHtml,
   isSelector,
+  lookupNamespaceURI,
   parentsUntil,
   parse,
   previousElementSiblings,

@@ -41,6 +41,41 @@ test(`loadXml loads namespaces`, (assert) => {
   </w:numbering>`;
 
   let $ = loadXml(numberingXml);
-  assert.equal($(`w\\:lvl`).length, 1);
+  let $lvl = $(`w\\:lvl`);
+  assert.equal($lvl.length, 1);
   assert.ok($(`<w:foo />`), 'can wrap namespaced xml');
+  $lvl.setAttrNS('xml:space', 'preserve');
+  assert.deepEqual(
+    $lvl.attr(),
+    { 'w:ilvl': '0', 'xml:space': 'preserve' }
+  );
+
+  let $root = $(`w\\:numbering`);
+  $root.setAttrNS('xmlns:foo', 'bar');
+  assert.equal(
+    $root.document.lookupNamespaceURI('foo'),
+    'bar'
+  );
+
+  $lvl.setAttrNS('foo:baz', '7');
+  assert.deepEqual(
+    $(`w\\:lvl`).attr(),
+    { 'w:ilvl': '0', 'xml:space': 'preserve', 'foo:baz': '7' }
+  );
+});
+
+
+test(`loadXml can define namespaces & create namespaced elements`, (assert) => {
+  let $ = loadXml(`<Pr>Hi there!</Pr>`);
+
+  assert.throws(
+    () => $.createElementNS(`foo:div`),
+    `can't create element in unknown namespace`
+  );
+  $('Pr').defineNamespace('foo', 'bar');
+
+  assert.equal(
+    $.createElementNS(`foo:div`).outerHtml(),
+    `<foo:div xmlns:foo="bar"/>`
+  );
 });
