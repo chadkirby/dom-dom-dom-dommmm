@@ -801,11 +801,15 @@ test(`$.setCssAdapter`, (assert) => {
   // eslint-disable-next-line no-shadow
   let $ = loadHtml(`<html><body></body></html>`);
   let cssCalled = 0;
-  $.setCssAdapter({ cssSelectAll(nodes, selector) {
-    cssCalled += 1;
-    // always find 'b'
-    return nodes[0].querySelectorAll('b');
-  } });
+  $.setCssAdapter({
+    'text/html': {
+      cssSelectAll(nodes, selector) {
+        cssCalled += 1;
+        // always find 'b'
+        return nodes[0].querySelectorAll('b');
+      }
+    }
+  });
   let $x = $(`<div><a>1<b>2<c>3</c></b></a></div>`);
   let $a = $x.find('a');
 

@@ -6,27 +6,40 @@ const { isTextNode, isEl } = require('./is-node');
 const { removeSubsets } = require('./remove-subsets');
 
 function wrapper(document, { toHtml, cssAdapter } = {}) {
+  let contentType = document.contentType.toLowerCase();
+
   class DOMList extends DOMArray {
     static get document() {
       return document;
     }
     static cssSelectAll(nodes, selector) {
-      if (cssAdapter) {
-        return cssAdapter.cssSelectAll(removeSubsets(nodes), selector);
+      try {
+        return cssAdapter[contentType].cssSelectAll(
+          removeSubsets(nodes),
+          selector,
+          super.cssSelectAll
+        );
+      } catch (e) {
+        return super.cssSelectAll(nodes, selector);
       }
-      return super.cssSelectAll(nodes, selector);
     }
     static cssSelectOne(nodes, selector) {
-      if (cssAdapter) {
-        return cssAdapter.cssSelectOne(removeSubsets(nodes), selector);
+      try {
+        return cssAdapter[contentType].cssSelectOne(
+          removeSubsets(nodes),
+          selector,
+          super.cssSelectOne
+        );
+      } catch (e) {
+        return super.cssSelectOne(nodes, selector);
       }
-      return super.cssSelectOne(nodes, selector);
     }
     static cssIs(node, selector) {
-      if (cssAdapter) {
-        return cssAdapter.cssIs(node, selector);
+      try {
+        return cssAdapter[contentType].cssIs(node, selector, super.cssIs);
+      } catch (e) {
+        return super.cssIs(node, selector);
       }
-      return super.cssIs(node, selector);
     }
   }
 
