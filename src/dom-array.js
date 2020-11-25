@@ -217,11 +217,23 @@ class DOMArray extends Array {
       return this.queryAll(target);
     }
     if (typeof target === 'function') {
+      return this.constructor.from(
+        this.arrayFilter((el, i) => target.call(el, i, el))
+      );
+    }
+    throw new Error('unknown find target');
+  }
+
+  findFirst(target) {
+    if (isSelector(target)) {
+      return this.query(target);
+    }
+    if (typeof target === 'function') {
       return this.constructor.of(
         this.arrayFind((el, i) => target.call(el, i, el))
       );
     }
-    throw new Error('unknown find target');
+    throw new Error('unknown findFirst target');
   }
 
   // jq
@@ -249,11 +261,16 @@ class DOMArray extends Array {
   html(str) {
     if (str !== undefined) {
       for (const el of this) {
-        el.innerHTML = str;
+        if (el) {
+          el.innerHTML = str;
+        }
       }
       return this;
     }
-    return this.arrayMap((el) => el.innerHTML || el.textContent).join(``);
+    return this
+      .arrayFilter((el) => el)
+      .arrayMap((el) => el.innerHTML || el.textContent)
+      .join(``);
   }
   xml({ delimiter = '' } = {}) {
     return this.arrayMap((el) => {
@@ -437,11 +454,16 @@ class DOMArray extends Array {
   text(newText) {
     if (newText || newText === ``) {
       for (const el of this) {
-        el.textContent = newText;
+        if (el) {
+          el.textContent = newText;
+        }
       }
       return this;
     }
-    return this.arrayMap((el) => el.textContent).join(``);
+    return this
+      .arrayFilter((el) => el)
+      .arrayMap((el) => el.textContent)
+      .join(``);
   }
 
   unwrap() {
