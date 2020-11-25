@@ -1,4 +1,4 @@
-const { window, document: globalDocument } = require('./dom');
+const DOM = require('./dom');
 const { isTextNode } = require('./is-node');
 /**
  * iterator to collect text nodes from a dom element
@@ -78,7 +78,7 @@ function fragmentToText(fragment) {
  *
  * @return  {HTMLElement}  Document Fragment
  */
-function createFragment(string = ``, document = globalDocument) {
+function createFragment(string = ``, document = DOM.document) {
   const template = document.createElement(`template`);
   template.innerHTML = string;
   if (template.content) {
@@ -100,7 +100,7 @@ function createFragment(string = ``, document = globalDocument) {
  *
  * @return  {HTMLElement}
  */
-function createElement(string = ``, document = globalDocument) {
+function createElement(string = ``, document = DOM.document) {
   return createFragment(string, document).firstElementChild;
 }
 
@@ -111,7 +111,7 @@ function createElement(string = ``, document = globalDocument) {
  *
  * @return  {HTMLElement}
  */
-function createTextNode(text, document = globalDocument) {
+function createTextNode(text, document = DOM.document) {
   return document.createTextNode(text);
 }
 
@@ -339,7 +339,7 @@ function parse(string, contentType) {
     string = string.toString();
   }
 
-  let dom = new window.DOMParser().parseFromString(
+  let dom = new DOM.window.DOMParser().parseFromString(
     string,
     contentType
   );

@@ -116,6 +116,5 @@ module.exports = {
   el,
   text,
   unpretty,
-  unprettyns,
-  unprettyx: unprettyns()
+  unprettyns
 };

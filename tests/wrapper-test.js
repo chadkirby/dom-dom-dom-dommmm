@@ -1,6 +1,6 @@
 const test = require('./tape')(module);
 const { $, el, createTextNode, loadHtml } = require('../src/index');
-const { document } = require('../src/dom');
+const DOM = require('../src/dom');
 
 test(`$ wraps an element`, (assert) => {
   let $x = $(el`<span>foo</span>`);
@@ -721,7 +721,7 @@ test(`$.siblings`, (assert) => {
 test(`$.add`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   // add to the document dom so that we can add by selector
-  document.body.append($x[0]);
+  DOM.document.body.append($x[0]);
   let $a = $x.find('a');
   let $b = $x.find('b');
   let $c = $x.find('c');
@@ -801,11 +801,15 @@ test(`$.setCssAdapter`, (assert) => {
   // eslint-disable-next-line no-shadow
   let $ = loadHtml(`<html><body></body></html>`);
   let cssCalled = 0;
-  $.setCssAdapter({ cssSelectAll(nodes, selector) {
-    cssCalled += 1;
-    // always find 'b'
-    return nodes[0].querySelectorAll('b');
-  } });
+  $.setCssAdapter({
+    'text/html': {
+      cssSelectAll(nodes, selector) {
+        cssCalled += 1;
+        // always find 'b'
+        return nodes[0].querySelectorAll('b');
+      }
+    }
+  });
   let $x = $(`<div><a>1<b>2<c>3</c></b></a></div>`);
   let $a = $x.find('a');
 
