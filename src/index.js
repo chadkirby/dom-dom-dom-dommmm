@@ -57,6 +57,9 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
     createElementNS(tagName) {
       let [ prefix ] = tagName.split(':');
       let uri = lookupNamespaceURI(prefix, document);
+      if (!uri) {
+        throw new Error(`unknown namespace for ${prefix}`);
+      }
       return DOMList.of(document.createElementNS(uri, tagName));
     },
     query(selector) {
@@ -76,11 +79,14 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
       if (isEl(thing)) {
         return thing.outerHTML;
       }
-      return fragmentToHtml(document);
+      if (!arguments.length) {
+        return fragmentToHtml(document);
+      }
+      return '';
     },
-    xml() {
+    xml(doc = document) {
       let s = new DOM.window.XMLSerializer();
-      return s.serializeToString(document);
+      return s.serializeToString(doc);
     },
     text(selector) {
       if (selector) {
