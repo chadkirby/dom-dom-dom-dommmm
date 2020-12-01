@@ -1,7 +1,7 @@
 const DOM = require('./dom');
 const CSS = require('./css-adapter');
 
-const { attr, closest, createTextNode, hasDescendant, isHtml, isSelector, lookupNamespaceURI, nextElementSiblings, nextSiblings, nodeToSelector, parentsUntil, previousElementSiblings, previousSiblings, unwrap } = require('./helpers');
+const { attr, closest, createTextNode, empty, hasDescendant, isHtml, isSelector, lookupNamespaceURI, nextElementSiblings, nextSiblings, nodeToSelector, parentsUntil, previousElementSiblings, previousSiblings, unwrap } = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
 const { removeSubsets } = require('./remove-subsets');
 
@@ -182,9 +182,7 @@ class DOMArray extends Array {
   // jq
   empty() {
     for (const el of this) {
-      while (el.firstChild) {
-        el.firstChild.remove();
-      }
+      empty(el);
     }
     return this;
   }
@@ -452,10 +450,15 @@ class DOMArray extends Array {
   }
 
   text(newText) {
-    if (newText || newText === ``) {
+    if (newText || newText === '') {
       for (const el of this) {
         if (el) {
-          el.textContent = newText;
+          if (isEl(el)) {
+            empty(el);
+            el.append(createTextNode(newText));
+          } else if (isTextNode(el)) {
+            el.textContent = newText;
+          }
         }
       }
       return this;

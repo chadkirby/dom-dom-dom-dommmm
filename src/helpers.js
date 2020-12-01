@@ -27,6 +27,20 @@ function* collectTextNodes(el, endNode) {
 }
 
 /**
+ * empty a node
+ *
+ * @param   {HTMLElement}  el
+ *
+ * @return  {Iterable.HTMLElement}  iterates over text nodes
+ */
+function empty(el) {
+  while (el.firstChild) {
+    el.firstChild.remove();
+  }
+  return el;
+}
+
+/**
  * collect text nodes that satisfy a filter function
  *
  * @param   {HTMLElement}  el
@@ -372,6 +386,7 @@ module.exports = {
   createElement,
   createFragment,
   createTextNode,
+  empty,
   filterTextNodes,
   fragmentToHtml,
   fragmentToText,

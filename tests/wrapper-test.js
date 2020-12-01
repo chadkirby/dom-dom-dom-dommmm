@@ -504,6 +504,16 @@ test(`set text`, (assert) => {
     $x[0].outerHTML,
     `<div>foo</div>`
   );
+  $x.text('');
+  assert.equal(
+    $x[0].outerHTML,
+    `<div></div>`
+  );
+  assert.ok(
+    $x[0].childNodes.length,
+    1,
+    'an empty text node is inserted when text is set to the empty string'
+  );
 });
 
 test(`$.before`, (assert) => {
