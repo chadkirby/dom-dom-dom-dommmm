@@ -98,6 +98,9 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
       return '';
     },
     xml(doc = document) {
+      if (DOMList.isDOMArray(doc)) {
+        [ doc ] = doc;
+      }
       let s = new DOM.window.XMLSerializer();
       return s.serializeToString(doc);
     },
