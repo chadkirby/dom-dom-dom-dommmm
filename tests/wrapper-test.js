@@ -926,3 +926,11 @@ test(`$.not`, (assert) => {
     $x.find('a,c')
   );
 });
+
+test(`$.matches`, (assert) => {
+  let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
+  assert.equal(
+    $x.find('a,b').matches(/^\d{2}$/).outerHtml(),
+    $x.findFirst('b').outerHtml()
+  );
+});

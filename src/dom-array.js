@@ -310,6 +310,11 @@ class DOMArray extends Array {
     return this.arrayMap((el, i) => callback.call(el, i, el));
   }
 
+  // Filters the list to those whose text matches the given target
+  matches(target, getText = (el) => el.textContent) {
+    return this.arrayFilter((el, i) => getText(el, i, this).match(target));
+  }
+
   /**
    *  Get the immediately following sibling of each element
    *  in the set of matched elements. If a selector is
