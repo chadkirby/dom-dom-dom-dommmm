@@ -1,18 +1,17 @@
 const { parse, lookupNamespaceURI } = require('./helpers');
-const DOM = require('./dom');
+const _DOM = require('./dom');
 const { DOMArray, contentTypes } = require('./dom-array');
 const { fragmentToText, fragmentToHtml, isHtml } = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
 const { removeSubsets } = require('./remove-subsets');
 
-function wrapper(document, { toHtml, cssAdapter } = {}) {
-  let contentType = document.contentType.toLowerCase();
-
+function wrapper(DOM, { toHtml, cssAdapter } = {}) {
   class DOMList extends DOMArray {
     static get document() {
-      return document;
+      return DOM.document;
     }
     static cssSelectAll(nodes, selector) {
+      let contentType = DOM.document.contentType.toLowerCase();
       try {
         return cssAdapter[contentType].cssSelectAll(
           removeSubsets(nodes),
@@ -24,6 +23,7 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
       }
     }
     static cssSelectOne(nodes, selector) {
+      let contentType = DOM.document.contentType.toLowerCase();
       try {
         return cssAdapter[contentType].cssSelectOne(
           removeSubsets(nodes),
@@ -35,6 +35,7 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
       }
     }
     static cssIs(node, selector) {
+      let contentType = DOM.document.contentType.toLowerCase();
       try {
         return cssAdapter[contentType].cssIs(node, selector, super.cssIs);
       } catch (e) {
@@ -57,7 +58,7 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
       if (isHtml(arg)) {
         return DOMList.fromHtml(arg);
       }
-      return DOMList.from(document.querySelectorAll(arg));
+      return DOMList.from(DOM.document.querySelectorAll(arg));
     }
     let html = toHtml && toHtml(arg);
     if (html) {
@@ -66,25 +67,27 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
   }
 
   Object.assign($, {
-    document,
+    get document() {
+      return DOM.document;
+    },
     createElementNS(tagName) {
       let [ prefix ] = tagName.split(':');
-      let uri = lookupNamespaceURI(prefix, document);
+      let uri = lookupNamespaceURI(prefix, DOM.document);
       if (!uri) {
         throw new Error(`unknown namespace for ${prefix}`);
       }
-      return DOMList.of(document.createElementNS(uri, tagName));
+      return DOMList.of(DOM.document.createElementNS(uri, tagName));
     },
     query(selector) {
-      let found = document.querySelector(selector);
+      let found = DOM.document.querySelector(selector);
       return found ? DOMList.of(found) : DOMList.of();
     },
     queryAll(selector) {
-      return DOMList.from(document.querySelectorAll(selector));
+      return DOMList.from(DOM.document.querySelectorAll(selector));
     },
     html(thing) {
       if (typeof thing === 'string') {
-        return DOMList.from(document.querySelectorAll(thing)).outerHtml();
+        return DOMList.from(DOM.document.querySelectorAll(thing)).outerHtml();
       }
       if (DOMList.isDOMArray(thing)) {
         return thing.outerHtml();
@@ -93,11 +96,11 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
         return thing.outerHTML;
       }
       if (!arguments.length) {
-        return fragmentToHtml(document);
+        return fragmentToHtml(DOM.document);
       }
       return '';
     },
-    xml(doc = document) {
+    xml(doc = DOM.document) {
       if (DOMList.isDOMArray(doc)) {
         [ doc ] = doc;
       }
@@ -106,9 +109,9 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
     },
     text(selector) {
       if (selector) {
-        return DOMList.from(document.querySelectorAll(selector)).text();
+        return DOMList.from(DOM.document.querySelectorAll(selector)).text();
       }
-      return fragmentToText(document);
+      return fragmentToText(DOM.document);
     },
     setHtmlAdapter(adapter) {
       toHtml = adapter;
@@ -121,35 +124,30 @@ function wrapper(document, { toHtml, cssAdapter } = {}) {
   return $;
 }
 
-let $;
-
 module.exports = {
   loadHtml(
     html = `<!DOCTYPE html><body></body></html>`,
     { toHtml, cssAdapter } = {}
   ) {
     let document = parse(html, contentTypes.html);
-    return wrapper(document, { toHtml, cssAdapter });
+    return wrapper({ document }, { toHtml, cssAdapter });
   },
   loadXml(
     xml = `<?xml version="1.0" ?><root />`,
     { toHtml, cssAdapter } = {}
   ) {
     let document = parse(xml, contentTypes.xml);
-    return wrapper(document, { toHtml, cssAdapter });
+    return wrapper({ document }, { toHtml, cssAdapter });
   },
   new(document, { toHtml, cssAdapter } = {}) {
-    return wrapper(document, { toHtml, cssAdapter });
+    return wrapper({ document }, { toHtml, cssAdapter });
   },
 
   get $() {
-    if (!$) {
-      $ = wrapper(DOM.document);
-    }
-    return $;
+    return wrapper(_DOM);
   },
 
-  ...DOM,
+  ..._DOM,
   ...require('./helpers'),
   ...require('./splice-chars'),
   ...require('./tag-functions')
