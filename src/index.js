@@ -124,7 +124,9 @@ function wrapper(DOM, { toHtml, cssAdapter } = {}) {
   return $;
 }
 
+
 module.exports = {
+  $: wrapper(_DOM),
   loadHtml(
     html = `<!DOCTYPE html><body></body></html>`,
     { toHtml, cssAdapter } = {}
@@ -142,11 +144,6 @@ module.exports = {
   new(document, { toHtml, cssAdapter } = {}) {
     return wrapper({ document }, { toHtml, cssAdapter });
   },
-
-  get $() {
-    return wrapper(_DOM);
-  },
-
   ..._DOM,
   ...require('./helpers'),
   ...require('./splice-chars'),
