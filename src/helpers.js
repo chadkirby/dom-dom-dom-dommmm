@@ -66,9 +66,17 @@ function* filterTextNodes(el, filterFn) {
  * @return  {string}
  */
 function fragmentToHtml(fragment) {
-  return [ ...fragment.childNodes ].map(
-    (n) => isTextNode(n) ? n.textContent : n.outerHTML
-  ).join(``);
+  if (isFragment(fragment)) {
+    const div = fragment.ownerDocument.createElement('div');
+    div.appendChild(fragment.cloneNode(true));
+    return div.innerHTML;
+  }
+  if (isDocument(fragment)) {
+    const div = fragment.createElement('div');
+    div.appendChild(fragment.documentElement.cloneNode(true));
+    return div.innerHTML;
+  }
+  return fragment.innerHTML;
 }
 
 /**
@@ -82,6 +90,14 @@ function fragmentToText(fragment) {
   return [ ...fragment.childNodes ].map(
     (n) => n.textContent
   ).join(``);
+}
+
+function isFragment(obj) {
+  return obj && obj.nodeType === 11;
+}
+
+function isDocument(obj) {
+  return obj && obj.nodeType === 9;
 }
 
 /**
