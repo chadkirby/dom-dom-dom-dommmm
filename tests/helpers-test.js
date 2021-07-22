@@ -366,3 +366,14 @@ test(`lookupNamespaceURI knows well known URIs`, (assert) => {
     'http://www.w3.org/2000/xmlns/'
   );
 });
+
+test(`fragmentToHtml`, (assert) => {
+    let $paragraph = createFragment(`<p>foo<b></b>baz</p>`);
+    // put html-looking text in the <b> tag
+    $paragraph.querySelector('b').textContent = '<b>bar</b>';
+    assert.equal(
+      fragmentToHtml($paragraph),
+      '<p>foo<b>&lt;b&gt;bar&lt;/b&gt;</b>baz</p>',
+      'angle brackets are escaped'
+    );
+});
