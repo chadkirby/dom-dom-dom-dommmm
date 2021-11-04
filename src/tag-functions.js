@@ -1,4 +1,3 @@
-const { window, document: globalDocument } = require('./dom');
 const { collectTextNodes, createTextNode } = require('./helpers');
 
 function makeDom(document) {
@@ -39,7 +38,7 @@ function makeDom(document) {
  *
  * @return  {HTMLElement}  document fragment
  */
-let dom = makeDom(globalDocument);
+let dom = makeDom(globalThis.document);
 
 /**
  * Tagged template function to convert html to an element. E.g.
@@ -88,7 +87,7 @@ function unprettyns(namespaces = {}) {
     xml += ` xmlns:${prefix}="${ns}"`;
   }
   xml += ' />';
-  let document = new window.DOMParser().parseFromString(
+  let document = new globalThis.window.DOMParser().parseFromString(
     xml,
     "text/xml"
   );

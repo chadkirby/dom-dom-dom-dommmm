@@ -224,18 +224,18 @@ test(`filterTextNodes filters text nodes`, (assert) => {
 
 test(`attr returns attributes as a POJO`, (assert) => {
   assert.deepEqual(
-    attr(el`<span id='123' foo='bar' baz-bat='bot' />`),
+    { ...attr(el`<span id='123' foo='bar' baz-bat='bot' />`) },
     { foo: 'bar', 'baz-bat': 'bot', id: '123' }
   );
 
   assert.deepEqual(
     attr(el``),
-    {},
+    Object.create(null),
     `non-existent element returns empty object`
   );
   assert.deepEqual(
     attr(el`<p>foo</p>`),
-    {},
+    Object.create(null),
     `no attributes returns empty object`
   );
 });
@@ -368,12 +368,12 @@ test(`lookupNamespaceURI knows well known URIs`, (assert) => {
 });
 
 test(`fragmentToHtml`, (assert) => {
-    let $paragraph = createFragment(`<p>foo<b></b>baz</p>`);
-    // put html-looking text in the <b> tag
-    $paragraph.querySelector('b').textContent = '<b>bar</b>';
-    assert.equal(
-      fragmentToHtml($paragraph),
-      '<p>foo<b>&lt;b&gt;bar&lt;/b&gt;</b>baz</p>',
-      'angle brackets are escaped'
-    );
+  let $paragraph = createFragment(`<p>foo<b></b>baz</p>`);
+  // put html-looking text in the <b> tag
+  $paragraph.querySelector('b').textContent = '<b>bar</b>';
+  assert.equal(
+    fragmentToHtml($paragraph),
+    '<p>foo<b>&lt;b&gt;bar&lt;/b&gt;</b>baz</p>',
+    'angle brackets are escaped'
+  );
 });

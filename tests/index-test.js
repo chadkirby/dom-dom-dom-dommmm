@@ -1,7 +1,7 @@
 const test = require('./tape')(module);
-const { document, window } = require('../src/index');
 
 test(`global things exists`, (assert) => {
+  const { document, window } = globalThis;
   assert.ok(document, `document exists`);
   assert.ok(window, `window exists`);
   assert.ok(window.DOMParser, `window.DOMParser exists`);
