@@ -2,7 +2,16 @@
   "name": "@ckirby/dom-dom-dom-dommmm",
   "version": "5.2.2",
   "description": "DOM helper functions for a post-jquery world",
+  "engines": {
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+  },
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./*": "./src/*",
+    "./setup": "./setup.js"
+  },
+
   "scripts": {
     "test": "yarn lint && yarn test:tape:difflet",
     "test:ci": "yarn lint && yarn test:tape",
@@ -19,17 +28,15 @@
   "author": "Chad Kirby",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^6.6.0",
-    "eslint-plugin-turbopatent": "^4.0.0",
-    "jsdom": "^15.2.1",
+    "eslint": "^8.1.0",
+    "eslint-plugin-turbopatent": "^6.0.0",
+    "jsdom": "^18.0.1",
     "tap-difflet": "^0.7.1",
-    "tape": "^4.10.2",
+    "tape": "^5.3.1",
     "tape-promise": "^4.0.0",
     "tom-jumbo-grumbo": "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.5"
   },
-  "dependencies": {
-    "globalthis": "^1.0.0"
-  },
+  "dependencies": {},
   "bugs": {
     "url": "https://github.com/chadkirby/splice-chars/issues"
   },

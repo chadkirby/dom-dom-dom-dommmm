@@ -1,4 +1,3 @@
-const DOM = require('./dom');
 const CSS = require('./css-adapter');
 
 const { attr, closest, createTextNode, empty, hasDescendant, isHtml, isSelector, lookupNamespaceURI, nextElementSiblings, nextSiblings, nodeToSelector, parentsUntil, previousElementSiblings, previousSiblings, unwrap } = require('./helpers');
@@ -15,7 +14,7 @@ class DOMArray extends Array {
     return true;
   }
   static get document() {
-    return DOM.document;
+    return globalThis.document;
   }
   get document() {
     return this.length ? this[0].ownerDocument : this.constructor.document;
@@ -272,7 +271,7 @@ class DOMArray extends Array {
   }
   xml({ delimiter = '' } = {}) {
     return this.arrayMap((el) => {
-      let s = new DOM.window.XMLSerializer();
+      let s = new globalThis.window.XMLSerializer();
       return s.serializeToString(el);
     }).join(delimiter);
   }

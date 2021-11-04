@@ -1,5 +1,7 @@
 const _test = require('tape-promise/tape');
-require('../setup').setJSDOM((require('jsdom')));
+const jsdom = require('jsdom');
+const setup = require('../setup');
+setup(jsdom);
 module.exports = function(parent, { disableYesno } = {}) {
 
   function test(desc, testFn) {

@@ -46,7 +46,7 @@ test(`loadXml loads namespaces`, (assert) => {
   assert.ok($(`<w:foo />`), 'can wrap namespaced xml');
   $lvl.setAttrNS('xml:space', 'preserve');
   assert.deepEqual(
-    $lvl.attr(),
+    { ...$lvl.attr() },
     { 'w:ilvl': '0', 'xml:space': 'preserve' }
   );
 
@@ -59,7 +59,7 @@ test(`loadXml loads namespaces`, (assert) => {
 
   $lvl.setAttrNS('foo:baz', '7');
   assert.deepEqual(
-    $(`w\\:lvl`).attr(),
+    { ...$(`w\\:lvl`).attr() },
     { 'w:ilvl': '0', 'xml:space': 'preserve', 'foo:baz': '7' }
   );
 });
