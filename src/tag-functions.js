@@ -1,7 +1,8 @@
 const { collectTextNodes, createTextNode } = require('./helpers');
 
-function makeDom(document) {
+function makeDom(baseDocument) {
   return function(...args) {
+    let document = baseDocument || globalThis.document;
     let div = document.createElement('div');
     try {
       if (document.contentType.toLowerCase().endsWith('xml')) {
@@ -38,7 +39,7 @@ function makeDom(document) {
  *
  * @return  {HTMLElement}  document fragment
  */
-let dom = makeDom(globalThis.document);
+let dom = makeDom();
 
 /**
  * Tagged template function to convert html to an element. E.g.
