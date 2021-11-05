@@ -4,13 +4,13 @@ const { fragmentToText, fragmentToHtml, isHtml } = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
 const { removeSubsets } = require('./remove-subsets');
 
-function wrapper({ document }, { toHtml, cssAdapter } = {}) {
+function wrapper({ document: baseDocument }, { toHtml, cssAdapter } = {}) {
   class DOMList extends DOMArray {
     static get document() {
-      return document;
+      return baseDocument || globalThis.document;
     }
     static cssSelectAll(nodes, selector) {
-      let contentType = document.contentType.toLowerCase();
+      let contentType = this.document.contentType.toLowerCase();
       try {
         return cssAdapter[contentType].cssSelectAll(
           removeSubsets(nodes),
@@ -22,7 +22,7 @@ function wrapper({ document }, { toHtml, cssAdapter } = {}) {
       }
     }
     static cssSelectOne(nodes, selector) {
-      let contentType = document.contentType.toLowerCase();
+      let contentType = this.document.contentType.toLowerCase();
       try {
         return cssAdapter[contentType].cssSelectOne(
           removeSubsets(nodes),
@@ -34,7 +34,7 @@ function wrapper({ document }, { toHtml, cssAdapter } = {}) {
       }
     }
     static cssIs(node, selector) {
-      let contentType = document.contentType.toLowerCase();
+      let contentType = this.document.contentType.toLowerCase();
       try {
         return cssAdapter[contentType].cssIs(node, selector, super.cssIs);
       } catch (e) {
@@ -57,7 +57,7 @@ function wrapper({ document }, { toHtml, cssAdapter } = {}) {
       if (isHtml(arg)) {
         return DOMList.fromHtml(arg);
       }
-      return DOMList.from(document.querySelectorAll(arg));
+      return DOMList.from(DOMList.document.querySelectorAll(arg));
     }
     let html = toHtml && toHtml(arg);
     if (html) {
@@ -67,26 +67,26 @@ function wrapper({ document }, { toHtml, cssAdapter } = {}) {
 
   Object.assign($, {
     get document() {
-      return document;
+      return DOMList.document;
     },
     createElementNS(tagName) {
       let [ prefix ] = tagName.split(':');
-      let uri = lookupNamespaceURI(prefix, document);
+      let uri = lookupNamespaceURI(prefix, DOMList.document);
       if (!uri) {
         throw new Error(`unknown namespace for ${prefix}`);
       }
-      return DOMList.of(document.createElementNS(uri, tagName));
+      return DOMList.of(DOMList.document.createElementNS(uri, tagName));
     },
     query(selector) {
-      let found = document.querySelector(selector);
+      let found = DOMList.document.querySelector(selector);
       return found ? DOMList.of(found) : DOMList.of();
     },
     queryAll(selector) {
-      return DOMList.from(document.querySelectorAll(selector));
+      return DOMList.from(DOMList.document.querySelectorAll(selector));
     },
     html(thing) {
       if (typeof thing === 'string') {
-        return DOMList.from(document.querySelectorAll(thing)).outerHtml();
+        return DOMList.from(DOMList.document.querySelectorAll(thing)).outerHtml();
       }
       if (DOMList.isDOMArray(thing)) {
         return thing.outerHtml();
@@ -95,11 +95,11 @@ function wrapper({ document }, { toHtml, cssAdapter } = {}) {
         return thing.outerHTML;
       }
       if (!arguments.length) {
-        return fragmentToHtml(document);
+        return fragmentToHtml(DOMList.document);
       }
       return '';
     },
-    xml(doc = document) {
+    xml(doc = DOMList.document) {
       if (DOMList.isDOMArray(doc)) {
         [ doc ] = doc;
       }
@@ -108,9 +108,9 @@ function wrapper({ document }, { toHtml, cssAdapter } = {}) {
     },
     text(selector) {
       if (selector) {
-        return DOMList.from(document.querySelectorAll(selector)).text();
+        return DOMList.from(DOMList.document.querySelectorAll(selector)).text();
       }
-      return fragmentToText(document);
+      return fragmentToText(DOMList.document);
     },
     setHtmlAdapter(adapter) {
       toHtml = adapter;
@@ -146,5 +146,4 @@ module.exports = {
   ...require('./helpers'),
   ...require('./splice-chars'),
   ...require('./tag-functions')
-
 };
