@@ -1,6 +1,6 @@
 {
   "name": "@ckirby/dom-dom-dom-dommmm",
-  "version": "6.0.2",
+  "version": "6.0.3",
   "description": "DOM helper functions for a post-jquery world",
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
