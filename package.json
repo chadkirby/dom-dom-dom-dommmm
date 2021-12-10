@@ -1,9 +1,9 @@
 {
   "name": "@ckirby/dom-dom-dom-dommmm",
   "version": "6.0.3",
-  "description": "DOM helper functions for a post-jquery world",
+  "description": "DOM/JSDOM wrapper",
   "engines": {
-    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+    "node": ">=12.20.0"
   },
   "main": "src/index.js",
   "exports": {
