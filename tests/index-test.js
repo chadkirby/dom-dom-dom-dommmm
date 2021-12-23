@@ -8,4 +8,3 @@ test(`global things exists`, (assert) => {
   assert.ok(window.XMLSerializer, `window.XMLSerializer exists`);
   assert.ok(document.implementation, `document.implementation exists`);
 });
-

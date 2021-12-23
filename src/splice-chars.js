@@ -13,9 +13,13 @@ const { collectTextNodes, createTextNode } = require('./helpers');
  */
 function spliceChars($el, startIndex, deleteCount, ...insertions) {
   let endIndex = startIndex + deleteCount;
-  let textNodes = [ ...collectTextNodes($el) ];
+  let textNodes = [...collectTextNodes($el)];
 
-  for (let nodeIdx = 0, charIdx = 0; nodeIdx < textNodes.length && charIdx <= endIndex; nodeIdx++) {
+  for (
+    let nodeIdx = 0, charIdx = 0;
+    nodeIdx < textNodes.length && charIdx <= endIndex;
+    nodeIdx++
+  ) {
     let $node = textNodes[nodeIdx];
     let nodeText = $node.textContent;
     if (charIdx <= endIndex && startIndex < charIdx + nodeText.length) {

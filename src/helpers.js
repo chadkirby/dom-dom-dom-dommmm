@@ -86,9 +86,7 @@ function fragmentToHtml(fragment) {
  * @return  {string}
  */
 function fragmentToText(fragment) {
-  return [ ...fragment.childNodes ].map(
-    (n) => n.textContent
-  ).join(``);
+  return [...fragment.childNodes].map((n) => n.textContent).join(``);
 }
 
 function isFragment(obj) {
@@ -172,7 +170,7 @@ function matches(el, comparator) {
     return el.matches && el.matches(comparator);
   }
   if (Array.isArray(comparator)) {
-    [ comparator ] = comparator;
+    [comparator] = comparator;
   }
   return el === comparator;
 }
@@ -246,7 +244,7 @@ function splitSearch(el, pattern) {
       textMap.push({
         start: counter,
         end: counter + node.textContent.length,
-        node
+        node,
       });
     }
     counter += node.textContent.length;
@@ -266,7 +264,7 @@ function splitSearch(el, pattern) {
         textMap.splice(nodeIndex + 1, 0, {
           start: textMap[nodeIndex].end,
           end: textMap[nodeIndex].end + trailingNode.textContent.length,
-          node: trailingNode
+          node: trailingNode,
         });
       }
 
@@ -277,7 +275,7 @@ function splitSearch(el, pattern) {
         textMap.splice(nodeIndex + 1, 0, {
           start: textMap[nodeIndex].end,
           end: textMap[nodeIndex].end + resultNode.textContent.length,
-          node: resultNode
+          node: resultNode,
         });
         nodeIndex += 1;
       }
@@ -292,7 +290,6 @@ function splitSearch(el, pattern) {
   }
   return out;
 }
-
 
 // split a text node at the given char offset
 function splitTextNode(node, offset) {
@@ -314,7 +311,6 @@ function splitTextNode(node, offset) {
   // return the text node we just inserted
   return newNode;
 }
-
 
 function* previousSiblings(el) {
   while (el && (el = el.previousSibling)) {
@@ -343,9 +339,9 @@ function* nextElementSiblings(el) {
 function nodeToSelector(node) {
   return [
     node.nodeName.toLowerCase(),
-    ...Array.from(node.attributes).map(
-      ({ name, value }) => value ? `[${name}="${value}"]` : ``
-    )
+    ...Array.from(node.attributes).map(({ name, value }) =>
+      value ? `[${name}="${value}"]` : ``
+    ),
   ].join(``);
 }
 
@@ -387,11 +383,14 @@ function isHtml(thing) {
 
 const NAMESPACES = Object.assign(Object.create(null), {
   xml: 'http://www.w3.org/XML/1998/namespace',
-  xmlns: 'http://www.w3.org/2000/xmlns/'
+  xmlns: 'http://www.w3.org/2000/xmlns/',
 });
 function lookupNamespaceURI(prefix, document) {
-  [ prefix ] = prefix.split(':');
-  return NAMESPACES[prefix.toLowerCase()] || (document && document.lookupNamespaceURI(prefix));
+  [prefix] = prefix.split(':');
+  return (
+    NAMESPACES[prefix.toLowerCase()] ||
+    (document && document.lookupNamespaceURI(prefix))
+  );
 }
 
 module.exports = {
@@ -417,5 +416,5 @@ module.exports = {
   nextSiblings,
   nodeToSelector,
   splitSearch,
-  unwrap
+  unwrap,
 };

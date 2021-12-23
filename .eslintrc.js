@@ -1,19 +1,63 @@
+
 module.exports = {
-  root: true,
   parserOptions: {
-    ecmaVersion: 2018
-  },
-  env: {
-    'es6': true
+    ecmaVersion: 2020
   },
   extends: [
-    'plugin:turbopatent/node'
+    'eslint:recommended',
+    'plugin:prettier/recommended',
   ],
+  plugins: ['@typescript-eslint'],
+  ignorePatterns: ["dist"],
   rules: {
-    "no-shadow": [
-      "error", 
-      { builtinGlobals: true, hoist: "functions", allow: [ "URL" ] }
-    ]
+    'prefer-const': 'off',
   },
-  overrides: []
+  overrides: [
+
+    // javascript
+    {
+      files: ['**/*.js'],
+      plugins: [ 'node', 'no-only-tests' ],
+      extends: [
+        'eslint:recommended',
+        'plugin:prettier/recommended',
+        'plugin:node/recommended',
+      ],
+      rules: {
+        "no-shadow": [
+          "error",
+          {
+            builtinGlobals: true,
+            hoist: "functions",
+            allow: [ "URL", "URLSearchParams", "root", "path" ]
+          }
+        ],
+        "node/no-extraneous-require": [
+          "error", {
+            "allowModules": ["tape", "tape-promise", "sinon"],
+            "resolvePaths": [],
+            "tryExtensions": []
+          }
+        ],
+        'node/shebang': 'off'
+      },
+    },
+
+    // typescript
+    {
+      files: ['**/*.ts'],
+      parser: '@typescript-eslint/parser',
+      extends: [
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:@typescript-eslint/recommended',
+      ],
+      rules: {
+        '@typescript-eslint/no-non-null-assertion': 'off',
+      },
+    }, {
+      files: [ "tests/*.js" ],
+      rules: {}
+    }
+
+  ]
 };

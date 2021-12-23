@@ -1,12 +1,28 @@
 const CSS = require('./css-adapter');
 
-const { attr, closest, createTextNode, empty, hasDescendant, isHtml, isSelector, lookupNamespaceURI, nextElementSiblings, nextSiblings, nodeToSelector, parentsUntil, previousElementSiblings, previousSiblings, unwrap } = require('./helpers');
+const {
+  attr,
+  closest,
+  createTextNode,
+  empty,
+  hasDescendant,
+  isHtml,
+  isSelector,
+  lookupNamespaceURI,
+  nextElementSiblings,
+  nextSiblings,
+  nodeToSelector,
+  parentsUntil,
+  previousElementSiblings,
+  previousSiblings,
+  unwrap,
+} = require('./helpers');
 const { isTextNode, isEl } = require('./is-node');
 const { removeSubsets } = require('./remove-subsets');
 
 const contentTypes = Object.assign(Object.create(null), {
   xml: 'text/xml',
-  html: 'text/html'
+  html: 'text/html',
 });
 
 class DOMArray extends Array {
@@ -36,7 +52,10 @@ class DOMArray extends Array {
   // jq
   add(content) {
     if (isSelector(content)) {
-      let newElems = this.constructor.cssSelectAll([ this.document.body ], content);
+      let newElems = this.constructor.cssSelectAll(
+        [this.document.body],
+        content
+      );
       return this.concat(newElems);
     }
     if (isHtml(content)) {
@@ -96,7 +115,7 @@ class DOMArray extends Array {
 
   // jq
   attr(name, value) {
-    let [ first ] = this;
+    let [first] = this;
     if (!(first && first.getAttribute)) {
       return name ? null : {};
     }
@@ -112,7 +131,7 @@ class DOMArray extends Array {
     return first.getAttribute(name);
   }
   setAttrNS(name, value) {
-    let [ prefix ] = name.split(':');
+    let [prefix] = name.split(':');
     let { document } = this;
     let uri = lookupNamespaceURI(prefix, document);
     for (const el of this) {
@@ -139,10 +158,7 @@ class DOMArray extends Array {
     return getSet(this, (el) => el.children).filter(selector);
   }
   clone({ deep = true } = {}) {
-    return this.constructor.from(
-      this,
-      (el) => el.cloneNode(deep)
-    );
+    return this.constructor.from(this, (el) => el.cloneNode(deep));
   }
   // jq
   closest(target) {
@@ -247,10 +263,10 @@ class DOMArray extends Array {
       // Filter the list to those with a descendant that matches the
       // given selector.
       let { constructor: PROTO } = this;
-      return this.filter((i, el) => PROTO.cssSelectOne([ el ], thing));
+      return this.filter((i, el) => PROTO.cssSelectOne([el], thing));
     }
     if (Array.isArray(thing)) {
-      [ thing ] = thing;
+      [thing] = thing;
     }
     return this.filter((i, el) => hasDescendant(el, thing));
   }
@@ -264,8 +280,7 @@ class DOMArray extends Array {
       }
       return this;
     }
-    return this
-      .arrayFilter((el) => el)
+    return this.arrayFilter((el) => el)
       .arrayMap((el) => el.innerHTML || el.textContent)
       .join(``);
   }
@@ -276,20 +291,20 @@ class DOMArray extends Array {
     }).join(delimiter);
   }
   outerHtml(delimiter = '') {
-    return this.arrayMap(
-      (el) => el.outerHTML || el.textContent
-    ).join(delimiter);
+    return this.arrayMap((el) => el.outerHTML || el.textContent).join(
+      delimiter
+    );
   }
   // jq
   index(target) {
     if (Array.isArray(target)) {
-      [ target ] = target;
+      [target] = target;
     }
     return this.findIndex((el) => el === target);
   }
   is(target) {
     if (Array.isArray(target)) {
-      return Boolean([ ...target ].find(((t) => this.is(t))));
+      return Boolean([...target].find((t) => this.is(t)));
     }
     let finder = target;
     if (isEl(target) || isTextNode(target)) {
@@ -338,9 +353,9 @@ class DOMArray extends Array {
   // set of matched elements, optionally filtered by a
   // selector.
   nextAll(selector) {
-    let sibsList = this.constructor.of().concat(
-      ...this.arrayMap((el) => [ ...nextElementSiblings(el) ])
-    );
+    let sibsList = this.constructor
+      .of()
+      .concat(...this.arrayMap((el) => [...nextElementSiblings(el)]));
     return sibsList.arrayFilter((el) => el).filter(selector);
   }
 
@@ -398,9 +413,9 @@ class DOMArray extends Array {
   // Get all preceding siblings of each element in the set
   // of matched elements, optionally filtered by a selector.
   prevAll(selector) {
-    let sibsList = this.constructor.of().concat(
-      ...this.arrayMap((el) => [ ...previousElementSiblings(el) ])
-    );
+    let sibsList = this.constructor
+      .of()
+      .concat(...this.arrayMap((el) => [...previousElementSiblings(el)]));
     return sibsList.arrayFilter((el) => el).filter(selector);
   }
 
@@ -438,7 +453,7 @@ class DOMArray extends Array {
   siblings(selector) {
     return this.constructor.from([
       ...this.prevAll(selector).reverse(),
-      ...this.nextAll(selector)
+      ...this.nextAll(selector),
     ]);
   }
 
@@ -467,8 +482,7 @@ class DOMArray extends Array {
       }
       return this;
     }
-    return this
-      .arrayFilter((el) => el)
+    return this.arrayFilter((el) => el)
       .arrayMap((el) => el.textContent)
       .join(``);
   }
@@ -521,7 +535,7 @@ function getSet(domArray, getter) {
     let result = getter(el);
     if (result) {
       if (!result[Symbol.iterator] || typeof result === 'string') {
-        result = [ result ];
+        result = [result];
       }
       for (const item of result) {
         set.add(item);
@@ -529,7 +543,6 @@ function getSet(domArray, getter) {
     }
   }
   return domArray.constructor.from(set);
-
 }
 
 function each(domArray, op, val) {
@@ -538,7 +551,7 @@ function each(domArray, op, val) {
     if (isHtml(content)) {
       content = domArray.constructor.fromHtml(content);
       if (content.length === 1) {
-        [ content ] = content;
+        [content] = content;
       }
     }
     if (Array.isArray(content)) {
@@ -559,7 +572,7 @@ function each(domArray, op, val) {
 
 function thingToNode(thing, domArray) {
   if (Array.isArray(thing)) {
-    [ thing ] = thing;
+    [thing] = thing;
   }
   if (isEl(thing) || isTextNode(thing)) {
     return thing;
@@ -577,5 +590,5 @@ function thingToNode(thing, domArray) {
 
 module.exports = {
   DOMArray,
-  contentTypes
+  contentTypes,
 };

@@ -26,7 +26,6 @@ function makeDom(baseDocument) {
     }
     return div;
   };
-
 }
 
 /**
@@ -84,7 +83,7 @@ function unpretty(...args) {
 
 function unprettyns(namespaces = {}) {
   let xml = `<?xml version="1.0" encoding="utf-8" ?><root`;
-  for (const [ prefix, ns ] of Object.entries(namespaces)) {
+  for (const [prefix, ns] of Object.entries(namespaces)) {
     xml += ` xmlns:${prefix}="${ns}"`;
   }
   xml += ' />';
@@ -106,9 +105,9 @@ function unprettyns(namespaces = {}) {
  * assemble a template literal into a string
  */
 function assemble(strings, ...placeholders) {
-  return Object.entries(strings).map(
-    ([ i, str ]) => `${str}${placeholders[i] || ``}`
-  ).join(``);
+  return Object.entries(strings)
+    .map(([i, str]) => `${str}${placeholders[i] || ``}`)
+    .join(``);
 }
 
 module.exports = {
@@ -116,5 +115,5 @@ module.exports = {
   el,
   text,
   unpretty,
-  unprettyns
+  unprettyns,
 };

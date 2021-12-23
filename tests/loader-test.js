@@ -52,10 +52,7 @@ test(`loadXml loads namespaces`, (assert) => {
 
   let $root = $(`w\\:numbering`);
   $root.setAttrNS('xmlns:foo', 'bar');
-  assert.equal(
-    $root.document.lookupNamespaceURI('foo'),
-    'bar'
-  );
+  assert.equal($root.document.lookupNamespaceURI('foo'), 'bar');
 
   $lvl.setAttrNS('foo:baz', '7');
   assert.deepEqual(
@@ -63,7 +60,6 @@ test(`loadXml loads namespaces`, (assert) => {
     { 'w:ilvl': '0', 'xml:space': 'preserve', 'foo:baz': '7' }
   );
 });
-
 
 test(`loadXml can define namespaces & create namespaced elements`, (assert) => {
   let $ = loadXml(`<Pr>Hi there!</Pr>`);

@@ -2,15 +2,9 @@ const test = require('./tape')(module);
 const { dom, el, text, unpretty, fragmentToHtml } = require('../src/index');
 
 test(`el creates element`, (assert) => {
-  assert.equal(
-    el`<span />`.outerHTML,
-    `<span></span>`
-  );
+  assert.equal(el`<span />`.outerHTML, `<span></span>`);
 
-  assert.equal(
-    el`<span />`.nodeName,
-    `SPAN`
-  );
+  assert.equal(el`<span />`.nodeName, `SPAN`);
 
   assert.equal(
     el`<span
@@ -25,29 +19,19 @@ test(`el creates element`, (assert) => {
     `tolerates extra whitespace`
   );
 
-  assert.equal(
-    el`foo`,
-    null
-  );
+  assert.equal(el`foo`, null);
 
   assert.equal(
     el`foo <span />`.outerHTML,
     `<span></span>`,
     `first element is returned`
   );
-
 });
 
 test(`dom creates fragment`, (assert) => {
-  assert.equal(
-    fragmentToHtml(dom`<span />`),
-    `<span></span>`
-  );
+  assert.equal(fragmentToHtml(dom`<span />`), `<span></span>`);
 
-  assert.equal(
-    dom`<span />`.nodeName,
-    `DIV`
-  );
+  assert.equal(dom`<span />`.nodeName, `DIV`);
 
   assert.equal(
     fragmentToHtml(
@@ -64,10 +48,7 @@ test(`dom creates fragment`, (assert) => {
     ` <span foo="bar"></span> `
   );
 
-  assert.equal(
-    fragmentToHtml(dom`foo`),
-    `foo`
-  );
+  assert.equal(fragmentToHtml(dom`foo`), `foo`);
 
   assert.equal(
     fragmentToHtml(dom`
@@ -84,7 +65,6 @@ test(`dom creates fragment`, (assert) => {
     `SPAN`,
     `firstChild is not empty text node`
   );
-
 });
 
 test(`unpretty de-formats an html string`, (assert) => {
@@ -130,15 +110,9 @@ test(`unpretty de-formats an html string`, (assert) => {
 });
 
 test(`text creates text node`, (assert) => {
-  assert.equal(
-    text`<span />`.textContent,
-    `<span />`
-  );
+  assert.equal(text`<span />`.textContent, `<span />`);
 
-  assert.equal(
-    text`<span />`.nodeName,
-    `#text`
-  );
+  assert.equal(text`<span />`.nodeName, `#text`);
 
   assert.equal(
     text`
@@ -147,8 +121,5 @@ test(`text creates text node`, (assert) => {
     `\n    123\n    `
   );
 
-  assert.equal(
-    text``.textContent,
-    ``
-  );
+  assert.equal(text``.textContent, ``);
 });

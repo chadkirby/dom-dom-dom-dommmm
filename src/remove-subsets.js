@@ -1,7 +1,7 @@
 // takes an array of nodes, and removes any duplicates, as
 // well as any nodes whose ancestors are also in the array
 function removeSubsets(nodes) {
-  return [ ...new Set(nodes) ].filter((node, i, uniques) => {
+  return [...new Set(nodes)].filter((node, i, uniques) => {
     if (node.nodeType !== 1) {
       return false;
     }
@@ -15,5 +15,5 @@ function removeSubsets(nodes) {
 }
 
 module.exports = {
-  removeSubsets
+  removeSubsets,
 };

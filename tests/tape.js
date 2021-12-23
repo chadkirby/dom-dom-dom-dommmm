@@ -11,7 +11,8 @@ module.exports = function(parent, { disableYesno } = {}) {
   test.onFinish = _test.onFinish;
   test.skip = _test.skip;
   //eslint-disable-next-line no-only-tests/no-only-tests
-  test.only = (desc, testFn) => _test.only(prependTestFile(desc), doTest(desc, testFn));
+  test.only = (desc, testFn) =>
+    _test.only(prependTestFile(desc), doTest(desc, testFn));
 
   return test;
 

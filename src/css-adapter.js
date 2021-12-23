@@ -1,7 +1,7 @@
 module.exports = {
   cssSelectAll(nodes, selector) {
     return nodes.reduce(
-      (matches, node) => matches.concat([ ...node.querySelectorAll(selector) ]),
+      (matches, node) => matches.concat([...node.querySelectorAll(selector)]),
       []
     );
   },
@@ -18,5 +18,5 @@ module.exports = {
   cssIs(node, selector) {
     // text nodes can't matches anything
     return node.matches && node.matches(selector);
-  }
+  },
 };

@@ -101,7 +101,7 @@ function wrapper({ document: baseDocument }, { toHtml, cssAdapter } = {}) {
     },
     xml(doc = DOMList.document) {
       if (DOMList.isDOMArray(doc)) {
-        [ doc ] = doc;
+        [doc] = doc;
       }
       let s = new globalThis.window.XMLSerializer();
       return s.serializeToString(doc);
@@ -117,12 +117,11 @@ function wrapper({ document: baseDocument }, { toHtml, cssAdapter } = {}) {
     },
     setCssAdapter(adapter) {
       cssAdapter = adapter;
-    }
+    },
   });
 
   return $;
 }
-
 
 module.exports = {
   $: wrapper({ document: globalThis.document }),
@@ -133,10 +132,7 @@ module.exports = {
     let document = parse(html, contentTypes.html);
     return wrapper({ document }, { toHtml, cssAdapter });
   },
-  loadXml(
-    xml = `<?xml version="1.0" ?><root />`,
-    { toHtml, cssAdapter } = {}
-  ) {
+  loadXml(xml = `<?xml version="1.0" ?><root />`, { toHtml, cssAdapter } = {}) {
     let document = parse(xml, contentTypes.xml);
     return wrapper({ document }, { toHtml, cssAdapter });
   },
@@ -145,5 +141,5 @@ module.exports = {
   },
   ...require('./helpers'),
   ...require('./splice-chars'),
-  ...require('./tag-functions')
+  ...require('./tag-functions'),
 };
