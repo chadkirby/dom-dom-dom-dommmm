@@ -2,8 +2,7 @@ const _test = require('tape-promise/tape');
 const jsdom = require('jsdom');
 const setup = require('../setup');
 setup(jsdom);
-module.exports = function(parent, { disableYesno } = {}) {
-
+module.exports = function (parent) {
   function test(desc, testFn) {
     _test(prependTestFile(desc), doTest(desc, testFn));
   }

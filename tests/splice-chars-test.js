@@ -4,7 +4,7 @@ const {
   createElement,
   createFragment,
   fragmentToHtml,
-} = require('../src/index');
+} = require('../');
 
 test('spliceChars exports something', function (assert) {
   assert.equal(typeof spliceChars, `function`, `spliceChars function exists`);

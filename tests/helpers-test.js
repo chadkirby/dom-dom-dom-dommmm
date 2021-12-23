@@ -16,7 +16,7 @@ const {
   nextSiblings,
   splitSearch,
   unwrap,
-} = require('../src/index');
+} = require('../');
 
 test(`createFragment creates fragment`, (assert) => {
   let $ = createFragment(`Hello<span> </span>World`);
@@ -204,11 +204,14 @@ test(`filterTextNodes filters text nodes`, (assert) => {
 });
 
 test(`attr returns attributes as a POJO`, (assert) => {
-  assert.deepEqual(attr(el`<span id='123' foo='bar' baz-bat='bot' />`), {
-    foo: 'bar',
-    'baz-bat': 'bot',
-    id: '123',
-  });
+  assert.deepEqual(
+    { ...attr(el`<span id='123' foo='bar' baz-bat='bot' />`) },
+    {
+      foo: 'bar',
+      'baz-bat': 'bot',
+      id: '123',
+    }
+  );
 
   assert.deepEqual(
     attr(el``),

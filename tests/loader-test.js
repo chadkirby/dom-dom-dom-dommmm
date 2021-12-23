@@ -1,5 +1,5 @@
 const test = require('./tape')(module);
-const { loadHtml, loadXml } = require('../src/index');
+const { loadHtml, loadXml } = require('../');
 
 test(`loadHtml loads`, (assert) => {
   let $ = loadHtml();
@@ -50,7 +50,7 @@ test(`loadXml loads namespaces`, (assert) => {
     { 'w:ilvl': '0', 'xml:space': 'preserve' }
   );
 
-  let $root = $(`w\\:numbering`);
+  let $root = $lvl.parents('w\\:numbering');
   $root.setAttrNS('xmlns:foo', 'bar');
   assert.equal($root.document.lookupNamespaceURI('foo'), 'bar');
 

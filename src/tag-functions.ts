@@ -1,22 +1,28 @@
-const { collectTextNodes, createTextNode } = require('./helpers');
+import { collectTextNodes, createTextNode } from './helpers';
 
-function makeDom(baseDocument) {
-  return function(...args) {
-    let document = baseDocument || globalThis.document;
-    let div = document.createElement('div');
+function makeDom(baseDocument?: Document) {
+  return function (
+    x: TemplateStringsArray,
+    ...placeholders: unknown[]
+  ): HTMLDivElement {
+    const document = baseDocument ?? globalThis.document;
+    const div = document.createElement('div');
     try {
       if (document.contentType.toLowerCase().endsWith('xml')) {
         // add the div to the DOM so it will inherit the
         // document's namespaces
-        document.firstElementChild.append(div);
+        document.firstElementChild?.append(div);
       }
-      div.innerHTML = assemble(...args);
+      div.innerHTML = assemble(x, ...placeholders);
     } finally {
       div.remove();
     }
 
     for (const node of collectTextNodes(div)) {
-      let trimmed = node.textContent.replace(/^\s*\n\s*|\s*\n\s*$/g, '');
+      const trimmed = (node.textContent || '').replace(
+        /^\s*\n\s*|\s*\n\s*$/g,
+        ''
+      );
       if (node.textContent && !trimmed) {
         // remove the node if we just emptied it out
         node.remove();
@@ -38,7 +44,7 @@ function makeDom(baseDocument) {
  *
  * @return  {HTMLElement}  document fragment
  */
-let dom = makeDom();
+export const dom = makeDom();
 
 /**
  * Tagged template function to convert html to an element. E.g.
@@ -49,8 +55,11 @@ let dom = makeDom();
  *
  * @return  {HTMLElement}  element
  */
-function el(...args) {
-  return dom(...args).firstElementChild;
+export function el(
+  x: TemplateStringsArray,
+  ...placeholders: unknown[]
+): Element | null {
+  return dom(x, ...placeholders).firstElementChild;
 }
 
 /**
@@ -62,8 +71,8 @@ function el(...args) {
  *
  * @return  {HTMLElement}  element
  */
-function text(...args) {
-  return createTextNode(assemble(...args));
+export function text(x: TemplateStringsArray, ...args: unknown[]): Text {
+  return createTextNode(assemble(x, ...args));
 }
 
 /**
@@ -77,25 +86,28 @@ function text(...args) {
  *
  * @return  {string}  de-formatted html
  */
-function unpretty(...args) {
-  return dom(...args).innerHTML;
+export function unpretty(x: TemplateStringsArray, ...args: unknown[]): string {
+  return dom(x, ...args).innerHTML;
 }
 
-function unprettyns(namespaces = {}) {
+export function unprettyns(
+  namespaces = {}
+): (x: TemplateStringsArray, ...args: unknown[]) => string {
   let xml = `<?xml version="1.0" encoding="utf-8" ?><root`;
   for (const [prefix, ns] of Object.entries(namespaces)) {
     xml += ` xmlns:${prefix}="${ns}"`;
   }
   xml += ' />';
-  let document = new globalThis.window.DOMParser().parseFromString(
+  const document = new globalThis.window.DOMParser().parseFromString(
     xml,
-    "text/xml"
+    'text/xml'
   );
-  if (document.firstElementChild.matches('parsererror')) {
-    throw new Error(document.firstElementChild.textContent);
+  if (document.firstElementChild?.matches('parsererror')) {
+    const msg = document.firstElementChild.textContent || '';
+    throw new Error(msg);
   }
-  function unprettyx(...args) {
-    return makeDom(document)(...args).innerHTML;
+  function unprettyx(x: TemplateStringsArray, ...args: unknown[]): string {
+    return makeDom(document)(x, ...args).innerHTML;
   }
 
   return unprettyx;
@@ -104,16 +116,8 @@ function unprettyns(namespaces = {}) {
 /**
  * assemble a template literal into a string
  */
-function assemble(strings, ...placeholders) {
+function assemble(strings: TemplateStringsArray, ...placeholders: unknown[]) {
   return Object.entries(strings)
     .map(([i, str]) => `${str}${placeholders[i] || ``}`)
     .join(``);
 }
-
-module.exports = {
-  dom,
-  el,
-  text,
-  unpretty,
-  unprettyns,
-};

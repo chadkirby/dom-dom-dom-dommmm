@@ -1,5 +1,5 @@
 const test = require('./tape')(module);
-const { dom, el, text, unpretty, fragmentToHtml } = require('../src/index');
+const { dom, el, text, unpretty, fragmentToHtml } = require('../');
 
 test(`el creates element`, (assert) => {
   assert.equal(el`<span />`.outerHTML, `<span></span>`);
