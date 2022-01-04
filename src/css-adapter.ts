@@ -1,34 +1,32 @@
 import { isEl } from './is-node';
-
-type TextEl = Text | Element;
 export interface ADAPTER {
   cssSelectAll(
-    nodes: TextEl[],
+    nodes: Node[],
     selector: string,
-    fallback?: (nodes: TextEl[], selector: string) => Element[]
+    fallback?: (nodes: Node[], selector: string) => Element[]
   ): Element[];
   cssSelectOne(
-    nodes: TextEl[],
+    nodes: Node[],
     selector: string,
     fallback?: (nodes: Element[], selector: string) => Element | null
   ): Element | null;
   cssIs(
-    node: TextEl,
+    node: Node,
     selector: string,
     fallback?: (node: Element, selector: string) => boolean
   ): boolean;
 }
 
 class CSSADAPTER implements ADAPTER {
-  cssSelectAll(nodes: TextEl[], selector: string): Element[] {
+  cssSelectAll(nodes: Node[], selector: string): Element[] {
     return nodes.reduce(
-      (matches: Element[], node: TextEl) =>
+      (matches: Element[], node: Node) =>
         matches.concat(isEl(node) ? [...node.querySelectorAll(selector)] : []),
       []
     );
   }
 
-  cssSelectOne(nodes: TextEl[], selector: string): Element | null {
+  cssSelectOne(nodes: Node[], selector: string): Element | null {
     for (const node of nodes) {
       if (isEl(node)) {
         const result = node.querySelector(selector);
@@ -40,7 +38,7 @@ class CSSADAPTER implements ADAPTER {
     return null;
   }
 
-  cssIs(node: TextEl, selector: string): boolean {
+  cssIs(node: Node, selector: string): boolean {
     // text nodes can't matches anything
     return isEl(node) && node.matches(selector);
   }

@@ -1,7 +1,5 @@
 {
   "extends": "./tsconfig-base.json",
-  "declaration": true /* Generates corresponding '.d.ts' file. */,
-  "declarationDir": "./types",
   "compilerOptions": {
 
     "outDir": "./dist/cjs" /* Redirect output structure to the directory. */,

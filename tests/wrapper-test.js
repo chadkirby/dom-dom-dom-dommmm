@@ -622,7 +622,7 @@ test(`$.setCssAdapter`, (assert) => {
       cssSelectAll(nodes) {
         cssCalled += 1;
         // always find 'b'
-        return nodes[0].querySelectorAll('b');
+        return [...nodes[0].querySelectorAll('b')];
       },
     },
   });

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "declaration": true /* Generates corresponding '.d.ts' file. */,
+    "declarationDir": "./dist/types" /* Specifies the location where generated '.d.ts' files will be saved. */,
     "moduleResolution": "node",
     "noImplicitAny": false,
     "noImplicitThis": false,
