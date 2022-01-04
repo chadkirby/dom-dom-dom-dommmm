@@ -1,4 +1,4 @@
-import { collectTextNodes, createTextNode } from './helpers';
+import { collectTextNodes, createTextNode } from './helpers.js';
 
 /**
  * removes characters from an element, optionally inserting

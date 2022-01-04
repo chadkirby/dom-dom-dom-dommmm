@@ -1,4 +1,4 @@
-import { isEl } from './is-node';
+import { isEl } from './is-node.js';
 export interface ADAPTER {
   cssSelectAll(
     nodes: Node[],

@@ -1,11 +1,43 @@
 {
-  "extends": "./tsconfig-base.json",
+  "include": ["src/**/*"],
   "compilerOptions": {
-
-    "outDir": "./dist/cjs" /* Redirect output structure to the directory. */,
+    "module": "es2020" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
+    "outDir": "./dist",
 
     "rootDir": "./src" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
+
+    "declaration": true /* Generates corresponding '.d.ts' file. */,
+    "declarationDir": "./dist" /* Specifies the location where generated '.d.ts' files will be saved. */,
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "alwaysStrict": false,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noEmitOnError": false,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "baseUrl": ".",
+    "experimentalDecorators": true,
+
+    "target": "es2019",
+    "lib": ["es6", "dom", "DOM.Iterable"],
+
+    "allowJs": true /* Allow javascript files to be compiled. */,
+
+    "checkJs": true /* Report errors in .js files. */,
+
+    "strict": false /* Enable all strict type-checking options. */,
+
+    "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
+
+    "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
+
   },
 
-  "include": ["src/**/*"]
+  "skipLibCheck": true
  }

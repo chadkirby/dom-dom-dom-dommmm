@@ -1,4 +1,5 @@
-const test = require('./tape')(module);
+import getTest from './tape.js';
+const test = getTest({ filename: import.meta.url });
 
 test(`global things exists`, (assert) => {
   const { document, window } = globalThis;

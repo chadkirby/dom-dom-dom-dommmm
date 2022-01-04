@@ -1,4 +1,4 @@
-import { collectTextNodes, createTextNode } from './helpers';
+import { collectTextNodes, createTextNode } from './helpers.js';
 
 function makeDom(baseDocument?: Document) {
   return function (

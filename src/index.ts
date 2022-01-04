@@ -1,16 +1,23 @@
-import { parse, lookupNamespaceURI } from './helpers';
-import { DOMArray, contentTypes, defaultConfig } from './dom-array';
-import type { CONFIG as DOMARRAY_CONFIG } from './dom-array';
-import { fragmentToText, fragmentToHtml, isHtml } from './helpers';
-import { isTextNode, isEl, isNode } from './is-node';
-import { removeSubsets } from './remove-subsets';
-import { ADAPTER } from './css-adapter';
+import {
+  parse,
+  lookupNamespaceURI,
+  fragmentToText,
+  fragmentToHtml,
+  isHtml,
+} from './helpers.js';
+import { DOMArray, contentTypes, defaultConfig } from './dom-array.js';
+import type { CONFIG as DOMARRAY_CONFIG } from './dom-array.js';
+import { isTextNode, isEl, isNode } from './is-node.js';
+import { removeSubsets } from './remove-subsets.js';
+import { ADAPTER } from './css-adapter.js';
 
 type TOHTML = (node: unknown) => string;
 type Config = {
   toHtml?: TOHTML;
   cssAdapter?: Record<string, ADAPTER>;
 };
+
+export type TDOMArray = DOMArray;
 
 export function wrapper(
   baseDocument?: Document,
@@ -154,7 +161,7 @@ export function wrapper(
         if (selector) {
           const results = config.document.querySelectorAll(selector);
           const $r = DOMArray.from([...results], config);
-          return $r.text() as string;
+          return $r.text();
         }
         return fragmentToText(config.document);
       },
@@ -186,6 +193,6 @@ export function loadXml(
   return wrapper(document, { toHtml, cssAdapter });
 }
 
-export * from './helpers';
-export * from './splice-chars';
-export * from './tag-functions';
+export * from './helpers.js';
+export * from './splice-chars.js';
+export * from './tag-functions.js';

@@ -1,5 +1,7 @@
-const test = require('./tape')(module);
-const { dom, el, text, unpretty, fragmentToHtml } = require('../');
+import getTest from './tape.js';
+const test = getTest({ filename: import.meta.url });
+
+import { dom, el, text, unpretty, fragmentToHtml } from '../dist/index.js';
 
 test(`el creates element`, (assert) => {
   assert.equal(el`<span />`.outerHTML, `<span></span>`);

@@ -1,5 +1,7 @@
-const test = require('./tape')(module);
-const { $, el, createTextNode, loadHtml } = require('../');
+import getTest from './tape.js';
+const test = getTest({ filename: import.meta.url });
+
+import { $, el, createTextNode, loadHtml } from '../dist/index.js';
 
 test(`$ wraps an element`, (assert) => {
   let $x = $(el`<span>foo</span>`);

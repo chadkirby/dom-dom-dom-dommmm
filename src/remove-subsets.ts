@@ -1,4 +1,4 @@
-import { isEl } from './is-node';
+import { isEl } from './is-node.js';
 
 // takes an array of nodes, and removes any duplicates, as
 // well as any nodes whose ancestors are also in the array

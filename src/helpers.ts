@@ -1,4 +1,4 @@
-import { isEl, isTextNode } from './is-node';
+import { isEl, isTextNode } from './is-node.js';
 /**
  * iterator to collect text nodes from a dom element
  *

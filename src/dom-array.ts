@@ -1,5 +1,5 @@
 /// <reference lib="dom" />
-import { CssAdapter as CSS } from './css-adapter';
+import { CssAdapter as CSS } from './css-adapter.js';
 
 import {
   attr,
@@ -18,10 +18,9 @@ import {
   previousElementSiblings,
   previousSiblings,
   unwrap,
-} from './helpers';
-import { isTextNode, isEl, isNode } from './is-node';
-import { removeSubsets } from './remove-subsets';
-// import type { Element, Text } from 'dom';
+} from './helpers.js';
+import { isTextNode, isEl, isNode } from './is-node.js';
+import { removeSubsets } from './remove-subsets.js';
 
 type sel = string;
 
@@ -188,13 +187,17 @@ export class DOMArray {
     return this.list.find(...args);
   }
 
-  arrayMap(...args: Parameters<InstanceType<typeof Array>['map']>) {
-    return this.list.map(...args);
+  arrayMap<U>(
+    callbackfn: (value: DOMTYPE, index: number, array: DOMTYPE[]) => U,
+    thisArg?: unknown
+  ): U[] {
+    return this.list.map(callbackfn, thisArg);
   }
 
   // jq
   attr(): Record<string, string>;
   attr(name: string): string | null;
+  attr(name: string, value: string | number): string;
   attr(
     name?: string,
     value?: string | number
@@ -389,6 +392,8 @@ export class DOMArray {
     return this.filter((_i, el) => hasDescendant(el, nodeThing));
   }
   // jq
+  html(): string;
+  html(str: string): DOMArray;
   html(str?: string): string | DOMArray {
     if (str !== undefined) {
       for (const el of this) {
@@ -417,7 +422,7 @@ export class DOMArray {
       .join(delimiter);
   }
   // jq
-  index(target: ArrayLike<Node> | Node): number {
+  index(target: ArrayLike<DOMTYPE> | DOMTYPE | DOMArray): number {
     if (Array.isArray(target) || DOMArray.isDOMArray(target)) {
       [target] = target;
     }
@@ -624,6 +629,8 @@ export class DOMArray {
     return this;
   }
 
+  text(): string;
+  text(newText: string): DOMArray;
   text(newText?: string): string | DOMArray {
     if (newText === undefined) {
       return this.list

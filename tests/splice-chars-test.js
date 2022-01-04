@@ -1,10 +1,12 @@
-const test = require('./tape')(module);
-const {
+import getTest from './tape.js';
+const test = getTest({ filename: import.meta.url });
+
+import {
   spliceChars,
   createElement,
   createFragment,
   fragmentToHtml,
-} = require('../');
+} from '../dist/index.js';
 
 test('spliceChars exports something', function (assert) {
   assert.equal(typeof spliceChars, `function`, `spliceChars function exists`);

@@ -1,12 +1,13 @@
-const test = require('./tape')(module);
-const {
+import getTest from './tape.js';
+const test = getTest({ filename: import.meta.url });
+
+import {
   attr,
   closest,
   collectTextNodes,
   createElement,
   createFragment,
   createTextNode,
-  el,
   filterTextNodes,
   fragmentToHtml,
   lookupNamespaceURI,
@@ -16,7 +17,9 @@ const {
   nextSiblings,
   splitSearch,
   unwrap,
-} = require('../');
+} from '../dist/helpers.js';
+
+import { el } from '../dist/tag-functions.js';
 
 test(`createFragment creates fragment`, (assert) => {
   let $ = createFragment(`Hello<span> </span>World`);

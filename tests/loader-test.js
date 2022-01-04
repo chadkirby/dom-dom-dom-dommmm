@@ -1,5 +1,7 @@
-const test = require('./tape')(module);
-const { loadHtml, loadXml } = require('../');
+import getTest from './tape.js';
+const test = getTest({ filename: import.meta.url });
+
+import { loadHtml, loadXml } from '../dist/index.js';
 
 test(`loadHtml loads`, (assert) => {
   let $ = loadHtml();

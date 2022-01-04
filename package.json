@@ -2,25 +2,22 @@
   "name": "@ckirby/dom-dom-dom-dommmm",
   "version": "6.0.4",
   "description": "DOM/JSDOM wrapper",
-  "main": "dist/cjs/index.js",
+  "type": "module",
   "engines": {
     "node": ">=12.0.0"
   },
+  "main": "dist/index.js",
   "exports": {
-    ".": {
-      "require": "./dist/cjs/index.js",
-      "import": "./dist/esm/index.js"
-    }
+    ".": "./dist/index.js",
+    "./setup": "./setup.cjs"
   },
-  "types": "./dist/types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "compile": "yarn compile:cjs && yarn compile:esm",
-    "compile:cjs": "tsc -p tsconfig.json",
-    "compile:esm": "tsc -p tsconfig-esm.json",
+    "compile": "rm -rf dist && tsc -p tsconfig.json",
     "prepublishOnly": "yarn compile",
     "watch": "yarn tsc-watch",
     "test": "yarn lint && yarn test:tape:difflet",
-    "test:ci": "yarn compile:cjs && yarn lint && yarn test:tape",
+    "test:ci": "yarn compile && yarn lint && yarn test:tape",
     "test:tape": "tape `find tests -name '*-test.js'`",
     "test:tape:difflet": "yarn test:tape | tap-difflet --pessimistic",
     "lint": "eslint src tests",
@@ -40,6 +37,7 @@
     "@typescript-eslint/parser": "^5.3.0",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-no-only-tests": "^2.6.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -62,9 +60,8 @@
     "test": "tests"
   },
   "files": [
-    "setup",
-    "dist",
-    "types"
+    "setup.js",
+    "dist"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
