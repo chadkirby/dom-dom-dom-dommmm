@@ -60,7 +60,7 @@
     "test": "tests"
   },
   "files": [
-    "setup.js",
+    "setup.cjs",
     "dist"
   ],
   "publishConfig": {
