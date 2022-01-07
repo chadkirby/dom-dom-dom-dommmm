@@ -76,9 +76,7 @@ export function wrapper(
   };
 
   const $ = Object.assign(
-    function (
-      arg?: DOMArray | Text | Element | (Text | Element)[] | string | unknown
-    ): DOMArray {
+    function (arg?: DOMArray | Node | Node[] | string | unknown): DOMArray {
       if (DOMArray.isDOMArray(arg)) {
         return arg;
       }
