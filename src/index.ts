@@ -196,3 +196,4 @@ export function loadXml(
 export * from './helpers.js';
 export * from './splice-chars.js';
 export * from './tag-functions.js';
+export * from './is-node.js';

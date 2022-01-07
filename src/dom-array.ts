@@ -254,9 +254,7 @@ export class DOMArray {
   // jq
   closest(target): DOMArray {
     const matcher = (el: DOMTYPE) => this.newFromList([el]).is(target);
-    return getSet(this, (item: DOMTYPE) =>
-      isEl(item) ? closest(item, matcher) : []
-    );
+    return getSet(this, (item: DOMTYPE) => closest(item, matcher));
   }
   // jq
   contents(): DOMArray {

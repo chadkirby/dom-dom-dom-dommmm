@@ -1,4 +1,4 @@
-import { isEl, isTextNode } from './is-node.js';
+import { isEl, isNode, isTextNode } from './is-node.js';
 /**
  * iterator to collect text nodes from a dom element
  *
@@ -165,8 +165,9 @@ export function matches(el: Element, comparator: Matchable): boolean {
  * testing the element itself and traversing up through its
  * ancestors in the DOM tree.
  */
-export function closest(el: Element, matcher: Matchable): Element | null {
-  let out: Element | null = el;
+export function closest(el: unknown, matcher: Matchable): Element | null {
+  if (!isNode(el)) return null;
+  let out: Element | null = isEl(el) ? el : el.parentElement;
   while (out !== null && !matches(out, matcher)) {
     out = out.parentElement;
   }

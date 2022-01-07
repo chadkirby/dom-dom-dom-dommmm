@@ -10,7 +10,7 @@ export function isNode(
   thing: unknown | undefined,
   targetType = -1
 ): thing is Node {
-  if (thing === undefined) {
+  if (thing === undefined || thing === null) {
     return false;
   }
   const node = thing as Node;
