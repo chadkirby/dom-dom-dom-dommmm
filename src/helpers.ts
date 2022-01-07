@@ -1,16 +1,12 @@
-const { isTextNode } = require('./is-node');
+import { isEl, isNode, isTextNode } from './is-node.js';
 /**
  * iterator to collect text nodes from a dom element
  *
- * @param   {HTMLElement}  el  start element
- * @param   {HTMLElement}  endNode  stop element
- *
- * @return  {Iterable.HTMLElement}  iterates over text nodes
  */
-function* collectTextNodes(el, endNode) {
+export function* collectTextNodes(el: Node, endNode?: Node): Generator<Text> {
   // get a list of the element's children in case the dom is modified between
   // yields
-  let children = Array.from(el.childNodes);
+  const children = Array.from(el.childNodes);
   for (const child of children) {
     if (endNode && endNode === child) {
       // stop the generator if this child is the end node
@@ -27,12 +23,8 @@ function* collectTextNodes(el, endNode) {
 
 /**
  * empty a node
- *
- * @param   {HTMLElement}  el
- *
- * @return  {Iterable.HTMLElement}  iterates over text nodes
  */
-function empty(el) {
+export function empty(el: Node): Node {
   while (el.firstChild) {
     el.firstChild.remove();
   }
@@ -41,14 +33,12 @@ function empty(el) {
 
 /**
  * collect text nodes that satisfy a filter function
- *
- * @param   {HTMLElement}  el
- * @param   {Function}  filterFn
- *
- * @return  {Iterable.HTMLElement}  iterates over text nodes
  */
-function* filterTextNodes(el, filterFn) {
-  let getNodes = collectTextNodes(el);
+export function* filterTextNodes(
+  el: Node,
+  filterFn: (Node) => boolean
+): Generator<Text> {
+  const getNodes = collectTextNodes(el);
   let tNode;
   while ((tNode = getNodes.next().value)) {
     if (filterFn(tNode)) {
@@ -59,12 +49,10 @@ function* filterTextNodes(el, filterFn) {
 
 /**
  * convert a document fragment to html
- *
- * @param   {HTMLElement}  fragment  document fragment
- *
- * @return  {string}
  */
-function fragmentToHtml(fragment) {
+export function fragmentToHtml(
+  fragment: Document | DocumentFragment | Element
+): string {
   if (isFragment(fragment)) {
     const div = fragment.ownerDocument.createElement('div');
     div.appendChild(fragment.cloneNode(true));
@@ -81,41 +69,36 @@ function fragmentToHtml(fragment) {
 /**
  * convert a document fragment to html
  *
- * @param   {HTMLElement}  fragment  document fragment
- *
- * @return  {string}
  */
-function fragmentToText(fragment) {
-  return [ ...fragment.childNodes ].map(
-    (n) => n.textContent
-  ).join(``);
+export function fragmentToText(fragment: Document | DocumentFragment): string {
+  return [...fragment.childNodes].map((n) => n.textContent).join(``);
 }
 
-function isFragment(obj) {
+export function isFragment(obj: Node): obj is DocumentFragment {
   return obj && obj.nodeType === 11;
 }
 
-function isDocument(obj) {
-  return obj && obj.nodeType === 9;
+export function isDocument(obj: Node): obj is Document {
+  return obj.nodeType === 9;
 }
 
 /**
  * create a document fragment from an html string
  * copied from JSDOM
  *
- * @param   {String}  string  outerHTML for the new fragment
- *
- * @return  {HTMLElement}  Document Fragment
  */
-function createFragment(string = ``, document = globalThis.document) {
+export function createFragment(
+  html = ``,
+  document = globalThis.document
+): DocumentFragment {
   const template = document.createElement(`template`);
-  template.innerHTML = string;
+  template.innerHTML = html;
   if (template.content) {
     // the HTMLTemplateElement has a content property, which is a read-only
     // DocumentFragment containing the DOM subtree that the template represents.
     return template.content;
   }
-  let fragment = document.createDocumentFragment();
+  const fragment = document.createDocumentFragment();
   while (template.firstChild) {
     fragment.append(template.firstChild);
   }
@@ -125,22 +108,22 @@ function createFragment(string = ``, document = globalThis.document) {
 /**
  * create one HTML element from an html string
  *
- * @param   {string}  html  e.g. `<span />`
- *
- * @return  {HTMLElement}
  */
-function createElement(string = ``, document = globalThis.document) {
-  return createFragment(string, document).firstElementChild;
+export function createElement(
+  html = ``,
+  document = globalThis.document
+): Element | null {
+  return createFragment(html, document).firstElementChild;
 }
 
 /**
  * return a text node
  *
- * @param   {String}  text  textContent for the new text node
- *
- * @return  {HTMLElement}
  */
-function createTextNode(text, document = globalThis.document) {
+export function createTextNode(
+  text: string,
+  document = globalThis.document
+): Text {
   return document.createTextNode(text);
 }
 
@@ -148,12 +131,12 @@ function createTextNode(text, document = globalThis.document) {
  * iterate over a dom element's parents until a target
  * element or selector is found
  *
- * @param   {HTMLElement}  childNode
- * @param   {HTMLElement|string}  target
- *
- * @return  {Iterable.HTMLElement}
  */
-function* parentsUntil(childNode, target) {
+type Matchable = Node | Node[] | string | ((node: Node) => boolean);
+export function* parentsUntil(
+  childNode: Element,
+  target: Matchable
+): Generator<Element> {
   let current = childNode.parentElement;
   while (current && !matches(current, target)) {
     yield current;
@@ -161,18 +144,18 @@ function* parentsUntil(childNode, target) {
   }
 }
 
-function matches(el, comparator) {
-  if (!el) {
+export function matches(el: Element, comparator: Matchable): boolean {
+  if (!isEl(el)) {
     return false;
   }
   if (typeof comparator === `function`) {
     return comparator(el);
   }
   if (typeof comparator === `string`) {
-    return el.matches && el.matches(comparator);
+    return el.matches(comparator);
   }
   if (Array.isArray(comparator)) {
-    [ comparator ] = comparator;
+    [comparator] = comparator;
   }
   return el === comparator;
 }
@@ -181,27 +164,21 @@ function matches(el, comparator) {
  * get the first element that matches the selector by
  * testing the element itself and traversing up through its
  * ancestors in the DOM tree.
- *
- * @param   {HTMLElement}  el
- * @param   {string}  selector
- *
- * @return  {HTMLElement|null}
  */
-function closest(el, selector) {
-  while (el && !matches(el, selector)) {
-    el = el.parentElement;
+export function closest(el: unknown, matcher: Matchable): Element | null {
+  if (!isNode(el)) return null;
+  let out: Element | null = isEl(el) ? el : el.parentElement;
+  while (out !== null && !matches(out, matcher)) {
+    out = out.parentElement;
   }
-  return el;
+  return out;
 }
 
 /**
  * unwrap the contents of an element
  *
- * @param   {HTMLElement}  el  element to unwrap
- *
- * @return  {undefined}
  */
-function unwrap(el) {
+export function unwrap(el: Element): void {
   // move all children out of the element
   while (el.firstChild) {
     el.before(el.firstChild);
@@ -213,12 +190,9 @@ function unwrap(el) {
 /**
  * convert element.attributes NamedNodeMap to a POJO
  *
- * @param   {HTMLElement} el
- *
- * @return  {Object}
  */
-function attr(el) {
-  let attrs = Object.create(null);
+export function attr(el: Element): Record<string, string> {
+  const attrs = Object.create(null);
   if (el) {
     for (const { name, value } of el.attributes) {
       attrs[name] = value;
@@ -229,60 +203,55 @@ function attr(el) {
 
 /**
  * seach for text in an element
- *
- * @param   {HTMLElement}  el  element to search
- *
- * @param   {RegExp}  pattern  search pattern
- *
- * @return  {Array}
  */
-function splitSearch(el, pattern) {
-  let { textContent } = el;
-  let textNodes = collectTextNodes(el);
-  let textMap = [];
+export function splitSearch(el: Element, pattern: RegExp): Text[][] | Text[] {
+  const textContent = el.textContent || '';
+  const textNodes = collectTextNodes(el);
+  const textMap: { start: number; end: number; node: Text }[] = [];
   let counter = 0;
   for (const node of textNodes) {
     if (node.textContent) {
       textMap.push({
         start: counter,
         end: counter + node.textContent.length,
-        node
+        node,
       });
     }
-    counter += node.textContent.length;
+    counter += (node.textContent || '').length;
   }
-  let out = [];
+  const out: Text[][] = [];
   let result;
   while ((result = pattern.exec(textContent))) {
-    let found = [];
+    const found: Text[] = [];
     let { index, 0: match } = result;
     let nodeIndex = textMap.findIndex(({ end }) => end > index);
     while (match) {
-      let { start, node } = textMap[nodeIndex];
-      let localOffset = index - start;
-      let trailingNode = splitTextNode(node, localOffset + match.length);
+      const { start, node } = textMap[nodeIndex];
+      const localOffset = index - start;
+      const trailingNode = splitTextNode(node, localOffset + match.length);
       if (trailingNode) {
-        textMap[nodeIndex].end = start + node.textContent.length;
+        textMap[nodeIndex].end = start + len(node);
         textMap.splice(nodeIndex + 1, 0, {
           start: textMap[nodeIndex].end,
-          end: textMap[nodeIndex].end + trailingNode.textContent.length,
-          node: trailingNode
+          end: textMap[nodeIndex].end + len(trailingNode),
+          node: trailingNode,
         });
       }
 
-      let resultNode = splitTextNode(node, localOffset);
-      textMap[nodeIndex].end = start + node.textContent.length;
+      // resultNode should always exist
+      const resultNode = splitTextNode(node, localOffset)!;
+      textMap[nodeIndex].end = start + len(node);
       found.push(resultNode);
       if (resultNode !== node) {
         textMap.splice(nodeIndex + 1, 0, {
           start: textMap[nodeIndex].end,
-          end: textMap[nodeIndex].end + resultNode.textContent.length,
-          node: resultNode
+          end: textMap[nodeIndex].end + len(resultNode),
+          node: resultNode,
         });
         nodeIndex += 1;
       }
-      match = match.slice(node.textContent.length);
-      index += node.textContent.length;
+      match = match.slice(len(node));
+      index += len(node);
       nodeIndex += 1;
     }
     if (!pattern.global) {
@@ -293,10 +262,13 @@ function splitSearch(el, pattern) {
   return out;
 }
 
+function len(node: Node): number {
+  return (node.textContent || '').length;
+}
 
 // split a text node at the given char offset
-function splitTextNode(node, offset) {
-  let { textContent } = node;
+export function splitTextNode(node: Text, offset: number): Text | null {
+  const textContent = node.textContent || '';
   if (offset < 0) {
     offset += textContent.length;
   }
@@ -304,52 +276,55 @@ function splitTextNode(node, offset) {
     return node;
   }
   if (offset < 0 || offset >= textContent.length) {
-    return;
+    return null;
   }
   // crop the text content of the existing text node
   node.textContent = textContent.slice(0, offset);
   // insert a new text node with the remaining text (if any)
-  let newNode = createTextNode(textContent.slice(offset));
+  const newNode = createTextNode(textContent.slice(offset));
   node.after(newNode);
   // return the text node we just inserted
   return newNode;
 }
 
-
-function* previousSiblings(el) {
-  while (el && (el = el.previousSibling)) {
+export function* previousSiblings(el: Node): Generator<Node> {
+  while (el !== null && el.previousSibling !== null) {
+    el = el.previousSibling;
     yield el;
   }
 }
 
-function* previousElementSiblings(el) {
-  while (el && (el = el.previousElementSibling)) {
+export function* previousElementSiblings(el: Element): Generator<Element> {
+  while (el !== null && el.previousElementSibling !== null) {
+    el = el.previousElementSibling;
     yield el;
   }
 }
 
-function* nextSiblings(el) {
-  while (el && (el = el.nextSibling)) {
+export function* nextSiblings(el: Node): Generator<Node> {
+  while (el !== null && el.nextSibling !== null) {
+    el = el.nextSibling;
     yield el;
   }
 }
 
-function* nextElementSiblings(el) {
-  while (el && (el = el.nextElementSibling)) {
+export function* nextElementSiblings(el: Element): Generator<Element> {
+  while (el !== null && el.nextElementSibling !== null) {
+    el = el.nextElementSibling;
     yield el;
   }
 }
 
-function nodeToSelector(node) {
+export function nodeToSelector(node: Element): string {
   return [
     node.nodeName.toLowerCase(),
-    ...Array.from(node.attributes).map(
-      ({ name, value }) => value ? `[${name}="${value}"]` : ``
-    )
+    ...Array.from(node.attributes).map(({ name, value }) =>
+      value ? `[${name}="${value}"]` : ``
+    ),
   ].join(``);
 }
 
-function hasDescendant(parent, target) {
+export function hasDescendant(parent: Node, target: Node): boolean {
   // traverse breadth-first
   const queue = Array.from(parent.childNodes);
   let current;
@@ -361,61 +336,46 @@ function hasDescendant(parent, target) {
       queue.push(...current.childNodes);
     }
   }
+  return false;
 }
 
-function parse(string, contentType) {
+export function parse(
+  string: string,
+  contentType: DOMParserSupportedType
+): Document {
   if (Buffer.isBuffer(string)) {
     string = string.toString();
   }
 
-  let dom = new globalThis.window.DOMParser().parseFromString(
+  const dom = new globalThis.window.DOMParser().parseFromString(
     string,
     contentType
   );
-  if (dom.firstElementChild.matches('parsererror')) {
-    throw new Error(dom.firstElementChild.textContent);
+  const child = dom.firstElementChild;
+  if (child !== null && child.matches('parsererror')) {
+    throw new Error(child.textContent || '');
   }
   return dom;
 }
 
-function isSelector(thing) {
+export function isSelector(thing: unknown): thing is string {
   return typeof thing === 'string' && !isHtml(thing);
 }
-function isHtml(thing) {
+export function isHtml(thing: unknown): thing is string {
   return typeof thing === 'string' && /^\s*<\w.*?>/.test(thing);
 }
 
 const NAMESPACES = Object.assign(Object.create(null), {
   xml: 'http://www.w3.org/XML/1998/namespace',
-  xmlns: 'http://www.w3.org/2000/xmlns/'
+  xmlns: 'http://www.w3.org/2000/xmlns/',
 });
-function lookupNamespaceURI(prefix, document) {
-  [ prefix ] = prefix.split(':');
-  return NAMESPACES[prefix.toLowerCase()] || (document && document.lookupNamespaceURI(prefix));
+export function lookupNamespaceURI(
+  prefix: string,
+  document?: Document
+): string {
+  [prefix] = prefix.split(':');
+  return (
+    NAMESPACES[prefix.toLowerCase()] ||
+    (document && document.lookupNamespaceURI(prefix))
+  );
 }
-
-module.exports = {
-  attr,
-  closest,
-  collectTextNodes,
-  createElement,
-  createFragment,
-  createTextNode,
-  empty,
-  filterTextNodes,
-  fragmentToHtml,
-  fragmentToText,
-  hasDescendant,
-  isHtml,
-  isSelector,
-  lookupNamespaceURI,
-  parentsUntil,
-  parse,
-  previousElementSiblings,
-  previousSiblings,
-  nextElementSiblings,
-  nextSiblings,
-  nodeToSelector,
-  splitSearch,
-  unwrap
-};

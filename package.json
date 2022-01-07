@@ -2,18 +2,22 @@
   "name": "@ckirby/dom-dom-dom-dommmm",
   "version": "6.0.4",
   "description": "DOM/JSDOM wrapper",
+  "type": "module",
   "engines": {
-    "node": ">=12.20.0"
+    "node": ">=12.0.0"
   },
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "exports": {
-    ".": "./src/index.js",
-    "./*": "./src/*",
-    "./setup": "./setup.js"
+    ".": "./dist/index.js",
+    "./setup": "./setup.cjs"
   },
+  "types": "./dist/index.d.ts",
   "scripts": {
+    "compile": "rm -rf dist && tsc -p tsconfig.json",
+    "prepublishOnly": "yarn compile",
+    "watch": "yarn tsc-watch",
     "test": "yarn lint && yarn test:tape:difflet",
-    "test:ci": "yarn lint && yarn test:tape",
+    "test:ci": "yarn compile && yarn lint && yarn test:tape",
     "test:tape": "tape `find tests -name '*-test.js'`",
     "test:tape:difflet": "yarn test:tape | tap-difflet --pessimistic",
     "lint": "eslint src tests",
@@ -27,13 +31,25 @@
   "author": "Chad Kirby",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^8.1.0",
-    "eslint-plugin-turbopatent": "^6.0.0",
+    "@types/node": "^16.11.6",
+    "@types/tape": "^4.13.2",
+    "@typescript-eslint/eslint-plugin": "^5.3.0",
+    "@typescript-eslint/parser": "^5.3.0",
+    "eslint": "^8.2.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-no-only-tests": "^2.6.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "jsdom": "^18.0.1",
+    "prettier": "^2.4.1",
     "tap-difflet": "^0.7.1",
     "tape": "^5.3.1",
     "tape-promise": "^4.0.0",
-    "tom-jumbo-grumbo": "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.5"
+    "tom-jumbo-grumbo": "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.5",
+    "ts-node": "^10.4.0",
+    "tsc-watch": "^4.4.0",
+    "typescript": "^4.4.4"
   },
   "dependencies": {},
   "bugs": {
@@ -45,7 +61,7 @@
   },
   "files": [
     "setup.js",
-    "src"
+    "dist"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
