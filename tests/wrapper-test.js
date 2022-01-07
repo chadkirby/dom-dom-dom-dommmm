@@ -24,6 +24,7 @@ test(`$ wraps an element`, (assert) => {
   );
 
   assert.ok($x.first().is(span));
+  assert.equal($($x), $x, 're-wrapped DomArray is the same');
 });
 
 test(`$ wraps an html string`, (assert) => {

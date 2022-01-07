@@ -77,8 +77,11 @@ export function wrapper(
 
   const $ = Object.assign(
     function (
-      arg?: Text | Element | (Text | Element)[] | string | unknown
+      arg?: DOMArray | Text | Element | (Text | Element)[] | string | unknown
     ): DOMArray {
+      if (DOMArray.isDOMArray(arg)) {
+        return arg;
+      }
       if (Array.isArray(arg)) {
         return DOMArray.from(arg, config);
       }
