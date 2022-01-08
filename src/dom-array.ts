@@ -479,7 +479,7 @@ export class DOMArray {
    */
   next(selector?: sel): DOMArray {
     return getSet(this, (el) =>
-      isEl(el) ? el.nextElementSibling : null
+      isEl(el) ? el.nextElementSibling : el.nextSibling
     ).filter(selector);
   }
   nextSibling(selector?: sel): DOMArray {
@@ -493,7 +493,9 @@ export class DOMArray {
   // selector.
   nextAll(selector?: sel): DOMArray {
     const list = this.list
-      .map((el) => (isEl(el) ? [...nextElementSiblings(el)] : []))
+      .map((el) =>
+        isEl(el) ? [...nextElementSiblings(el)] : [...nextSiblings(el)]
+      )
       .flat()
       .filter(Boolean);
     return this.newFromList(list).filter(selector);
@@ -508,7 +510,7 @@ export class DOMArray {
     if (isSelector(target)) {
       return this.arrayFilter((el) => !this.config.cssIs(el, target));
     }
-    if (isEl(target)) {
+    if (isNode(target)) {
       return this.arrayFilter((el) => el !== target);
     }
     if (Array.isArray(target)) {
@@ -527,18 +529,14 @@ export class DOMArray {
   }
   // jq
   parents(selector?: sel): DOMArray {
-    return getSet(this, (el) =>
-      isEl(el) ? parentsUntil(el, () => false) : null
-    ).filter(selector);
+    return getSet(this, (el) => parentsUntil(el, () => false)).filter(selector);
   }
   // jq
   parentsUntil(target, filter?): DOMArray {
     if (DOMArray.isDOMArray(target)) {
       target = target.list;
     }
-    return getSet(this, (el) =>
-      isEl(el) ? parentsUntil(el, target) : null
-    ).filter(filter);
+    return getSet(this, (el) => parentsUntil(el, target)).filter(filter);
   }
 
   /**
@@ -554,7 +552,7 @@ export class DOMArray {
    */
   prev(selector?: sel): DOMArray {
     return getSet(this, (el) =>
-      isEl(el) ? el.previousElementSibling : null
+      isEl(el) ? el.previousElementSibling : el.previousSibling
     ).filter(selector);
   }
   previousSiblings(selector?: sel): DOMArray {
@@ -568,7 +566,9 @@ export class DOMArray {
   // of matched elements, optionally filtered by a selector.
   prevAll(selector?: sel): DOMArray {
     const list = this.list
-      .map((el) => (isEl(el) ? [...previousElementSiblings(el)] : []))
+      .map((el) =>
+        isEl(el) ? [...previousElementSiblings(el)] : [...previousSiblings(el)]
+      )
       .flat()
       .filter(Boolean);
     return this.newFromList(list).filter(selector);
@@ -651,7 +651,7 @@ export class DOMArray {
 
   unwrap(): DOMArray {
     for (const el of this) {
-      if (isEl(el)) unwrap(el);
+      unwrap(el);
     }
     return this;
   }
@@ -665,9 +665,11 @@ export class DOMArray {
   wrap(target: Nodable): void {
     for (const el of this) {
       const wrapper = thingToNode(target, this);
-      if (isEl(el) && isEl(wrapper)) {
-        el.replaceWith(wrapper);
+      if (isEl(wrapper)) {
+        el.parentElement?.replaceChild(wrapper, el);
         wrapper.append(el);
+      } else {
+        throw new Error(`can't wrap target in non-element`);
       }
     }
   }

@@ -134,7 +134,7 @@ export function createTextNode(
  */
 type Matchable = Node | Node[] | string | ((node: Node) => boolean);
 export function* parentsUntil(
-  childNode: Element,
+  childNode: Node,
   target: Matchable
 ): Generator<Element> {
   let current = childNode.parentElement;
@@ -178,13 +178,13 @@ export function closest(el: unknown, matcher: Matchable): Element | null {
  * unwrap the contents of an element
  *
  */
-export function unwrap(el: Element): void {
+export function unwrap(el: Node): void {
   // move all children out of the element
   while (el.firstChild) {
-    el.before(el.firstChild);
+    el.parentNode?.insertBefore(el.firstChild, el);
   }
   // remove the empty element
-  el.remove();
+  el.parentNode?.removeChild(el);
 }
 
 /**
