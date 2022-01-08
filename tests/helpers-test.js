@@ -110,7 +110,10 @@ test(`collectTextNodes collects text nodes`, (assert) => {
     Array.from(parentsUntil($f, `b`), (n) => n.nodeName),
     [`E`, `D`, `C`]
   );
-
+  assert.deepEqual(
+    Array.from(parentsUntil($f.firstChild, `b`), (n) => n.nodeName),
+    ['F', `E`, `D`, `C`]
+  );
   assert.deepEqual(
     Array.from(parentsUntil($f, $.querySelector(`a`)), (n) => n.nodeName),
     [`E`, `D`, `C`, `B`]
