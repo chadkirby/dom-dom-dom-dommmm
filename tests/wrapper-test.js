@@ -710,3 +710,8 @@ test(`$.matches`, (assert) => {
     $x.findFirst('b').outerHtml()
   );
 });
+
+test(`can wrap the empty string`, (assert) => {
+  let $x = $(``);
+  assert.equal($x.outerHtml(), '');
+});
