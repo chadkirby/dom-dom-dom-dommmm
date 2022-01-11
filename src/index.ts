@@ -87,9 +87,8 @@ export function wrapper(
         return DOMArray.from([arg], config);
       }
       if (typeof arg === `string`) {
-        if (isHtml(arg)) {
-          return DOMArray.fromHtml(arg, config);
-        }
+        if (arg === '') return DOMArray.from([]);
+        if (isHtml(arg)) return DOMArray.fromHtml(arg, config);
         return DOMArray.from(
           [...config.document.querySelectorAll(arg)],
           config
