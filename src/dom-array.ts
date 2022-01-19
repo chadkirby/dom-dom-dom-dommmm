@@ -763,7 +763,7 @@ function thingToNode(
   thing: Nodable,
   domArray: DOMArray
 ): Text | Element | null {
-  if (Array.isArray(thing)) {
+  if (Array.isArray(thing) || DOMArray.isDOMArray(thing)) {
     [thing] = thing;
   }
   if (isEl(thing) || isTextNode(thing)) {
