@@ -470,6 +470,8 @@ test(`$.wrap`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   $x.queryAll(`a,b`).wrap(`<xx />`);
   assert.equal($x.html(), `<xx><a>1</a></xx><xx><b>2</b></xx><c>3</c>`);
+  $x.query('b').wrap($x.query('c'));
+  assert.equal($x.html(), `<xx><a>1</a></xx><xx><c>3<b>2</b></c></xx>`);
 });
 
 test(`$.wrap`, (assert) => {
