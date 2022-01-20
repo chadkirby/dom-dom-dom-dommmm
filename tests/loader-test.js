@@ -77,3 +77,14 @@ test(`loadXml can define namespaces & create namespaced elements`, (assert) => {
     `<foo:div xmlns:foo="bar"/>`
   );
 });
+
+test(`can append XML elements`, (assert) => {
+  let $ = loadXml(`<Pr>Hi there!</Pr>`);
+  let $p = $('Pr');
+  $p.append('<fooBar>baz</fooBar>');
+
+  assert.equal(
+    $.document.firstElementChild.outerHTML,
+    `<Pr>Hi there!<fooBar>baz</fooBar></Pr>`
+  );
+});
