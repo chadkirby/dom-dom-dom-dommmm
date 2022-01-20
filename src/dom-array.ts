@@ -87,8 +87,16 @@ export class DOMArray {
   }
 
   newFromHtml(html: string): DOMArray {
+    if (this.document?.contentType === contentTypes.xml) {
+      return this.newFromXml(html);
+    }
     const doc = parse(html, contentTypes.html);
     return newDomArray(this.config, getChildNodes(doc.body));
+  }
+
+  newFromXml(xml: string): DOMArray {
+    const doc = parse(xml, contentTypes.xml);
+    return newDomArray(this.config, getChildNodes(doc));
   }
 
   [Symbol.iterator](): Iterator<DOMTYPE> {
@@ -687,7 +695,7 @@ export class DOMArray {
   }
 }
 
-function getChildNodes(el: Element): DOMTYPE[] {
+function getChildNodes(el: Element | Document): DOMTYPE[] {
   const list: DOMTYPE[] = [];
   for (const child of el.childNodes) {
     if (isEl(child)) {
