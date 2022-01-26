@@ -343,12 +343,8 @@ export function parse(
   string: string,
   contentType: DOMParserSupportedType
 ): Document {
-  if (Buffer.isBuffer(string)) {
-    string = string.toString();
-  }
-
   const dom = new globalThis.window.DOMParser().parseFromString(
-    string,
+    string.toString(),
     contentType
   );
   const child = dom.firstElementChild;
