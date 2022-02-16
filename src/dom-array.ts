@@ -32,6 +32,9 @@ export const contentTypes = Object.assign(Object.create(null), {
 type DOMTYPE = Node;
 
 type FILTER_FN = (i: number, el: DOMTYPE) => boolean;
+type AttrArgsGetOne = [string];
+type AttrArgsSetOne = [string, string | number];
+type AttrArgsSetRecord = [Record<string, string>];
 
 export type CONFIG = {
   document: Document;
@@ -205,20 +208,30 @@ export class DOMArray {
   }
 
   // jq
-  attr(): Record<string, string>;
-  attr(name: string): string | null;
-  attr(name: string, value: string | number): string;
+  attr(): Record<string, string>; // get all
+  attr(name: string): string | null; // get one
+  attr(name: string, value: string | number): string; // set one
+  attr(attrs: Record<string, string>): null; // set many
   attr(
-    name?: string,
-    value?: string | number
+    ...args: AttrArgsGetOne | AttrArgsSetOne | AttrArgsSetRecord
   ): Record<string, string> | string | null {
     const [first] = this;
-    if (!name) {
+    if (!args.length) {
       // return hash of attributes
       return isEl(first) ? attr(first) : {};
     }
     if (isEl(first)) {
-      if (value !== undefined) {
+      if (args.length === 1) {
+        if (typeof args[0] === 'string') {
+          let [name] = args as AttrArgsGetOne;
+          return first.getAttribute(name);
+        }
+        let [attrs] = args as AttrArgsSetRecord;
+        for (const [key, val] of Object.entries(attrs)) {
+          this.attr(key, val);
+        }
+      } else {
+        let [name, value] = args as AttrArgsSetOne;
         if (/\w+:\w+/.test(name)) {
           throw new Error('use setAttrNS() to set namespaced attributes');
         }
@@ -226,7 +239,6 @@ export class DOMArray {
           (el) => isEl(el) && el.setAttribute(name, value.toString())
         );
       }
-      return first.getAttribute(name);
     }
     return null;
   }
