@@ -136,7 +136,7 @@ export function wrapper(
           config
         );
       },
-      html(thing): string {
+      html(thing?): string {
         if (typeof thing === 'string') {
           return DOMArray.from(
             [...config.document.querySelectorAll(thing)],
