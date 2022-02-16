@@ -71,11 +71,12 @@ test(`$.query`, (assert) => {
   assert.equal($x.queryAll(`a`).first().queryAll(`a`).length, 0);
 });
 
-test(`$.attr`, (assert) => {
+test(`$.attr gets`, (assert) => {
   let $x = $(`<span id='2' foo='bar' />`);
   assert.deepLooseEqual($x.attr(), { id: '2', foo: 'bar' });
   assert.equal($x.attr('id'), '2');
-  assert.equal($x.attr('id', 3), '3');
+  $x.attr('id', 3);
+  assert.equal($x.attr('id'), '3');
   assert.equal($x.attr('doesnotexist'), null, 'attr does not exist');
   assert.equal(
     $x.find('nonexistant').attr('nonexistant'),
@@ -89,13 +90,15 @@ test(`$.attr`, (assert) => {
   assert.equal($x.toSelector(), `span[id="3"][foo="bar"]`);
 });
 
-test(`$.attr`, (assert) => {
+test(`$.attr sets`, (assert) => {
   let $x = $(`<span id='2' foo='bar' />`);
   assert.deepLooseEqual($x.attr(), { id: '2', foo: 'bar' });
   $x.attr('id', 3);
   assert.equal($x[0].outerHTML, `<span id="3" foo="bar"></span>`);
   $x.removeAttr('id');
   assert.equal($x[0].outerHTML, `<span foo="bar"></span>`);
+  $x.attr({ id: '2', foo: 'baz' });
+  assert.equal($x[0].outerHTML, `<span foo="baz" id="2"></span>`);
 });
 
 test(`$.index`, (assert) => {
