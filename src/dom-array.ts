@@ -31,6 +31,8 @@ export const contentTypes = Object.assign(Object.create(null), {
 
 type DOMTYPE = Node;
 
+type FILTER_FN = (i: number, el: DOMTYPE) => boolean;
+
 export type CONFIG = {
   document: Document;
   cssSelectAll(nodes: DOMTYPE[], selector: sel): Element[];
@@ -252,7 +254,7 @@ export class DOMArray {
   before(content: Nodable): DOMArray {
     return each(this, `before`, content);
   }
-  children(selector: sel): DOMArray {
+  children(selector?: sel): DOMArray {
     return getSet(this, (el) => (isEl(el) ? el.children : [])).filter(selector);
   }
   clone({ deep = true } = {}): DOMArray {
@@ -331,9 +333,7 @@ export class DOMArray {
     return this.newFromList([]);
   }
 
-  filter(
-    target: undefined | sel | ((i: number, el: DOMTYPE) => boolean)
-  ): DOMArray {
+  filter(target?: sel | FILTER_FN): DOMArray {
     if (!target) {
       return this.slice();
     }
@@ -346,7 +346,7 @@ export class DOMArray {
     throw new Error('unknown filter target');
   }
 
-  find(target): DOMArray {
+  find(target: sel | FILTER_FN): DOMArray {
     if (isSelector(target)) {
       return this.queryAll(target);
     }

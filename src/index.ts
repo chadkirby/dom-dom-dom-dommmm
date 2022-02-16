@@ -19,6 +19,10 @@ type Config = {
 
 export type TDOMArray = DOMArray;
 
+export function isDomDom(obj): obj is TDOMArray {
+  return DOMArray.isDOMArray(obj);
+}
+
 export function wrapper(
   baseDocument?: Document,
   { toHtml, cssAdapter }: Config = {}
