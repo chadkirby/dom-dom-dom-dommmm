@@ -698,6 +698,11 @@ export class DOMArray {
     return this.list;
   }
 
+  toElements(): Element[] {
+    let elements = this.list.filter(isEl);
+    return elements;
+  }
+
   toSelector(): string {
     return this.arrayMap(nodeToSelector).join(`,`);
   }
