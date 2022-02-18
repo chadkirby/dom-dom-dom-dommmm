@@ -29,7 +29,7 @@ export const contentTypes = Object.assign(Object.create(null), {
   html: 'text/html',
 });
 
-type DOMTYPE = Node;
+export type DOMTYPE = Node;
 
 type FILTER_FN = (i: number, el: DOMTYPE) => boolean;
 type AttrArgsGetOne = [string];
