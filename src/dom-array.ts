@@ -29,7 +29,7 @@ export const contentTypes = Object.assign(Object.create(null), {
   html: 'text/html',
 });
 
-type DOMTYPE = Node;
+export type DOMTYPE = Node;
 
 type FILTER_FN = (i: number, el: DOMTYPE) => boolean;
 type AttrArgsGetOne = [string];
@@ -392,7 +392,7 @@ export class DOMArray {
     return this.slice(-1);
   }
   // Filters the list to those with the given dom node as a descendant
-  has(thing: string | Node[] | DOMArray): DOMArray {
+  has(thing: string | Node | Node[] | DOMArray): DOMArray {
     if (isSelector(thing)) {
       // Filter the list to those with a descendant that matches the
       // given selector.
@@ -400,7 +400,7 @@ export class DOMArray {
         (_i, el) => this.config.cssSelectOne([el], thing) !== null
       );
     }
-    let nodeThing: Node;
+    let nodeThing = thing as Node;
     if (Array.isArray(thing)) {
       [nodeThing] = thing;
     }

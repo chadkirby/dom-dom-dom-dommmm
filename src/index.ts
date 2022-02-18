@@ -124,19 +124,22 @@ export function wrapper(
           config
         );
       },
-      query(selector): DOMArray {
+      query(selector: string): DOMArray {
         const found = config.document.querySelector(selector);
         return found
           ? DOMArray.from([found], config)
           : DOMArray.from([], config);
       },
-      queryAll(selector): DOMArray {
+      queryAll(selector: string): DOMArray {
         return DOMArray.from(
           [...config.document.querySelectorAll(selector)],
           config
         );
       },
-      html(thing?): string {
+      html(thing?: string | DOMArray | Node): string {
+        if (thing === undefined) {
+          return fragmentToHtml(config.document);
+        }
         if (typeof thing === 'string') {
           return DOMArray.from(
             [...config.document.querySelectorAll(thing)],
@@ -149,8 +152,8 @@ export function wrapper(
         if (isEl(thing)) {
           return thing.outerHTML;
         }
-        if (!arguments.length) {
-          return fragmentToHtml(config.document);
+        if (isTextNode(thing)) {
+          return thing.textContent!;
         }
         return '';
       },

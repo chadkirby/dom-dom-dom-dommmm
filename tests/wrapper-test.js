@@ -266,6 +266,20 @@ test(`$.has`, (assert) => {
       .arrayMap(({ outerHTML }) => outerHTML),
     ['<a><b><c></c></b></a>', '<b><c></c></b>']
   );
+  assert.deepLooseEqual(
+    $x
+      .find('a,b,c')
+      .has($c)
+      .arrayMap(({ outerHTML }) => outerHTML),
+    ['<a><b><c></c></b></a>', '<b><c></c></b>']
+  );
+  assert.deepLooseEqual(
+    $x
+      .find('a,b,c')
+      .has($c[0])
+      .arrayMap(({ outerHTML }) => outerHTML),
+    ['<a><b><c></c></b></a>', '<b><c></c></b>']
+  );
 });
 
 test(`$.toArray`, (assert) => {
