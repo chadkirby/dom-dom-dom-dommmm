@@ -303,6 +303,27 @@ test(`$.toArray`, (assert) => {
   assert.notOk($x.queryAll(`b,c`).toArray().closest);
 });
 
+test(`$.toElements`, (assert) => {
+  let $x = $(`<div><a><b><c /></b></a></div>`);
+  assert.deepLooseEqual(
+    $x
+      .queryAll(`b,c`)
+      .toElements()
+      .map(({ outerHTML }) => outerHTML),
+    ['<b><c></c></b>', '<c></c>']
+  );
+  assert.deepLooseEqual(
+    $x.queryAll(`b,c`).arrayMap(({ outerHTML }) => outerHTML),
+    ['<b><c></c></b>', '<c></c>']
+  );
+  assert.deepLooseEqual(
+    $x.queryAll(`b,c`).arrayMap(({ outerHTML }) => outerHTML),
+    ['<b><c></c></b>', '<c></c>']
+  );
+  assert.ok(Array.isArray($x.queryAll(`b,c`).toElements()));
+  assert.notOk($x.queryAll(`b,c`).toElements().closest);
+});
+
 test(`$.replaceWith`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   $x.queryAll(`a,c`).replaceWith(`<e></e>`);
