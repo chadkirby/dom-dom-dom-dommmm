@@ -110,6 +110,7 @@ export function wrapper(
       return DOMArray.from([], config);
     },
     {
+      document: globalThis.document, // assign here so that typescript understands that it's a property
       createElementNS(tagName): DOMArray {
         const [prefix] = tagName.split(':');
         const uri = lookupNamespaceURI(prefix, config.document);
@@ -178,6 +179,8 @@ export function wrapper(
     }
   );
 
+  // redefine document as a getter so that if we're in Node, the caller
+  // can configure/reconfigure JSDOM after dom-dom is initialized
   Object.defineProperties($, {
     document: {
       get(): Document {
