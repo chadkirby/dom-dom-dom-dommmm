@@ -110,9 +110,6 @@ export function wrapper(
       return DOMArray.from([], config);
     },
     {
-      get document(): Document {
-        return config.document;
-      },
       createElementNS(tagName): DOMArray {
         const [prefix] = tagName.split(':');
         const uri = lookupNamespaceURI(prefix, config.document);
@@ -180,6 +177,14 @@ export function wrapper(
       },
     }
   );
+
+  Object.defineProperties($, {
+    document: {
+      get(): Document {
+        return config.document;
+      },
+    },
+  });
 
   return $;
 }
