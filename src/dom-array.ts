@@ -100,6 +100,17 @@ export class DOMArray {
   }
 
   newFromXml(xml: string): DOMArray {
+    let tmp = this.document?.createElement('div');
+    if (tmp) {
+      try {
+        this.document?.documentElement.appendChild(tmp);
+        tmp.innerHTML = xml;
+        let $xml = newDomArray(this.config, getChildNodes(tmp));
+        return $xml;
+      } finally {
+        tmp.remove();
+      }
+    }
     const doc = parse(xml, contentTypes.xml);
     return newDomArray(this.config, getChildNodes(doc));
   }

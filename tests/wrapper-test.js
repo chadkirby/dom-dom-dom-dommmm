@@ -1,7 +1,14 @@
 import getTest from './tape.js';
 const test = getTest({ filename: import.meta.url });
 
-import { $, el, createTextNode, loadHtml, isDomDom } from '../dist/index.js';
+import {
+  $,
+  el,
+  createTextNode,
+  loadHtml,
+  isDomDom,
+  loadXml,
+} from '../dist/index.js';
 
 test(`$ wraps an element`, (assert) => {
   let $x = $(el`<span>foo</span>`);
@@ -759,4 +766,22 @@ test(`can wrap the empty string`, (assert) => {
 test(`identity`, (assert) => {
   let $x = $(`<div />`);
   assert.ok(isDomDom($x));
+});
+
+test(`can append XML elements with namespace`, (assert) => {
+  let x$ = loadXml(
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <root xmlns:foo="bar"></root>`,
+    `text/xml`
+  );
+  assert.equal(
+    x$.document.documentElement.outerHTML,
+    `<root xmlns:foo="bar"/>`
+  );
+
+  x$(`root`).append(`<foo:bat>Hi</foo:bat>`);
+  assert.equal(
+    x$.document.documentElement.outerHTML,
+    `<root xmlns:foo="bar"><foo:bat>Hi</foo:bat></root>`
+  );
 });
