@@ -80,15 +80,14 @@ export function wrapper(
   };
 
   const $ = Object.assign(
-    function (arg?: DOMArray | Node | Node[] | string | unknown): DOMArray {
+    function (
+      arg?: DOMArray | Node | Node[] | Iterable<Node> | string | unknown
+    ): DOMArray {
       if (DOMArray.isDOMArray(arg)) {
         return arg;
       }
       if (Array.isArray(arg)) {
         return DOMArray.from(arg, config);
-      }
-      if (isEl(arg) || isTextNode(arg)) {
-        return DOMArray.from([arg], config);
       }
       if (typeof arg === `string`) {
         if (arg === '') return DOMArray.from([]);
@@ -97,6 +96,12 @@ export function wrapper(
           [...config.document.querySelectorAll(arg)],
           config
         );
+      }
+      if (isIterable<Node>(arg)) {
+        return DOMArray.from([...arg], config);
+      }
+      if (isEl(arg) || isTextNode(arg)) {
+        return DOMArray.from([arg], config);
       }
       if (isNode(arg)) {
         return DOMArray.from([arg], config);
@@ -212,3 +217,7 @@ export * from './helpers.js';
 export * from './splice-chars.js';
 export * from './tag-functions.js';
 export * from './is-node.js';
+
+function isIterable<T>(item): item is Iterable<T> {
+  return typeof item[Symbol.iterator] === 'function';
+}
