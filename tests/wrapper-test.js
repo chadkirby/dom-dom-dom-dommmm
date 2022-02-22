@@ -791,3 +791,8 @@ test(`can wrap NodeLists`, (assert) => {
   assert.equal($(div.querySelectorAll('a,b,c')).length, 3);
   assert.equal($(div.querySelectorAll('a,b,c')).html(), '123');
 });
+
+test(`can wrap undefined`, (assert) => {
+  assert.equal($(undefined).length, 0);
+  assert.equal($(null).length, 0);
+});

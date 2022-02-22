@@ -219,5 +219,5 @@ export * from './tag-functions.js';
 export * from './is-node.js';
 
 function isIterable<T>(item): item is Iterable<T> {
-  return typeof item[Symbol.iterator] === 'function';
+  return item && typeof item[Symbol.iterator] === 'function';
 }
