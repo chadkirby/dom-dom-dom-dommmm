@@ -563,10 +563,11 @@ export class DOMArray {
     return getSet(this, (el) => parentsUntil(el, () => false)).filter(selector);
   }
   // jq
-  parentsUntil(target, filter?): DOMArray {
-    if (DOMArray.isDOMArray(target)) {
-      target = target.list;
-    }
+  parentsUntil(
+    input: DOMArray | Node | Node[] | string | ((node: Node) => boolean),
+    filter?
+  ): DOMArray {
+    let target = DOMArray.isDOMArray(input) ? input.toElements() : input;
     return getSet(this, (el) => parentsUntil(el, target)).filter(filter);
   }
 
