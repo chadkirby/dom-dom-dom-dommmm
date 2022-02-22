@@ -785,3 +785,9 @@ test(`can append XML elements with namespace`, (assert) => {
     `<root xmlns:foo="bar"><foo:bat>Hi</foo:bat></root>`
   );
 });
+
+test(`can wrap NodeLists`, (assert) => {
+  let [div] = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
+  assert.equal($(div.querySelectorAll('a,b,c')).length, 3);
+  assert.equal($(div.querySelectorAll('a,b,c')).html(), '123');
+});
