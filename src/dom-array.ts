@@ -31,7 +31,7 @@ export const contentTypes = Object.assign(Object.create(null), {
 
 export type DOMTYPE = Node;
 
-type FILTER_FN = (i: number, el: DOMTYPE, list?: DOMTYPE[]) => boolean;
+type FILTER_FN = (i: number, el: DOMTYPE, list: DOMTYPE[]) => boolean;
 type AttrArgsGetOne = [string];
 type AttrArgsSetOne = [string, string | number];
 type AttrArgsSetRecord = [Record<string, string>];
@@ -338,7 +338,7 @@ export class DOMArray {
     this.list.forEach(callbackfn);
   }
 
-  each(fn: FILTER_FN): DOMArray {
+  each(fn: (i: number, el: DOMTYPE, list: DOMTYPE[]) => void): DOMArray {
     this.list.forEach((el: DOMTYPE, i: number, arr: DOMTYPE[]) =>
       fn.call(el, i, el, arr)
     );
@@ -375,7 +375,7 @@ export class DOMArray {
       return this.arrayFilter((el) => this.config.cssIs(el, target));
     }
     if (typeof target === 'function') {
-      return this.arrayFilter((el, i) => target.call(el, i, el));
+      return this.arrayFilter((el, i, list) => target.call(el, i, el, list));
     }
     throw new Error('unknown filter target');
   }
@@ -386,7 +386,7 @@ export class DOMArray {
     }
     if (typeof target === 'function') {
       return this.newFromList(
-        this.list.filter((el, i) => target.call(el, i, el))
+        this.list.filter((el, i, list) => target.call(el, i, el, list))
       );
     }
     throw new Error('unknown find target');
