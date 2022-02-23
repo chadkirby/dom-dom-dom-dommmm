@@ -31,10 +31,17 @@ export const contentTypes = Object.assign(Object.create(null), {
 
 export type DOMTYPE = Node;
 
-type FILTER_FN = (i: number, el: DOMTYPE) => boolean;
+type FILTER_FN = (i: number, el: DOMTYPE, list?: DOMTYPE[]) => boolean;
 type AttrArgsGetOne = [string];
 type AttrArgsSetOne = [string, string | number];
 type AttrArgsSetRecord = [Record<string, string>];
+
+type TARGET<T = DOMTYPE> =
+  | DOMArray
+  | T
+  | T[]
+  | string
+  | ((value: DOMTYPE, index?: number, arr?: DOMTYPE[]) => boolean);
 
 export type CONFIG = {
   document: Document;
@@ -66,7 +73,7 @@ function newDomArray(config: CONFIG, list: DOMTYPE[]): DOMArray {
       if (Number.isInteger(i)) {
         return target.nodeAt(i);
       } else {
-        return target[prop];
+        return target[prop as keyof DOMArray];
       }
     },
   });
@@ -74,6 +81,7 @@ function newDomArray(config: CONFIG, list: DOMTYPE[]): DOMArray {
 
 export class DOMArray {
   ['constructor']!: typeof DOMArray;
+  [index: number]: DOMTYPE | undefined;
   constructor(
     protected list: DOMTYPE[] = [],
     protected config = defaultConfig
@@ -199,16 +207,17 @@ export class DOMArray {
   }
 
   arrayFilter(
-    fn: (item: DOMTYPE, i?: number, arr?: DOMTYPE[]) => boolean
+    fn: (item: DOMTYPE, i: number, arr: DOMTYPE[]) => boolean
   ): DOMArray {
     const filtered = this.list.filter(fn);
     return this.newFromList(filtered);
   }
 
   arrayFind(
-    ...args: Parameters<InstanceType<typeof Array>['find']>
+    predicate: (value: DOMTYPE, index: number, arr: DOMTYPE[]) => boolean,
+    thisArg?: DOMArray
   ): DOMTYPE | undefined {
-    return this.list.find(...args);
+    return this.list.find(predicate, thisArg);
   }
 
   arrayMap<U>(
@@ -226,7 +235,7 @@ export class DOMArray {
   attr(
     ...args: AttrArgsGetOne | AttrArgsSetOne | AttrArgsSetRecord
   ): Record<string, string> | string | null {
-    const [first] = this;
+    const first = this[0];
     if (!args.length) {
       // return hash of attributes
       return isEl(first) ? attr(first) : {};
@@ -285,7 +294,7 @@ export class DOMArray {
     return this.newFromList(list);
   }
   // jq
-  closest(target): DOMArray {
+  closest(target: TARGET): DOMArray {
     const matcher = (el: DOMTYPE) => this.newFromList([el]).is(target);
     return getSet(this, (item: DOMTYPE) => closest(item, matcher));
   }
@@ -302,13 +311,13 @@ export class DOMArray {
   css(propertyName: string, value: string): DOMArray;
   css(
     propertyName?: string,
-    value?: unknown
+    value?: unknown & { toString(): string }
   ): string | CSSStyleDeclaration | DOMArray {
     const { HTMLElement } = globalThis.window;
     if (value !== undefined) {
       for (const el of this) {
         if (propertyName && el instanceof HTMLElement) {
-          el.style[propertyName] = value;
+          el.style.setProperty(propertyName, value.toString());
         }
       }
       return this;
@@ -329,8 +338,10 @@ export class DOMArray {
     this.list.forEach(callbackfn);
   }
 
-  each(fn): DOMArray {
-    this.list.forEach((el, i, arr) => fn.call(el, i, el, arr));
+  each(fn: FILTER_FN): DOMArray {
+    this.list.forEach((el: DOMTYPE, i: number, arr: DOMTYPE[]) =>
+      fn.call(el, i, el, arr)
+    );
     return this;
   }
 
@@ -388,7 +399,7 @@ export class DOMArray {
       return this.query(target);
     }
     if (typeof target === 'function') {
-      const found = this.list.find((el, i) => target.call(el, i, el));
+      const found = this.list.find((el, i) => target.call(el, el, i));
       return this.newFromList(found ? [found] : []);
     }
     throw new Error('unknown findFirst target');
@@ -457,18 +468,19 @@ export class DOMArray {
     }
     return this.list.findIndex((el) => el === target);
   }
-  is(target): boolean {
+  is(target: TARGET): boolean {
     if (DOMArray.isDOMArray(target)) {
       target = target.list;
     }
     if (Array.isArray(target)) {
       return Boolean(target.find((t) => this.is(t)));
     }
-    let finder = target;
+    let finder = target as (value: DOMTYPE) => boolean;
     if (isEl(target) || isTextNode(target)) {
-      finder = (el) => target === el;
+      finder = (el: DOMTYPE) => target === el;
     } else if (isSelector(target)) {
-      finder = (el) => this.config.cssIs(el, target);
+      let selector = target;
+      finder = (el) => this.config.cssIs(el, selector);
     } else {
       throw new Error('unknown "is" target');
     }
@@ -487,10 +499,12 @@ export class DOMArray {
 
   // Filters the list to those whose text matches the given target
   matches(
-    target,
+    target: string | RegExp,
     maybeGetText?: (a: Node, b?: number, c?: DOMArray) => string
   ): DOMArray {
-    const getText = maybeGetText ? maybeGetText : (el) => el.textContent || '';
+    const getText = maybeGetText
+      ? maybeGetText
+      : (el: Node) => el.textContent || '';
 
     return this.arrayFilter(
       (el, i) => getText(el, i, this).match(target) !== null
@@ -532,7 +546,7 @@ export class DOMArray {
     return this.newFromList(list).filter(selector);
   }
 
-  nextUntil(target): DOMArray {
+  nextUntil(target: TARGET): DOMArray {
     return this.nextAll().sliceUntil(target);
   }
   not(
@@ -563,10 +577,7 @@ export class DOMArray {
     return getSet(this, (el) => parentsUntil(el, () => false)).filter(selector);
   }
   // jq
-  parentsUntil(
-    input: DOMArray | Node | Node[] | string | ((node: Node) => boolean),
-    filter?
-  ): DOMArray {
+  parentsUntil(input: TARGET<Element>, filter?: sel | FILTER_FN): DOMArray {
     let target = DOMArray.isDOMArray(input) ? input.toElements() : input;
     return getSet(this, (el) => parentsUntil(el, target)).filter(filter);
   }
@@ -606,7 +617,7 @@ export class DOMArray {
     return this.newFromList(list).filter(selector);
   }
 
-  prevUntil(target): DOMArray {
+  prevUntil(target: TARGET): DOMArray {
     return this.prevAll().sliceUntil(target);
   }
 
@@ -628,14 +639,14 @@ export class DOMArray {
     }
     return this;
   }
-  removeAttr(name): DOMArray {
+  removeAttr(name: string): DOMArray {
     for (const el of this) {
       if (isEl(el)) el.removeAttribute(name);
     }
     return this;
   }
   //jq
-  replaceWith(content): DOMArray {
+  replaceWith(content: Nodable): DOMArray {
     return each(this, `replaceWith`, content);
   }
 
@@ -647,7 +658,7 @@ export class DOMArray {
     ]);
   }
 
-  sliceUntil(target): DOMArray {
+  sliceUntil(target: TARGET): DOMArray {
     if (target) {
       const stop = this.list.findIndex((el) =>
         this.newFromList([el]).is(target)
@@ -716,15 +727,15 @@ export class DOMArray {
   }
 
   toSelector(): string {
-    return this.arrayMap(nodeToSelector).join(`,`);
+    return this.toElements().map(nodeToSelector).join(`,`);
   }
 
-  static isDOMArray(thing): thing is DOMArray {
+  static isDOMArray(thing: unknown): thing is DOMArray {
     return thing instanceof DOMArray;
   }
 }
 
-function getChildNodes(el: Element | Document): DOMTYPE[] {
+function getChildNodes(el: Node): DOMTYPE[] {
   const list: DOMTYPE[] = [];
   for (const child of el.childNodes) {
     if (isEl(child)) {
@@ -753,7 +764,10 @@ function getSet(
     const result = getter(el);
     if (result) {
       let resultArray: Array<DOMTYPE>;
-      if (result[Symbol.iterator]) {
+      if (
+        typeof (result as { [Symbol.iterator]: unknown })[Symbol.iterator] ===
+        `function`
+      ) {
         resultArray = Array.from(result as Iterable<DOMTYPE>);
       } else if (isNode(result)) {
         resultArray = [result];
@@ -768,25 +782,33 @@ function getSet(
   return domArray.newFromList(Array.from(set));
 }
 
-function each(domArray: DOMArray, op: string, val: Nodable): DOMArray {
-  for (const el of domArray) {
-    let content = DOMArray.isDOMArray(val) ? [...val] : val;
-    if (isHtml(content)) {
-      content = [...domArray.newFromHtml(content)];
-      if (content.length === 1) {
-        [content] = content;
+function each(
+  domArray: DOMArray,
+  op: keyof Element | keyof Text,
+  val: Nodable
+): DOMArray {
+  for (const item of domArray) {
+    if (typeof (item as never)[op] === `function`) {
+      let el = item as Element | Text;
+      let key = op as keyof typeof el;
+      let content = DOMArray.isDOMArray(val) ? [...val] : val;
+      if (isHtml(content)) {
+        content = [...domArray.newFromHtml(content)];
+        if (content.length === 1) {
+          [content] = content;
+        }
       }
-    }
-    if (Array.isArray(content)) {
-      el[op](
-        ...Array.from(content)
-          .map((item) => thingToNode(item, domArray))
-          .filter((x) => x)
-      );
-    } else {
-      const node = thingToNode(content, domArray);
-      if (node) {
-        el[op](node);
+      if (Array.isArray(content)) {
+        (el[key] as (...nodes: Array<DOMTYPE>) => unknown)(
+          ...Array.from(content)
+            .map((item) => thingToNode(item, domArray))
+            .filter((x): x is Element | Text => x !== null)
+        );
+      } else {
+        const node = thingToNode(content, domArray);
+        if (node) {
+          (el[key] as (node: DOMTYPE) => unknown)(node);
+        }
       }
     }
   }
@@ -807,7 +829,8 @@ function thingToNode(
     return thing;
   }
   if (isHtml(thing)) {
-    return domArray.newFromHtml(thing)[0];
+    let [first] = domArray.newFromHtml(thing).toElements();
+    return first || null;
   }
   if (typeof thing === `string` && domArray.document) {
     return createTextNode(thing, domArray.document);

@@ -19,7 +19,7 @@ type Config = {
 
 export type TDOMArray = DOMArray;
 
-export function isDomDom(obj): obj is TDOMArray {
+export function isDomDom(obj: unknown): obj is TDOMArray {
   return DOMArray.isDOMArray(obj);
 }
 
@@ -116,7 +116,7 @@ export function wrapper(
     },
     {
       document: globalThis.document, // assign here so that typescript understands that it's a property
-      createElementNS(tagName): DOMArray {
+      createElementNS(tagName: string): DOMArray {
         const [prefix] = tagName.split(':');
         const uri = lookupNamespaceURI(prefix, config.document);
         if (!uri) {
@@ -167,7 +167,7 @@ export function wrapper(
         const s = new globalThis.window.XMLSerializer();
         return s.serializeToString(doc);
       },
-      text(selector): string {
+      text(selector: string): string {
         if (selector) {
           const results = config.document.querySelectorAll(selector);
           const $r = DOMArray.from([...results], config);
@@ -178,7 +178,7 @@ export function wrapper(
       setHtmlAdapter(adapter: TOHTML) {
         toHtml = adapter;
       },
-      setCssAdapter(adapter) {
+      setCssAdapter(adapter: Config['cssAdapter']) {
         cssAdapter = adapter;
       },
     }
@@ -218,6 +218,8 @@ export * from './splice-chars.js';
 export * from './tag-functions.js';
 export * from './is-node.js';
 
-function isIterable<T>(item): item is Iterable<T> {
-  return item && typeof item[Symbol.iterator] === 'function';
+function isIterable<T>(item: unknown): item is Iterable<T> {
+  return (
+    Boolean(item) && typeof (item as never)[Symbol.iterator] === 'function'
+  );
 }
