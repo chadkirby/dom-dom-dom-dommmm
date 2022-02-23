@@ -36,7 +36,7 @@ export function empty(el: Node): Node {
  */
 export function* filterTextNodes(
   el: Node,
-  filterFn: (Node) => boolean
+  filterFn: (node: Node) => boolean
 ): Generator<Text> {
   const getNodes = collectTextNodes(el);
   let tNode;

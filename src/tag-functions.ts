@@ -117,7 +117,7 @@ export function unprettyns(
  * assemble a template literal into a string
  */
 function assemble(strings: TemplateStringsArray, ...placeholders: unknown[]) {
-  return Object.entries(strings)
+  return [...strings.entries()]
     .map(([i, str]) => `${str}${placeholders[i] || ``}`)
     .join(``);
 }
