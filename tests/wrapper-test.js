@@ -58,20 +58,20 @@ test(`$.query`, (assert) => {
   assert.equal($x.queryAll(`c`).length, 1);
   assert.equal($x.queryAll(`a`).length, 2);
   assert.equal(
-    $x.queryAll(`a`).filter((i, a) => a.querySelector(`c`)).length,
+    $x.queryAll(`a`).filter((i, a) => a.querySelector(`c`) !== null).length,
     1
   );
   assert.equal(
     $x
       .queryAll(`a`)
-      .arrayFilter((a) => a.querySelector(`c`))
+      .arrayFilter((a) => a.querySelector(`c`) !== null)
       .outerHtml(),
     '<a>bar<c></c></a>'
   );
   assert.equal(
     $x
       .queryAll(`a`)
-      .filter((i, a) => a.querySelector(`c`))
+      .filter((i, a) => a.querySelector(`c`) !== null)
       .html(),
     `bar<c></c>`
   );
@@ -143,7 +143,7 @@ test(`$.parentsUntil`, (assert) => {
     $x
       .queryAll(`c`)
       .parentsUntil(`div`)
-      .map((i, { outerHTML }) => outerHTML).list,
+      .arrayMap((p) => p.outerHTML),
     ['<b><c></c></b>', '<a><b><c></c></b></a>']
   );
   let $a = $x.queryAll('a');
@@ -307,7 +307,6 @@ test(`$.toArray`, (assert) => {
     ['<b><c></c></b>', '<c></c>']
   );
   assert.ok(Array.isArray($x.queryAll(`b,c`).toArray()));
-  assert.notOk($x.queryAll(`b,c`).toArray().closest);
 });
 
 test(`$.toElements`, (assert) => {
@@ -328,7 +327,6 @@ test(`$.toElements`, (assert) => {
     ['<b><c></c></b>', '<c></c>']
   );
   assert.ok(Array.isArray($x.queryAll(`b,c`).toElements()));
-  assert.notOk($x.queryAll(`b,c`).toElements().closest);
 });
 
 test(`$.replaceWith`, (assert) => {
@@ -771,8 +769,7 @@ test(`identity`, (assert) => {
 test(`can append XML elements with namespace`, (assert) => {
   let x$ = loadXml(
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <root xmlns:foo="bar"></root>`,
-    `text/xml`
+    <root xmlns:foo="bar"></root>`
   );
   assert.equal(
     x$.document.documentElement.outerHTML,
