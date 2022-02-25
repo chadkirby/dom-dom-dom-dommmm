@@ -433,8 +433,7 @@ test(`set text`, (assert) => {
   $x.append($a);
   $a.text('foo');
   assert.equal($x.html(), `<a>foo</a>`);
-  $x = $(createTextNode('')).text('foo');
-  assert.equal($x.text(), `foo`);
+  assert.equal($(createTextNode('')).text('foo').text(), `foo`);
   $x = $(`<div />`).text('foo');
   assert.equal($x[0].outerHTML, `<div>foo</div>`);
   $x.text('');

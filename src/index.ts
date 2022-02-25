@@ -17,9 +17,13 @@ type Config = {
   cssAdapter?: Record<string, ADAPTER>;
 };
 
-export type TDOMArray = DOMArray;
+export type TDOMArray<T extends Node = Node> = DOMArray<T>;
+export type TDOMDOM = DOMArray<Node>;
+export type TDOMEL = DOMArray<Element>;
+export type TDOMNODE = DOMArray<Node>;
+export type TDOMWRAPPER = typeof $;
 
-export function isDomDom(obj: unknown): obj is TDOMArray {
+export function isDomDom(obj: unknown): obj is DOMArray {
   return DOMArray.isDOMArray(obj);
 }
 
@@ -82,12 +86,25 @@ export function wrapper(
   function wrapIt(
     el: Element | Element[] | Iterable<Element>
   ): DOMArray<Element>;
-  function wrapIt(textNode: Text | Text[] | Iterable<Text>): DOMArray<Text>;
-  function wrapIt(arg: null | undefined): DOMArray;
-  function wrapIt(htmlOrSelector: string): DOMArray<Element>;
+  function wrapIt<WHICH extends Node>(
+    node: WHICH | WHICH[] | Iterable<WHICH>
+  ): DOMArray<WHICH>;
+  function wrapIt(node: Node | Node[] | Iterable<Node>): DOMArray<Node>;
+  function wrapIt(arg: null | undefined): DOMArray<Node>;
+  function wrapIt(html: string): DOMArray<Element>;
+  function wrapIt(selector: string): DOMArray<Element>;
+  function wrapIt($dom: DOMArray<Node>): DOMArray<Node>;
+  function wrapIt($dom: DOMArray<Element>): DOMArray<Element>;
   function wrapIt(
-    arg?: DOMArray<Node> | Node | Node[] | Iterable<Node> | string | null
-  ): DOMArray<Element> | DOMArray<Text> | DOMArray {
+    arg?:
+      | DOMArray<Node>
+      | DOMArray<Element>
+      | Node
+      | Node[]
+      | Iterable<Node>
+      | string
+      | null
+  ): DOMArray<Element> | DOMArray<Node> {
     if (DOMArray.isDOMArray(arg)) {
       return arg;
     }

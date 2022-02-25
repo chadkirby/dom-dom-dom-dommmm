@@ -152,9 +152,11 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return isEl(el) ? el.ownerDocument : this.config.document;
   }
   // jq
-  add(content: string): DOMArray<Node>;
+  add(content: string): DOMArray<T | Element>;
   add(content: T | T[] | DOMArray<T>): DOMArray<T>;
-  add(content: string | T | T[] | DOMArray<T>): DOMArray<T> | DOMArray<Node> {
+  add(
+    content: string | T | T[] | DOMArray<T>
+  ): DOMArray<T> | DOMArray<T | Element> {
     if (isSelector(content)) {
       const newElems = this.config.cssSelectAll(
         this.document ? [this.document.body] : [],
@@ -223,7 +225,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
 
   arrayFind(
     predicate: (value: T, index: number, arr: T[]) => boolean,
-    thisArg?: DOMArray
+    thisArg?: DOMArray<T>
   ): T | undefined {
     return this.list.find(predicate, thisArg);
   }
@@ -321,11 +323,11 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   // or more CSS properties for every matched element.
   css(): CSSStyleDeclaration;
   css(propertyName: string): string;
-  css(propertyName: string, value: string): DOMArray;
+  css(propertyName: string, value: string): DOMArray<T>;
   css(
     propertyName?: string,
     value?: unknown & { toString(): string }
-  ): string | CSSStyleDeclaration | DOMArray {
+  ): string | CSSStyleDeclaration | DOMArray<T> {
     const { HTMLElement } = globalThis.window;
     if (value !== undefined) {
       for (const el of this) {
@@ -395,8 +397,8 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
 
   find(target: sel): DOMArray<Element>;
-  find(target: FILTER_FN<T>): DOMArray<Node>;
-  find(target: sel | FILTER_FN<T>): DOMArray<Element> | DOMArray<Node> {
+  find(target: FILTER_FN<T>): DOMArray<T>;
+  find(target: sel | FILTER_FN<T>): DOMArray<Element> | DOMArray<T> {
     if (isSelector(target)) {
       return this.queryAll(target);
     }
@@ -409,8 +411,8 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
 
   findFirst(target: sel): DOMArray<Element>;
-  findFirst(target: FILTER_FN<T>): DOMArray<Node>;
-  findFirst(target: string | FILTER_FN<T>): DOMArray<Element> | DOMArray<Node> {
+  findFirst(target: FILTER_FN<T>): DOMArray<T>;
+  findFirst(target: string | FILTER_FN<T>): DOMArray<Element> | DOMArray<T> {
     if (isSelector(target)) {
       return this.query(target);
     }
@@ -432,12 +434,15 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this.slice(-1);
   }
   // Filters the list to those with the given dom node as a descendant
-  has(thing: string | Node | Node[] | DOMArray): DOMArray<T> {
+  has(
+    thing: string | Node | Node[] | DOMArray<Element> | DOMArray<Node>
+  ): DOMArray<Element> {
+    let elements = this.toElements();
     if (isSelector(thing)) {
       // Filter the list to those with a descendant that matches the
       // given selector.
-      return this.filter(
-        (_i, el) => this.config.cssSelectOne([el], thing) !== null
+      return this.newFromList<Element>(
+        elements.filter((el) => this.config.cssSelectOne([el], thing) !== null)
       );
     }
     let nodeThing = thing as Node;
@@ -445,22 +450,23 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       [nodeThing] = thing;
     }
     if (DOMArray.isDOMArray(thing)) {
-      [nodeThing] = thing.list;
+      [nodeThing] = thing;
     }
-    return this.filter((_i, el) => hasDescendant(el, nodeThing));
+    return this.newFromList(
+      elements.filter((el) => hasDescendant(el, nodeThing))
+    );
   }
   // jq
   html(): string;
-  html(str: string): DOMArray;
-  html(str?: string): string | DOMArray {
+  html(str: string): DOMArray<T>;
+  html(str?: string): string | DOMArray<T> {
     if (str !== undefined) {
-      for (const el of this) {
-        if (isEl(el)) {
-          el.innerHTML = str;
-        }
+      for (const el of this.list) {
+        if (isEl(el)) el.innerHTML = str;
       }
       return this;
     }
+
     return this.list
       .filter(Boolean)
       .map((el) => (isEl(el) ? el.innerHTML : el.textContent))
@@ -518,7 +524,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   // Filters the list to those whose text matches the given target
   matches(
     target: string | RegExp,
-    maybeGetText?: (a: Node, b?: number, c?: DOMArray) => string
+    maybeGetText?: (a: Node, b?: number, c?: DOMArray<T>) => string
   ): DOMArray<T> {
     const getText = maybeGetText
       ? maybeGetText
@@ -540,9 +546,9 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
    *
    * @see {@link http://api.jquery.com/next/}
    */
-  next(selector?: sel): DOMArray<Node> {
-    return getSet(this, (el) =>
-      isEl(el) ? el.nextElementSibling : el.nextSibling
+  next(selector?: sel): DOMArray<Element> {
+    return getSet<Element>(this, (el) =>
+      isEl(el) ? el.nextElementSibling : null
     ).filter(selector);
   }
   nextSibling(selector?: sel): DOMArray<Node> {
@@ -554,21 +560,25 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   // jq: Get all following siblings of each element in the
   // set of matched elements, optionally filtered by a
   // selector.
-  nextAll(selector?: sel): DOMArray<Node> {
+  nextAll(selector?: sel): DOMArray<Element> {
     const list = this.list
-      .map((el) =>
-        isEl(el) ? [...nextElementSiblings(el)] : [...nextSiblings(el)]
-      )
+      .map((el) => (isEl(el) ? [...nextElementSiblings(el)] : null))
       .flat()
-      .filter(Boolean);
+      .filter((item): item is Element => item !== null);
     return this.newFromList(list).filter(selector);
   }
 
-  nextUntil(target: TARGET): DOMArray<Node> {
+  nextUntil(target: TARGET): DOMArray<Element> {
     return this.nextAll().sliceUntil(target);
   }
   not(
-    target: sel | Node | Node[] | DOMArray | ((i: number, el: Node) => boolean)
+    target:
+      | sel
+      | Node
+      | Node[]
+      | DOMArray<Element>
+      | DOMArray<Node>
+      | ((i: number, el: Node) => boolean)
   ): DOMArray<T> {
     if (isSelector(target)) {
       return this.arrayFilter((el) => !this.config.cssIs(el, target));
@@ -579,11 +589,11 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     if (Array.isArray(target)) {
       return this.arrayFilter((el) => !target.includes(el));
     }
-    if (DOMArray.isDOMArray(target)) {
-      return this.arrayFilter((el) => !target.list.includes(el));
-    }
     if (typeof target === 'function') {
       return this.arrayFilter((el, i) => !target.call(el, i, el));
+    }
+    if (target.DOMArray) {
+      return this.arrayFilter((el) => !target.toArray().includes(el));
     }
     throw new Error('unknown "not" target');
   }
@@ -617,9 +627,9 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
    *
    * @see {@link http://api.jquery.com/prev/}
    */
-  prev(selector?: sel): DOMArray<Node> {
+  prev(selector?: sel): DOMArray<Element> {
     return getSet(this, (el) =>
-      isEl(el) ? el.previousElementSibling : el.previousSibling
+      isEl(el) ? el.previousElementSibling : null
     ).filter(selector);
   }
   previousSiblings(selector?: sel): DOMArray<Node> {
@@ -631,17 +641,15 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
 
   // Get all preceding siblings of each element in the set
   // of matched elements, optionally filtered by a selector.
-  prevAll(selector?: sel): DOMArray<Node> {
+  prevAll(selector?: sel): DOMArray<Element> {
     const list = this.list
-      .map((el) =>
-        isEl(el) ? [...previousElementSiblings(el)] : [...previousSiblings(el)]
-      )
+      .map((el) => (isEl(el) ? [...previousElementSiblings(el)] : null))
       .flat()
-      .filter(Boolean);
+      .filter((item): item is Element => item !== null);
     return this.newFromList(list).filter(selector);
   }
 
-  prevUntil(target: TARGET): DOMArray<Node> {
+  prevUntil(target: TARGET): DOMArray<Element> {
     return this.prevAll().sliceUntil(target);
   }
 
@@ -675,7 +683,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
 
   // jq
-  siblings(selector?: sel): DOMArray<Node> {
+  siblings(selector?: sel): DOMArray<Element> {
     return this.newFromList([
       ...this.prevAll(selector).list.reverse(),
       ...this.nextAll(selector).list,
@@ -754,7 +762,9 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this.toElements().map(nodeToSelector).join(`,`);
   }
 
-  static isDOMArray(thing: unknown): thing is DOMArray {
+  static isDOMArray<WHICH extends DOMTYPE = DOMTYPE>(
+    thing: unknown
+  ): thing is DOMArray<WHICH> {
     return thing instanceof DOMArray;
   }
 }
@@ -772,7 +782,7 @@ function getChildNodes(el: Node): Node[] {
 }
 
 function getSet<T extends DOMTYPE>(
-  domArray: DOMArray,
+  domArray: DOMArray<Node>,
   getter: (
     el: Node
   ) => T | Iterable<T> | Generator<T> | Array<T> | DOMArray<T> | null
@@ -834,27 +844,33 @@ function each<T extends DOMTYPE>(
 }
 
 type ThingFn = (d?: Document) => Text | Element;
-type Nodable = string | Node | Node[] | DOMArray | ThingFn;
+type Nodable =
+  | string
+  | Node
+  | Node[]
+  | DOMArray<Node>
+  | DOMArray<Element>
+  | ThingFn;
 
-function thingToNode(
-  thing: Nodable,
-  domArray: DOMArray
-): Text | Element | null {
-  if (Array.isArray(thing) || DOMArray.isDOMArray(thing)) {
+function thingToNode(thing: Nodable, domArray: DOMArray): Node | null {
+  if (DOMArray.isDOMArray(thing)) {
+    return thing.nodeAt(0);
+  }
+  if (Array.isArray(thing)) {
     [thing] = thing;
   }
-  if (isEl(thing) || isTextNode(thing)) {
+  if (isNode(thing)) {
     return thing;
   }
-  if (isHtml(thing)) {
-    let [first] = domArray.newFromHtml(thing).toElements();
-    return first || null;
-  }
-  if (typeof thing === `string` && domArray.document) {
-    return createTextNode(thing, domArray.document);
+  if (typeof thing === `string`) {
+    if (isHtml(thing)) {
+      let [first] = domArray.newFromHtml(thing);
+      if (first) return first;
+    }
+    if (domArray.document) return createTextNode(thing, domArray.document);
   }
   if (typeof thing === `function`) {
-    return (thing as ThingFn)(domArray.document);
+    return thing(domArray.document);
   }
   return null;
 }
