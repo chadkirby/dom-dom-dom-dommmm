@@ -38,48 +38,30 @@ export function wrapper(
 
     cssSelectAll(nodes: Node[], selector: string) {
       const contentType = this.document.contentType.toLowerCase();
-      try {
-        if (cssAdapter === undefined) {
-          throw new Error('no css adapter');
-        }
-        return cssAdapter[contentType].cssSelectAll(
-          removeSubsets(nodes),
-          selector,
-          defaultConfig.cssSelectAll
-        );
-      } catch (e) {
-        return defaultConfig.cssSelectAll(nodes, selector);
-      }
+
+      return cssAdapter
+        ? cssAdapter[contentType].cssSelectAll(
+            removeSubsets(nodes),
+            selector,
+            defaultConfig.cssSelectAll
+          )
+        : defaultConfig.cssSelectAll(nodes, selector);
     },
     cssSelectOne(nodes: Node[], selector: string) {
       const contentType = this.document.contentType.toLowerCase();
-      try {
-        if (cssAdapter === undefined) {
-          throw new Error('no css adapter');
-        }
-        return cssAdapter[contentType].cssSelectOne(
-          removeSubsets(nodes),
-          selector,
-          defaultConfig.cssSelectOne
-        );
-      } catch (e) {
-        return defaultConfig.cssSelectOne(nodes, selector);
-      }
+      return cssAdapter
+        ? cssAdapter[contentType].cssSelectOne(
+            removeSubsets(nodes),
+            selector,
+            defaultConfig.cssSelectOne
+          )
+        : defaultConfig.cssSelectOne(nodes, selector);
     },
     cssIs(node: Node, selector: string) {
       const contentType = this.document.contentType.toLowerCase();
-      try {
-        if (cssAdapter === undefined) {
-          throw new Error('no css adapter');
-        }
-        return cssAdapter[contentType].cssIs(
-          node,
-          selector,
-          defaultConfig.cssIs
-        );
-      } catch (e) {
-        return defaultConfig.cssIs(node, selector);
-      }
+      return cssAdapter
+        ? cssAdapter[contentType].cssIs(node, selector, defaultConfig.cssIs)
+        : defaultConfig.cssIs(node, selector);
     },
   };
 
