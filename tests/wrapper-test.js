@@ -58,7 +58,7 @@ test(`$.query`, (assert) => {
   assert.equal($x.queryAll(`c`).length, 1);
   assert.equal($x.queryAll(`a`).length, 2);
   assert.equal(
-    $x.queryAll(`a`).filter((i, a) => a.querySelector(`c`) !== null).length,
+    $x.queryAll(`a`).filter((a) => a.querySelector(`c`) !== null).length,
     1
   );
   assert.equal(
@@ -71,7 +71,7 @@ test(`$.query`, (assert) => {
   assert.equal(
     $x
       .queryAll(`a`)
-      .filter((i, a) => a.querySelector(`c`) !== null)
+      .filter((a) => a.querySelector(`c`) !== null)
       .html(),
     `bar<c></c>`
   );
@@ -535,7 +535,7 @@ test(`$.not`, (assert) => {
   assert.deepLooseEqual(
     $x
       .queryAll(`a,b,c`)
-      .filter((i, node) => !node.matches(`a,b`))
+      .filter((node) => !node.matches(`a,b`))
       .arrayMap((node) => node.outerHTML),
     ['<c>3</c>']
   );
@@ -564,14 +564,14 @@ test(`$.contents`, (assert) => {
   assert.deepLooseEqual(
     $x
       .contents()
-      .filter((i, node) => $(node).is('a'))
+      .filter((node) => $(node).is('a'))
       .arrayMap((node) => $(node).text()),
     ['1']
   );
   assert.deepLooseEqual(
     $x
       .contents()
-      .filter((i, node) => $(node).isTextNode)
+      .filter((node) => $(node).isTextNode)
       .arrayMap((node) => $(node).text()),
     ['abc', 'def']
   );
@@ -739,7 +739,7 @@ test(`$.not`, (assert) => {
   assert.deepLooseEqual($x.find('a,b,c').not($x.find('a,b')), $x.find('c'));
   assert.deepLooseEqual($x.find('a,b,c').not($x.find('a')[0]), $x.find('b,c'));
   assert.deepLooseEqual(
-    $x.find('a,b,c').not((i) => i === 1),
+    $x.find('a,b,c').not((_el, i) => i === 1),
     $x.find('a,c')
   );
 });

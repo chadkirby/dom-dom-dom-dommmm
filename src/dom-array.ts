@@ -31,17 +31,21 @@ export const contentTypes = Object.assign(Object.create(null), {
 
 export type DOMTYPE = Node;
 
-type FILTER_FN<T extends DOMTYPE> = (i: number, el: T, list: T[]) => boolean;
+export type FILTER_FN<T extends DOMTYPE> = (
+  el: T,
+  i: number,
+  list: T[]
+) => boolean;
 type AttrArgsGetOne = [string];
 type AttrArgsSetOne = [string, string | number];
 type AttrArgsSetRecord = [Record<string, string>];
 
-type TARGET<T = DOMTYPE> =
-  | DOMArray
+export type TARGET<T extends DOMTYPE = DOMTYPE> =
+  | DOMArray<T>
   | T
   | T[]
   | string
-  | ((value: DOMTYPE, index?: number, arr?: DOMTYPE[]) => boolean);
+  | ((el: T) => boolean);
 
 export type CONFIG = {
   document: Document;
@@ -350,8 +354,8 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     this.list.forEach(callbackfn);
   }
 
-  each(fn: (i: number, el: T, list: T[]) => void): DOMArray<T> {
-    this.list.forEach((el: T, i: number, arr: T[]) => fn.call(el, i, el, arr));
+  each(fn: (el: T, i: number, list: T[]) => void): DOMArray<T> {
+    this.list.forEach((el: T, i: number, arr: T[]) => fn.call(el, el, i, arr));
     return this;
   }
 
@@ -390,7 +394,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       return this.arrayFilter((el) => this.config.cssIs(el, target));
     }
     if (typeof target === 'function') {
-      return this.arrayFilter((el, i, list) => target.call(el, i, el, list));
+      return this.arrayFilter((el, i, list) => target.call(el, el, i, list));
     }
     throw new Error('unknown filter target');
   }
@@ -514,9 +518,9 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
 
   map<U extends DOMTYPE>(
-    callback: (i: number, el: T, list: DOMArray<T>) => U
+    callback: (el: T, i: number, list: DOMArray<T>) => U
   ): DOMArray<U> {
-    const list = this.list.map((el, i) => callback.call(el, i, el, this));
+    const list = this.list.map((el, i) => callback.call(el, el, i, this));
     return this.newFromList<U>(list);
   }
 
@@ -570,15 +574,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   nextUntil(target: TARGET): DOMArray<Element> {
     return this.nextAll().sliceUntil(target);
   }
-  not(
-    target:
-      | sel
-      | Node
-      | Node[]
-      | DOMArray<Element>
-      | DOMArray<Node>
-      | ((i: number, el: Node) => boolean)
-  ): DOMArray<T> {
+  not(target: TARGET<T> | FILTER_FN<T>): DOMArray<T> {
     if (isSelector(target)) {
       return this.arrayFilter((el) => !this.config.cssIs(el, target));
     }
@@ -589,7 +585,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       return this.arrayFilter((el) => !target.includes(el));
     }
     if (typeof target === 'function') {
-      return this.arrayFilter((el, i) => !target.call(el, i, el));
+      return this.arrayFilter((el, i, list) => !target.call(el, el, i, list));
     }
     if (target.DOMArray) {
       return this.arrayFilter((el) => !target.toArray().includes(el));
