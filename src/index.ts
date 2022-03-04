@@ -91,7 +91,7 @@ export function wrapper(
       return arg;
     }
     if (arg === null || arg === undefined || arg === '') {
-      return DOMArray.from([], config);
+      return DOMArray.from<Element>([], config);
     }
     if (Array.isArray(arg)) {
       return DOMArray.from(arg, config);
@@ -100,7 +100,10 @@ export function wrapper(
       if (isHtml(arg)) {
         return DOMArray.fromHtml(arg, config);
       }
-      return DOMArray.from([...config.document.querySelectorAll(arg)], config);
+      return DOMArray.from<Element>(
+        [...config.document.querySelectorAll(arg)],
+        config
+      );
     }
     if (isIterable<Node>(arg)) {
       return DOMArray.from([...arg], config);
@@ -114,7 +117,7 @@ export function wrapper(
         return DOMArray.fromHtml(html, config);
       }
     }
-    return DOMArray.from([], config);
+    return DOMArray.from<Element>([], config);
   }
 
   const $ = Object.assign(wrapIt, {
@@ -134,7 +137,7 @@ export function wrapper(
       const found = config.document.querySelector(selector);
       return found
         ? DOMArray.from<Element>([found], config)
-        : DOMArray.from([], config);
+        : DOMArray.from<Element>([], config);
     },
     queryAll(selector: string): DOMArray<Element> {
       return DOMArray.from<Element>(

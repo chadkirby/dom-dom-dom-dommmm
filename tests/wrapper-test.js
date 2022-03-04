@@ -142,6 +142,13 @@ test(`$.parentsUntil`, (assert) => {
   assert.deepLooseEqual(
     $x
       .queryAll(`c`)
+      .parentsUntil((p) => p.matches('a'))
+      .arrayMap(({ outerHTML }) => outerHTML),
+    ['<b><c></c></b>']
+  );
+  assert.deepLooseEqual(
+    $x
+      .queryAll(`c`)
       .parentsUntil(`div`)
       .arrayMap((p) => p.outerHTML),
     ['<b><c></c></b>', '<a><b><c></c></b></a>']
