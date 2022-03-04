@@ -793,6 +793,17 @@ test(`can wrap undefined`, (assert) => {
   assert.equal($(null).length, 0);
 });
 
+test(`$.is`, (assert) => {
+  let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
+  assert.ok($x.find('a').is('a'), 'selector');
+  assert.ok($x.find('a').is($x.find('a')), 'DOMArray');
+  assert.ok($x.find('a').is($x.find('a')[0]), 'Element');
+  assert.ok(
+    $x.find('a').is(() => true),
+    'Function'
+  );
+});
+
 test(`$.notEmpty`, (assert) => {
   let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
   assert.ok($x.children('a').notEmpty, 'selector');

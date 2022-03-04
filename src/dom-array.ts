@@ -495,23 +495,28 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     }
     return this.list.findIndex((el) => el === target);
   }
-  is(target: TARGET): boolean {
-    if (DOMArray.isDOMArray(target)) {
-      target = target.list;
+  is(target: TARGET<T>): boolean {
+    let list: T[] | null = null;
+    if (DOMArray.isDOMArray<T>(target)) {
+      list = target.list;
+    } else if (Array.isArray(target)) {
+      list = target;
     }
-    if (Array.isArray(target)) {
-      return Boolean(target.find((t) => this.is(t)));
+    if (list) {
+      return Boolean(list.find((t) => this.is(t)));
     }
-    let finder = target as (value: T) => boolean;
+
+    let finder: null | ((el: T) => boolean) = null;
     if (isEl(target) || isTextNode(target)) {
       finder = (el: T) => target === el;
     } else if (isSelector(target)) {
       let selector = target;
       finder = (el) => this.config.cssIs(el, selector);
-    } else {
-      throw new Error('unknown "is" target');
+    } else if (typeof target === 'function') {
+      finder = target;
     }
-    return Boolean(this.arrayFind(finder));
+    if (finder) return Boolean(this.arrayFind(finder));
+    return false;
   }
   get isTextNode(): boolean {
     return this.length > 0 && isTextNode(this.list[0]);
