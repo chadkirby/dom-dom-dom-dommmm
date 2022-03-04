@@ -17,9 +17,13 @@ type Config = {
   cssAdapter?: Record<string, ADAPTER>;
 };
 
-export type TDOMArray = DOMArray;
+export type TDOMArray<T extends Node = Node> = DOMArray<T>;
+export type TDOMDOM = DOMArray<Node>;
+export type TDOMEL = DOMArray<Element>;
+export type TDOMNODE = DOMArray<Node>;
+export type TDOMWRAPPER = typeof $;
 
-export function isDomDom(obj: unknown): obj is TDOMArray {
+export function isDomDom(obj: unknown): obj is DOMArray {
   return DOMArray.isDOMArray(obj);
 }
 
@@ -34,65 +38,60 @@ export function wrapper(
 
     cssSelectAll(nodes: Node[], selector: string) {
       const contentType = this.document.contentType.toLowerCase();
-      try {
-        if (cssAdapter === undefined) {
-          throw new Error('no css adapter');
-        }
-        return cssAdapter[contentType].cssSelectAll(
-          removeSubsets(nodes),
-          selector,
-          defaultConfig.cssSelectAll
-        );
-      } catch (e) {
-        return defaultConfig.cssSelectAll(nodes, selector);
-      }
+
+      return cssAdapter
+        ? cssAdapter[contentType].cssSelectAll(
+            removeSubsets(nodes),
+            selector,
+            defaultConfig.cssSelectAll
+          )
+        : defaultConfig.cssSelectAll(nodes, selector);
     },
     cssSelectOne(nodes: Node[], selector: string) {
       const contentType = this.document.contentType.toLowerCase();
-      try {
-        if (cssAdapter === undefined) {
-          throw new Error('no css adapter');
-        }
-        return cssAdapter[contentType].cssSelectOne(
-          removeSubsets(nodes),
-          selector,
-          defaultConfig.cssSelectOne
-        );
-      } catch (e) {
-        return defaultConfig.cssSelectOne(nodes, selector);
-      }
+      return cssAdapter
+        ? cssAdapter[contentType].cssSelectOne(
+            removeSubsets(nodes),
+            selector,
+            defaultConfig.cssSelectOne
+          )
+        : defaultConfig.cssSelectOne(nodes, selector);
     },
     cssIs(node: Node, selector: string) {
       const contentType = this.document.contentType.toLowerCase();
-      try {
-        if (cssAdapter === undefined) {
-          throw new Error('no css adapter');
-        }
-        return cssAdapter[contentType].cssIs(
-          node,
-          selector,
-          defaultConfig.cssIs
-        );
-      } catch (e) {
-        return defaultConfig.cssIs(node, selector);
-      }
+      return cssAdapter
+        ? cssAdapter[contentType].cssIs(node, selector, defaultConfig.cssIs)
+        : defaultConfig.cssIs(node, selector);
     },
   };
 
   function wrapIt(
     el: Element | Element[] | Iterable<Element>
   ): DOMArray<Element>;
-  function wrapIt(textNode: Text | Text[] | Iterable<Text>): DOMArray<Text>;
-  function wrapIt(arg: null | undefined): DOMArray;
-  function wrapIt(htmlOrSelector: string): DOMArray<Element>;
+  function wrapIt<WHICH extends Node>(
+    node: WHICH | WHICH[] | Iterable<WHICH>
+  ): DOMArray<WHICH>;
+  function wrapIt(node: Node | Node[] | Iterable<Node>): DOMArray<Node>;
+  function wrapIt(arg: null | undefined): DOMArray<Node>;
+  function wrapIt(html: string): DOMArray<Element>;
+  function wrapIt(selector: string): DOMArray<Element>;
+  function wrapIt($dom: DOMArray<Node>): DOMArray<Node>;
+  function wrapIt($dom: DOMArray<Element>): DOMArray<Element>;
   function wrapIt(
-    arg?: DOMArray<Node> | Node | Node[] | Iterable<Node> | string | null
-  ): DOMArray<Element> | DOMArray<Text> | DOMArray {
+    arg?:
+      | DOMArray<Node>
+      | DOMArray<Element>
+      | Node
+      | Node[]
+      | Iterable<Node>
+      | string
+      | null
+  ): DOMArray<Element> | DOMArray<Node> {
     if (DOMArray.isDOMArray(arg)) {
       return arg;
     }
     if (arg === null || arg === undefined || arg === '') {
-      return DOMArray.from([], config);
+      return DOMArray.from<Element>([], config);
     }
     if (Array.isArray(arg)) {
       return DOMArray.from(arg, config);
@@ -101,7 +100,10 @@ export function wrapper(
       if (isHtml(arg)) {
         return DOMArray.fromHtml(arg, config);
       }
-      return DOMArray.from([...config.document.querySelectorAll(arg)], config);
+      return DOMArray.from<Element>(
+        [...config.document.querySelectorAll(arg)],
+        config
+      );
     }
     if (isIterable<Node>(arg)) {
       return DOMArray.from([...arg], config);
@@ -115,7 +117,7 @@ export function wrapper(
         return DOMArray.fromHtml(html, config);
       }
     }
-    return DOMArray.from([], config);
+    return DOMArray.from<Element>([], config);
   }
 
   const $ = Object.assign(wrapIt, {
@@ -135,7 +137,7 @@ export function wrapper(
       const found = config.document.querySelector(selector);
       return found
         ? DOMArray.from<Element>([found], config)
-        : DOMArray.from([], config);
+        : DOMArray.from<Element>([], config);
     },
     queryAll(selector: string): DOMArray<Element> {
       return DOMArray.from<Element>(

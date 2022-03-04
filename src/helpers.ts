@@ -132,7 +132,7 @@ export function createTextNode(
  * element or selector is found
  *
  */
-type Matchable = Node | Node[] | string | ((node: Node) => boolean);
+type Matchable = Element | Element[] | string | ((node: Element) => boolean);
 export function* parentsUntil(
   childNode: Node,
   target: Matchable
