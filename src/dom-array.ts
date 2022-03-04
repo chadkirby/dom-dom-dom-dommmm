@@ -94,8 +94,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return newDomArray<T>(config, list);
   }
   static fromHtml(html: string, config = defaultConfig): DOMArray<Element> {
-    const doc = parse(html, contentTypes.html);
-    return newDomArray(config, [...doc.body.children]);
+    return newDomArray(config, []).newFromHtml(html);
   }
 
   newFromList<NEWT extends DOMTYPE>(list: NEWT[]): DOMArray<NEWT> {

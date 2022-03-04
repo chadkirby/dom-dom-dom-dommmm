@@ -18,6 +18,9 @@ test(`loadXml loads`, (assert) => {
   let $ = loadXml();
   assert.ok($, `can loadXml with no argument`);
   assert.equal($.html(), `<root/>`);
+  assert.equal($.document.contentType, `text/xml`);
+  assert.equal($('<fooBar/>')[0].outerHTML, `<fooBar/>`);
+  assert.equal($('<fooBar/>').document.contentType, `text/xml`);
 });
 
 test(`loadXml loads specific html`, (assert) => {
