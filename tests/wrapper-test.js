@@ -792,3 +792,11 @@ test(`can wrap undefined`, (assert) => {
   assert.equal($(undefined).length, 0);
   assert.equal($(null).length, 0);
 });
+
+test(`$.notEmpty`, (assert) => {
+  let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
+  assert.ok($x.children('a').notEmpty, 'selector');
+  assert.notOk($x.children('a').isEmpty, 'selector');
+  assert.notOk($x.children('b').notEmpty, 'selector');
+  assert.ok($x.children('b').isEmpty, 'selector');
+});

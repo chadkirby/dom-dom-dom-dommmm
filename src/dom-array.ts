@@ -517,6 +517,13 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this.length > 0 && isTextNode(this.list[0]);
   }
 
+  get isEmpty(): boolean {
+    return this.length === 0;
+  }
+  get notEmpty(): boolean {
+    return this.length > 0;
+  }
+
   map<U extends DOMTYPE>(
     callback: (el: T, i: number, list: DOMArray<T>) => U
   ): DOMArray<U> {
