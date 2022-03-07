@@ -104,6 +104,7 @@ test(`$.attr sets`, (assert) => {
   assert.equal($x[0].outerHTML, `<span id="3" foo="bar"></span>`);
   $x.attr('id', undefined);
   assert.equal($x[0].outerHTML, `<span id="3" foo="bar"></span>`);
+  assert.equal($x.attr('id', undefined), $x.attr('id'));
   $x.removeAttr('id');
   assert.equal($x[0].outerHTML, `<span foo="bar"></span>`);
   $x.attr({ id: '2', foo: 'baz' });

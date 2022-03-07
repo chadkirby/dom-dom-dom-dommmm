@@ -260,7 +260,8 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       return isEl(first) ? attr(first) : {};
     }
     if (isEl(first)) {
-      if (args.length === 1) {
+      let [name, value] = args as AttrArgsSetOne;
+      if (value === undefined) {
         if (typeof args[0] === 'string') {
           let [name] = args as AttrArgsGetOne;
           return first.getAttribute(name);
@@ -270,15 +271,12 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
           this.attr(key, val);
         }
       } else {
-        let [name, value] = args as AttrArgsSetOne;
-        if (value !== undefined) {
-          if (/\w+:\w+/.test(name)) {
-            throw new Error('use setAttrNS() to set namespaced attributes');
-          }
-          this.forEach(
-            (el) => isEl(el) && el.setAttribute(name, value.toString())
-          );
+        if (/\w+:\w+/.test(name)) {
+          throw new Error('use setAttrNS() to set namespaced attributes');
         }
+        this.forEach(
+          (el) => isEl(el) && el.setAttribute(name, value.toString())
+        );
       }
     }
     return null;
