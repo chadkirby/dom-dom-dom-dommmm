@@ -202,7 +202,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this;
   }
   // jq
-  after(...contents: Nodable<Node>[]): DOMArray<T> {
+  after(...contents: AnyNodable[]): DOMArray<T> {
     let els = getEls(this.config, this.list);
     for (const content of contents) {
       each<Element>(els, `after`, content);
@@ -211,7 +211,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
 
   // jq
-  append(...contents: Nodable<Node>[]): DOMArray<T> {
+  append(...contents: AnyNodable[]): DOMArray<T> {
     let els = getEls(this.config, this.list);
     for (const content of contents) {
       each<Element>(els, `append`, content);
@@ -219,7 +219,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this;
   }
   // jq
-  prepend(...contents: Nodable<Node>[]): DOMArray<T> {
+  prepend(...contents: AnyNodable[]): DOMArray<T> {
     let els = getEls(this.config, this.list);
     for (const content of contents) {
       each<Element>(els, `prepend`, content);
@@ -271,12 +271,14 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
         }
       } else {
         let [name, value] = args as AttrArgsSetOne;
-        if (/\w+:\w+/.test(name)) {
-          throw new Error('use setAttrNS() to set namespaced attributes');
+        if (value !== undefined) {
+          if (/\w+:\w+/.test(name)) {
+            throw new Error('use setAttrNS() to set namespaced attributes');
+          }
+          this.forEach(
+            (el) => isEl(el) && el.setAttribute(name, value.toString())
+          );
         }
-        this.forEach(
-          (el) => isEl(el) && el.setAttribute(name, value.toString())
-        );
       }
     }
     return null;
@@ -302,7 +304,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this;
   }
   // jq
-  before(...contents: Nodable<Node>[]): DOMArray<T> {
+  before(...contents: AnyNodable[]): DOMArray<T> {
     let els = getEls(this.config, this.list);
     for (const content of contents) {
       each<Element>(els, `before`, content);
@@ -701,7 +703,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this;
   }
   //jq
-  replaceWith(content: Nodable<Node>): DOMArray<T> {
+  replaceWith(content: AnyNodable): DOMArray<T> {
     let els = getEls(this.config, this.list);
     each<Element>(els, `replaceWith`, content);
     return this;
@@ -845,17 +847,14 @@ function getSet<IN extends DOMTYPE, OUT extends DOMTYPE>(
 function each<T extends DOMTYPE>(
   domArray: DOMArray<T>,
   op: keyof T,
-  val: Nodable<Node>
+  val: AnyNodable
 ): void {
   for (const item of domArray) {
     if (typeof (item as never)[op] === `function`) {
       let el = item as never;
       let key = op as keyof typeof el;
-      let content: string | Node | ThingFn | Node[] = DOMArray.isDOMArray<Node>(
-        val
-      )
-        ? [...val]
-        : val;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let content: any = DOMArray.isDOMArray<Node>(val) ? [...val] : val;
       if (isHtml(content)) {
         content = [...domArray.newFromHtml(content)];
         if (content.length === 1) {
@@ -880,6 +879,18 @@ function each<T extends DOMTYPE>(
 
 type ThingFn = (d?: Document) => Text | Element;
 type Nodable<T extends Node> = string | T | T[] | DOMArray<T> | ThingFn;
+type AnyNodable =
+  | string
+  | Element
+  | Text
+  | Node
+  | Element[]
+  | Text[]
+  | Node[]
+  | DOMArray<Element>
+  | DOMArray<Node>
+  | DOMArray<Text>
+  | ThingFn;
 
 function thingToNode<T extends Node>(
   thing: Nodable<T>,

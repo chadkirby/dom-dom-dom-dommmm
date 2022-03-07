@@ -23,7 +23,9 @@ export type TDOMEL = DOMArray<Element>;
 export type TDOMNODE = DOMArray<Node>;
 export type TDOMWRAPPER = typeof $;
 
-export function isDomDom(obj: unknown): obj is DOMArray {
+export function isDomDom<T extends Node>(
+  obj: TDOMArray<T> | unknown
+): obj is DOMArray<T> {
   return DOMArray.isDOMArray(obj);
 }
 
