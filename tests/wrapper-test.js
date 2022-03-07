@@ -102,9 +102,13 @@ test(`$.attr sets`, (assert) => {
   assert.deepLooseEqual($x.attr(), { id: '2', foo: 'bar' });
   $x.attr('id', 3);
   assert.equal($x[0].outerHTML, `<span id="3" foo="bar"></span>`);
+  $x.attr('id', undefined);
+  assert.equal($x[0].outerHTML, `<span id="3" foo="bar"></span>`);
   $x.removeAttr('id');
   assert.equal($x[0].outerHTML, `<span foo="bar"></span>`);
   $x.attr({ id: '2', foo: 'baz' });
+  assert.equal($x[0].outerHTML, `<span foo="baz" id="2"></span>`);
+  $x.attr({ id: undefined, foo: undefined });
   assert.equal($x[0].outerHTML, `<span foo="baz" id="2"></span>`);
 });
 
