@@ -36,16 +36,16 @@ export type FILTER_FN<T extends DOMTYPE> = (
   i: number,
   list: T[]
 ) => boolean;
+
+export type TARGET<
+  WHICHNODE extends DOMTYPE = DOMTYPE,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  WHICHARRAY extends DOMTYPE = any
+> = DOMArray<WHICHARRAY> | WHICHNODE | WHICHNODE[] | string;
+
 type AttrArgsGetOne = [string];
 type AttrArgsSetOne = [string, string | number];
 type AttrArgsSetRecord = [Record<string, string>];
-
-export type TARGET<T extends DOMTYPE = DOMTYPE> =
-  | DOMArray<T>
-  | T
-  | T[]
-  | string
-  | ((el: T) => boolean);
 
 export type CONFIG = {
   document: Document;
@@ -319,7 +319,9 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this.newFromList(list);
   }
   // jq
-  closest(target: TARGET<Element>): DOMArray<Element> {
+  closest(
+    target: TARGET<Element, Element> | FILTER_FN<Element>
+  ): DOMArray<Element> {
     if (isSelector(target)) {
       return getSet<T, Element>(this, (el: T) => closest(el, target));
     }
@@ -409,7 +411,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     throw new Error('unknown filter target');
   }
 
-  find(selector: sel): DOMArray<Element>;
+  find<FOUND extends Element = Element>(selector: sel): DOMArray<FOUND>;
   find(element: T): DOMArray<T>;
   find(target: sel | T): DOMArray<Element> | DOMArray<T>;
   find(target: sel | T): DOMArray<Element> | DOMArray<T> {
@@ -487,15 +489,24 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       .join(delimiter);
   }
   // jq
-  index(target: ArrayLike<T> | T | DOMArray<T>): number {
+  index(
+    target:
+      | ArrayLike<Node>
+      | Node
+      | DOMArray<Node>
+      | ArrayLike<Element>
+      | Element
+      | DOMArray<Element>
+  ): number {
     if (Array.isArray(target) || DOMArray.isDOMArray(target)) {
       [target] = target;
     }
     return this.list.findIndex((el) => el === target);
   }
-  is(target: TARGET<T>): boolean {
-    let list: T[] | null = null;
-    if (DOMArray.isDOMArray<T>(target)) {
+  is(target: TARGET<Node> | FILTER_FN<T>): boolean {
+    let list: Node[] | null = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (DOMArray.isDOMArray<any>(target)) {
       list = target.list;
     } else if (Array.isArray(target)) {
       list = target;
@@ -504,9 +515,10 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       return Boolean(list.find((t) => this.is(t)));
     }
 
-    let finder: null | ((el: T) => boolean) = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let finder: null | FILTER_FN<T> = null;
     if (isEl(target) || isTextNode(target)) {
-      finder = (el: T) => target === el;
+      finder = (el: unknown) => target === el;
     } else if (isSelector(target)) {
       let selector = target;
       finder = (el) => this.config.cssIs(el, selector);
@@ -581,10 +593,10 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this.newFromList(list).filter(selector);
   }
 
-  nextUntil(target: TARGET<Element>): DOMArray<Element> {
+  nextUntil(target: TARGET<Element> | FILTER_FN<Element>): DOMArray<Element> {
     return this.nextAll().sliceUntil(target);
   }
-  not(target: TARGET<T> | FILTER_FN<T>): DOMArray<T> {
+  not(target: TARGET<Node> | FILTER_FN<T>): DOMArray<T> {
     if (isSelector(target)) {
       return this.arrayFilter((el) => !this.config.cssIs(el, target));
     }
@@ -592,7 +604,8 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       return this.arrayFilter((el) => el !== target);
     }
     if (Array.isArray(target)) {
-      return this.arrayFilter((el) => !target.includes(el));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return this.arrayFilter((el: any) => !target.includes(el));
     }
     if (typeof target === 'function') {
       return this.arrayFilter((el, i, list) => !target.call(el, el, i, list));
@@ -670,7 +683,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     return this.newFromList(list).filter(selector);
   }
 
-  prevUntil(target: TARGET<Element>): DOMArray<Element> {
+  prevUntil(target: TARGET<Element> | FILTER_FN<Element>): DOMArray<Element> {
     return this.prevAll().sliceUntil(target);
   }
 
@@ -715,7 +728,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
     ]);
   }
 
-  sliceUntil(target: TARGET<T>): DOMArray<T> {
+  sliceUntil(target: TARGET<Element> | FILTER_FN<T>): DOMArray<T> {
     if (target) {
       const stop = this.list.findIndex((el) =>
         this.newFromList([el]).is(target)
