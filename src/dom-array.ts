@@ -203,9 +203,9 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
   // jq
   after(...contents: AnyNodable[]): DOMArray<T> {
-    let els = getEls(this.config, this.list);
+    let els = getElOrText(this.config, this.list);
     for (const content of contents) {
-      each<Element>(els, `after`, content);
+      each<Element | Text>(els, `after`, content);
     }
     return this;
   }
@@ -303,9 +303,9 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
   // jq
   before(...contents: AnyNodable[]): DOMArray<T> {
-    let els = getEls(this.config, this.list);
+    let els = getElOrText(this.config, this.list);
     for (const content of contents) {
-      each<Element>(els, `before`, content);
+      each<Element | Text>(els, `before`, content);
     }
     return this;
   }
@@ -702,8 +702,8 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
   //jq
   replaceWith(content: AnyNodable): DOMArray<T> {
-    let els = getEls(this.config, this.list);
-    each<Element>(els, `replaceWith`, content);
+    let els = getElOrText(this.config, this.list);
+    each<Element | Text>(els, `replaceWith`, content);
     return this;
   }
 
@@ -796,6 +796,15 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
 
 function getEls(config: CONFIG, list: unknown[]): DOMArray<Element> {
   return new DOMArray(list.filter(isEl), config);
+}
+function getElOrText(
+  config: CONFIG,
+  list: unknown[]
+): DOMArray<Element | Text> {
+  let nods = list.filter<Element | Text>(
+    (item): item is Element | Text => isEl(item) || isTextNode(item)
+  );
+  return new DOMArray(nods, config);
 }
 
 function getChildNodes(el: Node): Node[] {
