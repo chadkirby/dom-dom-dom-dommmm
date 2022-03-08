@@ -18,9 +18,8 @@ type Config = {
 };
 
 export type TDOMArray<T extends Node = Node> = DOMArray<T>;
-export type TDOMDOM = DOMArray<Node>;
-export type TDOMEL = DOMArray<Element>;
-export type TDOMNODE = DOMArray<Node>;
+export type $NODES = DOMArray<Node>;
+export type $ELEMENTS = DOMArray<Element>;
 export type TDOMWRAPPER = typeof $;
 
 export function isDomDom<T extends Node>(
@@ -74,7 +73,7 @@ export function wrapper(
     node: WHICH | WHICH[] | Iterable<WHICH>
   ): DOMArray<WHICH>;
   function wrapIt(node: Node | Node[] | Iterable<Node>): DOMArray<Node>;
-  function wrapIt(arg: null | undefined): DOMArray<Node>;
+  function wrapIt(arg: null | undefined): DOMArray<Element>;
   function wrapIt(html: string): DOMArray<Element>;
   function wrapIt(selector: string): DOMArray<Element>;
   function wrapIt($dom: DOMArray<Node>): DOMArray<Node>;

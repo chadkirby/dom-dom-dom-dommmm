@@ -353,6 +353,10 @@ test(`$.replaceWith`, (assert) => {
   $x = $(`<div><a>1</a><b>2</b></div>`);
   $x.queryAll(`a,b`).replaceWith(`<e></e><f></f>`);
   assert.equal($x.html(), `<e></e><f></f><e></e><f></f>`);
+
+  $x = $(`<div><a>1</a><b>2</b></div>`);
+  $x.query(`a`).contents().replaceWith(`<e></e><f></f>`);
+  assert.equal($x.html(), `<a><e></e><f></f></a><b>2</b>`);
 });
 
 test(`$.first/last`, (assert) => {
@@ -377,6 +381,9 @@ test(`$.after`, (assert) => {
   let $c = $(`<c>bar</c>`);
   $x.find('a').after($c);
   assert.equal($x.html(), `<a>foo</a><c>bar</c>`);
+  let $foo = $c.contents().first();
+  $foo.after(globalThis.document.createTextNode('baz'));
+  assert.equal($x.html(), `<a>foo</a><c>barbaz</c>`);
 
   $x = $(`<div><a>1</a></div>`);
   $x.find('a').after(`<b>2</b><c>3</c>`);
@@ -465,6 +472,9 @@ test(`$.before`, (assert) => {
   $c.before($a);
   assert.equal($x.html(), `<a>foo</a><c>bar</c>`);
   assert.equal($x.queryAll(`a,c`).filter(`c`).text(), `bar`);
+  let $foo = $a.contents().first();
+  $foo.before(globalThis.document.createTextNode('baz'));
+  assert.equal($x.html(), `<a>bazfoo</a><c>bar</c>`);
 });
 
 test(`$.parent`, (assert) => {
