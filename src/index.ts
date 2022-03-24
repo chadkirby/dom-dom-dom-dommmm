@@ -174,7 +174,7 @@ export function wrapper(
       const s = new globalThis.window.XMLSerializer();
       return s.serializeToString(doc);
     },
-    text(selector: string): string {
+    text(selector?: string): string {
       if (selector) {
         const results = config.document.querySelectorAll(selector);
         const $r = DOMArray.from([...results], config);
