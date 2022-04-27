@@ -1,6 +1,6 @@
 import { collectTextNodes, createTextNode } from './helpers.js';
 
-function makeDom(baseDocument?: Document) {
+export function makeDom(baseDocument?: Document) {
   return function (
     x: TemplateStringsArray,
     ...placeholders: unknown[]
@@ -49,7 +49,7 @@ export const dom = makeDom();
 /**
  * Tagged template function to convert html to an element. E.g.
  *
- * el`&lt;p>foo&lt;/p>`
+ * el`<p>foo</p>`
  *
  * @param   {TemplateStringsArray}  ...  template literal
  *
