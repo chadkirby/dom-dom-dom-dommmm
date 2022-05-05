@@ -1,7 +1,14 @@
 import getTest from './tape.js';
 const test = getTest({ filename: import.meta.url });
 
-import { dom, el, text, unpretty, fragmentToHtml } from '../dist/index.js';
+import {
+  dom,
+  el,
+  text,
+  unpretty,
+  unprettyns,
+  fragmentToHtml,
+} from '../dist/index.js';
 
 test(`el creates element`, (assert) => {
   assert.equal(el`<span />`.outerHTML, `<span></span>`);
@@ -124,4 +131,20 @@ test(`text creates text node`, (assert) => {
   );
 
   assert.equal(text``.textContent, ``);
+});
+
+test(`unprettyns de-formats an xml string`, (assert) => {
+  let unprettyx = unprettyns({ foo: 'bar', baz: 'bat' });
+  assert.equal(
+    unprettyx`<foo:p>
+      <foo:span />
+    </foo:p>`,
+    `<foo:p><foo:span/></foo:p>`
+  );
+  assert.equal(
+    unprettyx`<foo:p baz:id="1">
+      <baz:span foo:id="2" />
+    </foo:p>`,
+    `<foo:p baz:id="1"><baz:span foo:id="2"/></foo:p>`
+  );
 });

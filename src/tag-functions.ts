@@ -107,7 +107,7 @@ export function unprettyns(
     throw new Error(msg);
   }
   function unprettyx(x: TemplateStringsArray, ...args: unknown[]): string {
-    return makeDom(document)(x, ...args).innerHTML;
+    return outerXml(document, ...makeDom(document)(x, ...args).children);
   }
 
   return unprettyx;
@@ -120,4 +120,25 @@ function assemble(strings: TemplateStringsArray, ...placeholders: unknown[]) {
   return [...strings.entries()]
     .map(([i, str]) => `${str}${placeholders[i] || ``}`)
     .join(``);
+}
+
+/**
+ * get the outer xml of a list of nodes in a document, without
+ * declarations of namespaces that are declared in the document
+ */
+export function outerXml(document: Document, ...els: Node[]): string {
+  let tagName = `x${Math.floor(Math.random() * 0xffffffff).toString(16)}`;
+  let tmpContainer = document.createElement(tagName);
+  try {
+    document.documentElement.append(tmpContainer);
+    for (const el of els) {
+      tmpContainer.append(el.cloneNode(true));
+    }
+    return document.documentElement.outerHTML.replace(
+      RegExp(`.*<${tagName}(?: .+?)?>(.+)</${tagName}>.*`),
+      '$1'
+    );
+  } finally {
+    tmpContainer.remove();
+  }
 }
