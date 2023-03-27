@@ -1,4 +1,4 @@
-import jsdom from 'jsdom';
-import setup from '../setup.cjs';
-setup(jsdom);
-export default jsdom;
+import { JSDOM } from 'jsdom';
+import { setup } from '../dist/setup.js';
+setup(JSDOM);
+export default JSDOM;
