@@ -9,7 +9,7 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./setup": "./setup.cjs"
+    "./*": "./*"
   },
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -31,10 +31,11 @@
   "author": "Chad Kirby",
   "license": "ISC",
   "devDependencies": {
+    "@types/jsdom": "^21.1.1",
     "@types/node": "^16.11.6",
     "@types/tape": "^4.13.2",
-    "@typescript-eslint/eslint-plugin": "^5.3.0",
-    "@typescript-eslint/parser": "^5.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.4",
@@ -48,7 +49,7 @@
     "tape-promise": "^4.0.0",
     "ts-node": "^10.4.0",
     "tsc-watch": "^4.4.0",
-    "typescript": "^4.4.4"
+    "typescript": "^5.0.2"
   },
   "dependencies": {},
   "bugs": {
@@ -59,7 +60,6 @@
     "test": "tests"
   },
   "files": [
-    "setup.cjs",
     "dist"
   ],
   "publishConfig": {
