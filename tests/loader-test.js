@@ -1,6 +1,6 @@
 import getTest from './tape.js';
 const test = getTest({ filename: import.meta.url });
-
+import fs from 'fs';
 import { loadHtml, loadXml } from '../dist/index.js';
 
 test(`loadHtml loads`, (assert) => {
@@ -89,5 +89,15 @@ test(`can append XML elements`, (assert) => {
   assert.equal(
     $.document.firstElementChild.outerHTML,
     `<Pr>Hi there!<fooBar>baz</fooBar></Pr>`
+  );
+});
+
+test(`loadXML can load forgivingly`, (assert) => {
+  let $ = loadXml(fs.readFileSync('tests/forbidden-chars.xml', 'utf8'));
+
+  assert.equal(
+    $.document.documentElement.outerHTML.slice(0, 28),
+    `<uspat:SpecificationDocument`,
+    `can parse a file with forbidden chars`
   );
 });
