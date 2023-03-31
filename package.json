@@ -9,6 +9,10 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
+    "./setup": {
+      "import": "./dist/setup.js",
+      "require": "./setup.cjs"
+    },
     "./*": "./*"
   },
   "types": "./dist/index.d.ts",
@@ -60,7 +64,8 @@
     "test": "tests"
   },
   "files": [
-    "dist"
+    "dist",
+    "setup.cjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
