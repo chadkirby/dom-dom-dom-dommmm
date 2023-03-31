@@ -1,33 +1,32 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { JSDOM as JSDOMT } from 'jsdom';
+/**
+ * @typedef {import('jsdom').JSDOM} JSDOMT
+ */
 
-// Augment the global `Window` interface to include the `jsdom`
-// property. This will allow TypeScript to recognize the `jsdom`
-// property on the global object.
-declare global {
-  interface Window {
-    jsdom: JSDOMT;
-  }
-}
-
-export const setup = (JSDOM: new (html?: string) => JSDOMT): void => {
+/**
+ * @param {new (html?: string) => JSDOMT} JSDOM
+ * @returns {void}
+ */
+function setup(JSDOM) {
   const jsdom = new JSDOM('');
+
+  /** @type any */
+  const globalAny = globalThis;
 
   // Assign the created `jsdom` instance to the global object. We need
   // to use `any` type when assigning to globalThis properties, because
   // TypeScript doesn't allow assigning to read-only properties. This
   // approach, however, keeps the typings for the rest of your code
   // intact.
-  (globalThis as any).jsdom = jsdom;
+  globalAny.jsdom = jsdom;
 
   // Assign the `window` property of the `jsdom` instance to the global
   // object. Using `any` type for the same reason as explained above.
-  (globalThis as any).window = jsdom.window;
+  globalAny.window = jsdom.window;
 
   // Assign the `document` property of the `jsdom.window` instance to
   // the global object. Using `any` type for the same reason as
   // explained above.
-  (globalThis as any).document = jsdom.window.document;
-};
+  globalAny.document = jsdom.window.document;
+}
 
-export default setup;
+module.exports = setup;

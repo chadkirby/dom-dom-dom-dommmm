@@ -1,6 +1,6 @@
 {
   "name": "@ckirby/dom-dom-dom-dommmm",
-  "version": "8.2.0",
+  "version": "9.0.0",
   "description": "DOM/JSDOM wrapper",
   "type": "module",
   "engines": {
@@ -9,13 +9,17 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
+    "./setup": {
+      "import": "./dist/setup.js",
+      "require": "./setup.cjs"
+    },
     "./*": "./*"
   },
   "types": "./dist/index.d.ts",
   "scripts": {
     "compile": "rm -rf dist && tsc -p tsconfig.json",
     "prepublishOnly": "yarn compile",
-    "watch": "yarn tsc-watch",
+    "watch": "tsc --build --watch",
     "test": "yarn lint && yarn test:tape:difflet",
     "test:ci": "yarn compile && yarn lint && yarn test:tape",
     "test:tape": "tape `find tests -name '*-test.js'`",
@@ -48,7 +52,6 @@
     "tape": "^5.3.1",
     "tape-promise": "^4.0.0",
     "ts-node": "^10.4.0",
-    "tsc-watch": "^4.4.0",
     "typescript": "^5.0.2"
   },
   "dependencies": {},
@@ -60,7 +63,8 @@
     "test": "tests"
   },
   "files": [
-    "dist"
+    "dist",
+    "setup.cjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
