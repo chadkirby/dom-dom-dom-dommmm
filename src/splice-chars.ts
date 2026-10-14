@@ -10,8 +10,8 @@ export function spliceChars(
   startIndex: number,
   // integer counting chars to delete starting at startIndex
   deleteCount: number,
-  // elements to insert at startIndex (if any)
-  ...insertions: Element[]
+  // nodes or strings to insert at startIndex (if any)
+  ...insertions: (Node | string)[]
 ): Element {
   const endIndex = startIndex + deleteCount;
   const textNodes = [...collectTextNodes($el)];

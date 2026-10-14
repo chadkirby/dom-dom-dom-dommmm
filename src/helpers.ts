@@ -136,7 +136,7 @@ export function createTextNode(
 type Matchable = Element | Element[] | string | ((node: Element) => boolean);
 export function* parentsUntil(
   childNode: Node,
-  target: Matchable,
+  target?: Matchable,
 ): Generator<Element> {
   let current = childNode.parentElement;
   while (current && !matches(current, target)) {
@@ -145,8 +145,8 @@ export function* parentsUntil(
   }
 }
 
-export function matches(el: Element, comparator: Matchable): boolean {
-  if (!isEl(el)) {
+export function matches(el: Element, comparator?: Matchable): boolean {
+  if (!comparator || !isEl(el)) {
     return false;
   }
   if (typeof comparator === `function`) {
@@ -166,7 +166,7 @@ export function matches(el: Element, comparator: Matchable): boolean {
  * testing the element itself and traversing up through its
  * ancestors in the DOM tree.
  */
-export function closest(el: unknown, matcher: Matchable): Element | null {
+export function closest(el: unknown, matcher?: Matchable): Element | null {
   if (!isNode(el)) return null;
   let out: Element | null = isEl(el) ? el : el.parentElement;
   while (out !== null && !matches(out, matcher)) {

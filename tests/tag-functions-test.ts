@@ -1,5 +1,4 @@
-import getTest from './tape.js';
-const test = getTest({ filename: import.meta.url });
+import { test } from './test-helper.js';
 
 import {
   dom,
@@ -8,22 +7,22 @@ import {
   unpretty,
   unprettyns,
   fragmentToHtml,
-} from '../dist/index.js';
+} from '../src/index.js';
 
 test(`el creates element`, (assert) => {
-  assert.equal(el`<span />`.outerHTML, `<span></span>`);
+  assert.equal(el`<span />`!.outerHTML, `<span></span>`);
 
-  assert.equal(el`<span />`.nodeName, `SPAN`);
+  assert.equal(el`<span />`!.nodeName, `SPAN`);
 
   assert.equal(
     el`<span
       foo='bar'
-    />`.outerHTML,
+    />`!.outerHTML,
     `<span foo="bar"></span>`,
   );
 
   assert.equal(
-    el` <span foo='bar'></span> `.outerHTML,
+    el` <span foo='bar'></span> `!.outerHTML,
     `<span foo="bar"></span>`,
     `tolerates extra whitespace`,
   );
@@ -31,7 +30,7 @@ test(`el creates element`, (assert) => {
   assert.equal(el`foo`, null);
 
   assert.equal(
-    el`foo <span />`.outerHTML,
+    el`foo <span />`!.outerHTML,
     `<span></span>`,
     `first element is returned`,
   );
@@ -70,7 +69,7 @@ test(`dom creates fragment`, (assert) => {
   <span />
   `;
   assert.equal(
-    $doc.firstChild.nodeName,
+    $doc.firstChild!.nodeName,
     `SPAN`,
     `firstChild is not empty text node`,
   );

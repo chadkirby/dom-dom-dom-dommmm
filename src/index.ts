@@ -67,13 +67,9 @@ export function wrapper(
   };
 
   function wrapIt(
-    el: Element | Element[] | Iterable<Element>,
+    el: Element | Element[] | Iterable<Element> | null | undefined,
   ): DOMArray<Element>;
-  function wrapIt<WHICH extends Node>(
-    node: WHICH | WHICH[] | Iterable<WHICH>,
-  ): DOMArray<WHICH>;
   function wrapIt(node: Node | Node[] | Iterable<Node>): DOMArray<Node>;
-  function wrapIt(arg: null | undefined): DOMArray<Element>;
   function wrapIt(html: string): DOMArray<Element>;
   function wrapIt(selector: string): DOMArray<Element>;
   function wrapIt($dom: DOMArray<Node>): DOMArray<Node>;
@@ -182,10 +178,10 @@ export function wrapper(
       }
       return fragmentToText(config.document);
     },
-    setHtmlAdapter(adapter: TOHTML) {
+    setHtmlAdapter(adapter?: TOHTML) {
       toHtml = adapter;
     },
-    setCssAdapter(adapter: Config['cssAdapter']) {
+    setCssAdapter(adapter?: Config['cssAdapter']) {
       cssAdapter = adapter;
     },
   });

@@ -1,5 +1,4 @@
-import getTest from './tape.js';
-const test = getTest({ filename: import.meta.url });
+import { test } from './test-helper.js';
 
 import {
   $,
@@ -8,13 +7,13 @@ import {
   loadHtml,
   isDomDom,
   loadXml,
-} from '../dist/index.js';
+} from '../src/index.js';
 
 test(`$ wraps an element`, (assert) => {
   let $x = $(el`<span>foo</span>`);
   assert.ok($x, `$x exists`);
   assert.equal($x.length, 1, `$x has a length`);
-  let span = $x[0];
+  let span = $x[0]!;
   assert.equal(span.outerHTML, `<span>foo</span>`);
   assert.equal($x.filter(`span`)[0], span, `can filter element by selector`);
   assert.equal($x.html(), `foo`, `html function exists & returns innerHTML`);
@@ -38,7 +37,7 @@ test(`$ wraps an html string`, (assert) => {
   let $x = $(`<span>foo</span>`);
   assert.ok($x, `$x exists`);
   assert.equal($x.length, 1, `$x has a length`);
-  let span = $x[0];
+  let span = $x[0]!;
   assert.equal(span.outerHTML, `<span>foo</span>`);
   assert.deepLooseEqual(
     [...$x.filter(`span`)],
@@ -90,7 +89,7 @@ test(`$.attr gets`, (assert) => {
     null,
     'empty Domlist',
   );
-  assert.equal($x[0].outerHTML, `<span id="3" foo="bar"></span>`);
+  assert.equal($x[0]!.outerHTML, `<span id="3" foo="bar"></span>`);
   assert.equal($x.is(`[id]`), true);
   assert.equal($x.is(`[id="3"]`), true);
   assert.equal($x.is(`[foo^=b]`), true);
@@ -101,21 +100,21 @@ test(`$.attr sets`, (assert) => {
   let $x = $(`<span id='2' foo='bar' />`);
   assert.deepLooseEqual($x.attr(), { id: '2', foo: 'bar' });
   $x.attr('id', 3);
-  assert.equal($x[0].outerHTML, `<span id="3" foo="bar"></span>`);
+  assert.equal($x[0]!.outerHTML, `<span id="3" foo="bar"></span>`);
   $x.attr('id', undefined);
-  assert.equal($x[0].outerHTML, `<span id="3" foo="bar"></span>`);
+  assert.equal($x[0]!.outerHTML, `<span id="3" foo="bar"></span>`);
   assert.equal($x.attr('id', undefined), $x.attr('id'));
   $x.removeAttr('id');
-  assert.equal($x[0].outerHTML, `<span foo="bar"></span>`);
+  assert.equal($x[0]!.outerHTML, `<span foo="bar"></span>`);
   $x.attr({ id: '2', foo: 'baz' });
-  assert.equal($x[0].outerHTML, `<span foo="baz" id="2"></span>`);
+  assert.equal($x[0]!.outerHTML, `<span foo="baz" id="2"></span>`);
   $x.attr({ id: undefined, foo: undefined });
-  assert.equal($x[0].outerHTML, `<span foo="baz" id="2"></span>`);
+  assert.equal($x[0]!.outerHTML, `<span foo="baz" id="2"></span>`);
 });
 
 test(`$.index`, (assert) => {
   let $x = $(`<div />`);
-  assert.equal($x.index($x[0]), 0);
+  assert.equal($x.index($x[0]!), 0);
   assert.equal($x.index($x), 0);
 });
 
@@ -295,7 +294,7 @@ test(`$.has`, (assert) => {
   assert.deepLooseEqual(
     $x
       .find('a,b,c')
-      .has($c[0])
+      .has($c[0]!)
       .arrayMap(({ outerHTML }) => outerHTML),
     ['<a><b><c></c></b></a>', '<b><c></c></b>'],
   );
@@ -367,7 +366,7 @@ test(`$.first/last`, (assert) => {
 
 test(`$.outerHtml`, (assert) => {
   assert.equal(
-    $(el`<span><a>foo</a><a>bar</a></span>`).outerHtml(),
+    $(el`<span><a>foo</a><a>bar</a></span>`!).outerHtml(),
     `<span><a>foo</a><a>bar</a></span>`,
   );
   assert.equal(
@@ -454,11 +453,11 @@ test(`set text`, (assert) => {
   assert.equal($x.html(), `<a>foo</a>`);
   assert.equal($(createTextNode('')).text('foo').text(), `foo`);
   $x = $(`<div />`).text('foo');
-  assert.equal($x[0].outerHTML, `<div>foo</div>`);
+  assert.equal($x[0]!.outerHTML, `<div>foo</div>`);
   $x.text('');
-  assert.equal($x[0].outerHTML, `<div></div>`);
-  assert.ok(
-    $x[0].childNodes.length,
+  assert.equal($x[0]!.outerHTML, `<div></div>`);
+  assert.equal(
+    $x[0]!.childNodes.length,
     1,
     'an empty text node is inserted when text is set to the empty string',
   );
@@ -493,16 +492,16 @@ test(`$.parent`, (assert) => {
     [
       $a[0],
       $x[0],
-      $x[0].ownerDocument.body,
-      $x[0].ownerDocument.documentElement,
+      $x[0]!.ownerDocument.body,
+      $x[0]!.ownerDocument.documentElement,
     ],
   );
   assert.deepLooseEqual(
     [...$x.find('a,c').parents()],
     [
       $x[0],
-      $x[0].ownerDocument.body,
-      $x[0].ownerDocument.documentElement,
+      $x[0]!.ownerDocument.body,
+      $x[0]!.ownerDocument.documentElement,
       $a[0],
     ],
   );
@@ -635,7 +634,7 @@ test(`$.siblings`, (assert) => {
 test(`$.add`, (assert) => {
   let $x = $(`<div><a>1</a><b>2</b><c>3</c></div>`);
   // add to the document dom so that we can add by selector
-  globalThis.document.body.append($x[0]);
+  globalThis.document.body.append($x[0]!);
   let $a = $x.find('a');
   let $b = $x.find('b');
   let $c = $x.find('c');
@@ -643,7 +642,7 @@ test(`$.add`, (assert) => {
   assert.deepLooseEqual([...$a.add(`b`)], [$a[0], $b[0]]);
   assert.deepLooseEqual([...$a.add($b)], [$a[0], $b[0]]);
   assert.deepLooseEqual([...$a.add($c)], [$a[0], $c[0]]);
-  assert.deepLooseEqual([...$a.add($b[0])], [$a[0], $b[0]]);
+  assert.deepLooseEqual([...$a.add($b[0]!)], [$a[0], $b[0]]);
   assert.equal($a.add(`<b>2</b>`).outerHtml(), '<a>1</a><b>2</b>');
 });
 
@@ -667,7 +666,7 @@ test(`$.setHtmlAdapter`, (assert) => {
   let $ = loadHtml(`<html />`);
   // any truthy thing we wrap should be interpreted as <div><a>...
   $.setHtmlAdapter(() => `<div><a>1<b>2<c>3</c></b></a></div>`);
-  let $x = $(true);
+  let $x = $(true as unknown as Node);
   let $a = $x.find('a');
 
   assert.equal($a.html(), '1<b>2<c>3</c></b>');
@@ -688,12 +687,12 @@ test(`$.setCssAdapter`, (assert) => {
   let cssCalled = 0;
   $.setCssAdapter({
     'text/html': {
-      cssSelectAll(nodes) {
+      cssSelectAll(nodes: Node[]) {
         cssCalled += 1;
         // always find 'b'
-        return [...nodes[0].querySelectorAll('b')];
+        return [...(nodes[0] as Element).querySelectorAll('b')];
       },
-    },
+    } as any,
   });
   let $x = $(`<div><a>1<b>2<c>3</c></b></a></div>`);
   let $a = $x.find('a');
@@ -759,7 +758,7 @@ test(`$.not`, (assert) => {
   let $x = $(`<div><a/><b/><c/></div>`);
   assert.deepLooseEqual($x.find('a,b,c').not('b'), $x.find('a,c'));
   assert.deepLooseEqual($x.find('a,b,c').not($x.find('a,b')), $x.find('c'));
-  assert.deepLooseEqual($x.find('a,b,c').not($x.find('a')[0]), $x.find('b,c'));
+  assert.deepLooseEqual($x.find('a,b,c').not($x.find('a')[0]!), $x.find('b,c'));
   assert.deepLooseEqual(
     $x.find('a,b,c').not((_el, i) => i === 1),
     $x.find('a,c'),
@@ -819,7 +818,7 @@ test(`$.is`, (assert) => {
   let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
   assert.ok($x.find('a').is('a'), 'selector');
   assert.ok($x.find('a').is($x.find('a')), 'DOMArray');
-  assert.ok($x.find('a').is($x.find('a')[0]), 'Element');
+  assert.ok($x.find('a').is($x.find('a')[0]!), 'Element');
   assert.ok(
     $x.find('a').is(() => true),
     'Function',

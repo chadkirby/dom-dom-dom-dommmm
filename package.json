@@ -18,12 +18,12 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "compile": "rm -rf dist && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
     "prepublishOnly": "pnpm compile",
     "watch": "tsc --build --watch",
-    "test": "pnpm lint && pnpm test:tape:difflet",
-    "test:ci": "pnpm compile && pnpm lint && pnpm test:tape",
-    "test:tape": "tape `find tests -name '*-test.js'`",
-    "test:tape:difflet": "pnpm test:tape | tap-difflet --pessimistic",
+    "test": "pnpm lint && vitest run",
+    "test:watch": "vitest",
+    "test:ci": "pnpm compile && pnpm lint && vitest run",
     "lint": "oxlint",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
@@ -39,15 +39,11 @@
   "devDependencies": {
     "@types/jsdom": "^21.1.1",
     "@types/node": "^26.6.5",
-    "@types/tape": "^4.13.2",
     "jsdom": "^19.0.0",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
-    "tap-difflet": "^0.7.1",
-    "tape": "^5.3.1",
-    "tape-promise": "^4.0.0",
-    "ts-node": "^10.4.0",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.4"
   },
   "bugs": {
     "url": "https://github.com/chadkirby/splice-chars/issues"

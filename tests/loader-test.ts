@@ -1,7 +1,6 @@
-import getTest from './tape.js';
-const test = getTest({ filename: import.meta.url });
+import { test } from './test-helper.js';
 import fs from 'fs';
-import { loadHtml, loadXml } from '../dist/index.js';
+import { loadHtml, loadXml } from '../src/index.js';
 
 test(`loadHtml loads`, (assert) => {
   let $ = loadHtml();
@@ -19,8 +18,8 @@ test(`loadXml loads`, (assert) => {
   assert.ok($, `can loadXml with no argument`);
   assert.equal($.html(), `<root/>`);
   assert.equal($.document.contentType, `text/xml`);
-  assert.equal($('<fooBar/>')[0].outerHTML, `<fooBar/>`);
-  assert.equal($('<fooBar/>').document.contentType, `text/xml`);
+  assert.equal($('<fooBar/>')[0]!.outerHTML, `<fooBar/>`);
+  assert.equal($('<fooBar/>').document!.contentType, `text/xml`);
 });
 
 test(`loadXml loads specific html`, (assert) => {
@@ -57,7 +56,7 @@ test(`loadXml loads namespaces`, (assert) => {
 
   let $root = $lvl.parents('w\\:numbering');
   $root.setAttrNS('xmlns:foo', 'bar');
-  assert.equal($root.document.lookupNamespaceURI('foo'), 'bar');
+  assert.equal($root.document!.lookupNamespaceURI('foo'), 'bar');
 
   $lvl.setAttrNS('foo:baz', '7');
   assert.deepEqual(
@@ -71,6 +70,7 @@ test(`loadXml can define namespaces & create namespaced elements`, (assert) => {
 
   assert.throws(
     () => $.createElementNS(`foo:div`),
+    /unknown namespace for foo/,
     `can't create element in unknown namespace`,
   );
   $('Pr').defineNamespace('foo', 'bar');
@@ -87,7 +87,7 @@ test(`can append XML elements`, (assert) => {
   $p.append('<fooBar>baz</fooBar>');
 
   assert.equal(
-    $.document.firstElementChild.outerHTML,
+    $.document.firstElementChild!.outerHTML,
     `<Pr>Hi there!<fooBar>baz</fooBar></Pr>`,
   );
 });
@@ -96,7 +96,7 @@ test(`loadXML can load forgivingly`, (assert) => {
   let $ = loadXml(fs.readFileSync('tests/forbidden-chars.xml', 'utf8'));
 
   assert.equal(
-    $.document.documentElement.outerHTML.slice(0, 28),
+    $.document.documentElement!.outerHTML.slice(0, 28),
     `<uspat:SpecificationDocument`,
     `can parse a file with forbidden chars`,
   );

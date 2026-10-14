@@ -43,8 +43,8 @@ export type TARGET<
 > = DOMArray<WHICHARRAY> | WHICHNODE | WHICHNODE[] | string;
 
 type AttrArgsGetOne = [string];
-type AttrArgsSetOne = [string, string | number];
-type AttrArgsSetRecord = [Record<string, string>];
+type AttrArgsSetOne = [string, string | number | undefined];
+type AttrArgsSetRecord = [Record<string, string | number | undefined>];
 
 export type CONFIG = {
   document: Document;
@@ -250,11 +250,10 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
 
   // jq
   attr(): Record<string, string>; // get all
-  attr(name: string): string | null; // get one
-  attr(name: string, value: string | number): string; // set one
-  attr(attrs: Record<string, string>): null; // set many
+  attr(name: string, value?: string | number): string | null; // get or set one
+  attr(attrs: Record<string, string | number | undefined>): null; // set many
   attr(
-    ...args: AttrArgsGetOne | AttrArgsSetOne | AttrArgsSetRecord
+    ...args: (string | number | Record<string, unknown> | undefined)[]
   ): Record<string, string> | string | null {
     const first = this[0];
     if (!args.length) {
