@@ -1,10 +1,11 @@
 {
   "name": "@ckirby/dom-dom-dom-dommmm",
-  "version": "9.0.0",
+  "version": "9.1.0",
   "description": "DOM/JSDOM wrapper",
   "type": "module",
+  "packageManager": "pnpm@11.11.0",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=18.0.0"
   },
   "main": "dist/index.js",
   "exports": {
@@ -18,47 +19,37 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "compile": "rm -rf dist && tsc -p tsconfig.json",
-    "prepublishOnly": "yarn compile",
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
+    "prepublishOnly": "pnpm compile",
     "watch": "tsc --build --watch",
-    "test": "yarn lint && yarn test:tape:difflet",
-    "test:ci": "yarn compile && yarn lint && yarn test:tape",
-    "test:tape": "tape `find tests -name '*-test.js'`",
-    "test:tape:difflet": "yarn test:tape | tap-difflet --pessimistic",
-    "lint": "eslint src tests",
+    "test": "pnpm lint && vitest run",
+    "test:watch": "vitest",
+    "test:ci": "pnpm compile && pnpm typecheck && pnpm lint && vitest run",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "release": "tp-release",
     "jsdoc": "jsdoc ./src/*.js -d docs/"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chadkirby/splice-chars.git"
+    "url": "git+https://github.com/chadkirby/dom-dom-dom-dommmm.git"
   },
   "author": "Chad Kirby",
   "license": "ISC",
   "devDependencies": {
-    "@types/jsdom": "^21.1.1",
-    "@types/node": "^16.11.6",
-    "@types/tape": "^4.13.2",
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
-    "eslint": "^8.2.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-no-only-tests": "^2.6.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "jsdom": "^19.0.0",
-    "prettier": "^2.4.1",
-    "tap-difflet": "^0.7.1",
-    "tape": "^5.3.1",
-    "tape-promise": "^4.0.0",
-    "ts-node": "^10.4.0",
-    "typescript": "^5.0.2"
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.5",
+    "jsdom": "^30.1.2",
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.4"
   },
-  "dependencies": {},
   "bugs": {
-    "url": "https://github.com/chadkirby/splice-chars/issues"
+    "url": "https://github.com/chadkirby/dom-dom-dom-dommmm/issues"
   },
-  "homepage": "https://github.com/chadkirby/splice-chars#readme",
+  "homepage": "https://github.com/chadkirby/dom-dom-dom-dommmm#readme",
   "directories": {
     "test": "tests"
   },

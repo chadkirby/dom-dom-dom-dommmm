@@ -1,7 +1,6 @@
-import getTest from './tape.js';
-const test = getTest({ filename: import.meta.url });
+import { test } from './test-helper.js';
 import fs from 'fs';
-import { loadHtml, loadXml } from '../dist/index.js';
+import { loadHtml, loadXml } from '../src/index.js';
 
 test(`loadHtml loads`, (assert) => {
   let $ = loadHtml();
@@ -19,8 +18,8 @@ test(`loadXml loads`, (assert) => {
   assert.ok($, `can loadXml with no argument`);
   assert.equal($.html(), `<root/>`);
   assert.equal($.document.contentType, `text/xml`);
-  assert.equal($('<fooBar/>')[0].outerHTML, `<fooBar/>`);
-  assert.equal($('<fooBar/>').document.contentType, `text/xml`);
+  assert.equal($('<fooBar/>')[0]!.outerHTML, `<fooBar/>`);
+  assert.equal($('<fooBar/>').document!.contentType, `text/xml`);
 });
 
 test(`loadXml loads specific html`, (assert) => {
@@ -46,23 +45,23 @@ test(`loadXml loads namespaces`, (assert) => {
   </w:numbering>`;
 
   let $ = loadXml(numberingXml);
-  let $lvl = $(`w\\:lvl`);
+  let $lvl = $('lvl');
   assert.equal($lvl.length, 1);
   assert.ok($(`<w:foo />`), 'can wrap namespaced xml');
   $lvl.setAttrNS('xml:space', 'preserve');
   assert.deepEqual(
     { ...$lvl.attr() },
-    { 'w:ilvl': '0', 'xml:space': 'preserve' }
+    { 'w:ilvl': '0', 'xml:space': 'preserve' },
   );
 
-  let $root = $lvl.parents('w\\:numbering');
+  let $root = $lvl.parents('numbering');
   $root.setAttrNS('xmlns:foo', 'bar');
-  assert.equal($root.document.lookupNamespaceURI('foo'), 'bar');
+  assert.equal($root.document!.lookupNamespaceURI('foo'), 'bar');
 
   $lvl.setAttrNS('foo:baz', '7');
   assert.deepEqual(
-    { ...$(`w\\:lvl`).attr() },
-    { 'w:ilvl': '0', 'xml:space': 'preserve', 'foo:baz': '7' }
+    { ...$(`lvl`).attr() },
+    { 'w:ilvl': '0', 'xml:space': 'preserve', 'foo:baz': '7' },
   );
 });
 
@@ -71,13 +70,14 @@ test(`loadXml can define namespaces & create namespaced elements`, (assert) => {
 
   assert.throws(
     () => $.createElementNS(`foo:div`),
-    `can't create element in unknown namespace`
+    /unknown namespace for foo/,
+    `can't create element in unknown namespace`,
   );
   $('Pr').defineNamespace('foo', 'bar');
 
   assert.equal(
     $.createElementNS(`foo:div`).outerHtml(),
-    `<foo:div xmlns:foo="bar"/>`
+    `<foo:div xmlns:foo="bar"/>`,
   );
 });
 
@@ -87,8 +87,8 @@ test(`can append XML elements`, (assert) => {
   $p.append('<fooBar>baz</fooBar>');
 
   assert.equal(
-    $.document.firstElementChild.outerHTML,
-    `<Pr>Hi there!<fooBar>baz</fooBar></Pr>`
+    $.document.firstElementChild!.outerHTML,
+    `<Pr>Hi there!<fooBar>baz</fooBar></Pr>`,
   );
 });
 
@@ -96,8 +96,8 @@ test(`loadXML can load forgivingly`, (assert) => {
   let $ = loadXml(fs.readFileSync('tests/forbidden-chars.xml', 'utf8'));
 
   assert.equal(
-    $.document.documentElement.outerHTML.slice(0, 28),
+    $.document.documentElement!.outerHTML.slice(0, 28),
     `<uspat:SpecificationDocument`,
-    `can parse a file with forbidden chars`
+    `can parse a file with forbidden chars`,
   );
 });

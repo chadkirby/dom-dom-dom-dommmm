@@ -1,4 +1,5 @@
 import { isEl, isNode, isTextNode } from './is-node.js';
+import type { DOMParserSupportedType } from './dom-types.js';
 /**
  * iterator to collect text nodes from a dom element
  *
@@ -36,7 +37,7 @@ export function empty(el: Node): Node {
  */
 export function* filterTextNodes(
   el: Node,
-  filterFn: (node: Node) => boolean
+  filterFn: (node: Node) => boolean,
 ): Generator<Text> {
   const getNodes = collectTextNodes(el);
   let tNode;
@@ -51,7 +52,7 @@ export function* filterTextNodes(
  * convert a document fragment to html
  */
 export function fragmentToHtml(
-  fragment: Document | DocumentFragment | Element
+  fragment: Document | DocumentFragment | Element,
 ): string {
   if (isFragment(fragment)) {
     const div = fragment.ownerDocument.createElement('div');
@@ -89,7 +90,7 @@ export function isDocument(obj: Node): obj is Document {
  */
 export function createFragment(
   html = ``,
-  document = globalThis.document
+  document = globalThis.document,
 ): DocumentFragment {
   const template = document.createElement(`template`);
   template.innerHTML = html;
@@ -111,7 +112,7 @@ export function createFragment(
  */
 export function createElement(
   html = ``,
-  document = globalThis.document
+  document = globalThis.document,
 ): Element | null {
   return createFragment(html, document).firstElementChild;
 }
@@ -122,7 +123,7 @@ export function createElement(
  */
 export function createTextNode(
   text: string,
-  document = globalThis.document
+  document = globalThis.document,
 ): Text {
   return document.createTextNode(text);
 }
@@ -135,7 +136,7 @@ export function createTextNode(
 type Matchable = Element | Element[] | string | ((node: Element) => boolean);
 export function* parentsUntil(
   childNode: Node,
-  target: Matchable
+  target?: Matchable,
 ): Generator<Element> {
   let current = childNode.parentElement;
   while (current && !matches(current, target)) {
@@ -144,8 +145,8 @@ export function* parentsUntil(
   }
 }
 
-export function matches(el: Element, comparator: Matchable): boolean {
-  if (!isEl(el)) {
+export function matches(el: Element, comparator?: Matchable): boolean {
+  if (!comparator || !isEl(el)) {
     return false;
   }
   if (typeof comparator === `function`) {
@@ -165,7 +166,7 @@ export function matches(el: Element, comparator: Matchable): boolean {
  * testing the element itself and traversing up through its
  * ancestors in the DOM tree.
  */
-export function closest(el: unknown, matcher: Matchable): Element | null {
+export function closest(el: unknown, matcher?: Matchable): Element | null {
   if (!isNode(el)) return null;
   let out: Element | null = isEl(el) ? el : el.parentElement;
   while (out !== null && !matches(out, matcher)) {
@@ -319,7 +320,7 @@ export function nodeToSelector(node: Element): string {
   return [
     node.nodeName.toLowerCase(),
     ...Array.from(node.attributes).map(({ name, value }) =>
-      value ? `[${name}="${value}"]` : ``
+      value ? `[${name}="${value}"]` : ``,
     ),
   ].join(``);
 }
@@ -341,11 +342,11 @@ export function hasDescendant(parent: Node, target: Node): boolean {
 
 export function parse(
   string: string,
-  contentType: DOMParserSupportedType
+  contentType: DOMParserSupportedType,
 ): Document {
   const dom = new globalThis.window.DOMParser().parseFromString(
     string.toString(),
-    contentType
+    contentType,
   );
   const child = dom.firstElementChild;
   if (child !== null && child.matches('parsererror')) {
@@ -367,7 +368,7 @@ const NAMESPACES = Object.assign(Object.create(null), {
 });
 export function lookupNamespaceURI(
   prefix: string,
-  document?: Document
+  document?: Document,
 ): string {
   [prefix] = prefix.split(':');
   return (

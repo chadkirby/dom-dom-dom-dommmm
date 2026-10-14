@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "/blueprints/*/files/",
+    "/vendor/",
+    "/dist/",
+    "/docs/",
+    "/tmp/",
+    "/bower_components/",
+    "/node_modules/",
+    "/coverage/",
+    "!.*",
+    ".eslintcache",
+    "/.node_modules.ember-try/",
+    "/bower.json.ember-try",
+    "/package.json.ember-try"
+  ]
+}

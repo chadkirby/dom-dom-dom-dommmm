@@ -1,8 +1,13 @@
-import getTest from './tape.js';
-const test = getTest({ filename: import.meta.url });
+import { test } from './test-helper.js';
 
 test(`global things exists`, (assert) => {
-  const { document, window } = globalThis;
+  const { document, window } = globalThis as unknown as {
+    document: Document;
+    window: Window & {
+      DOMParser: typeof DOMParser;
+      XMLSerializer: typeof XMLSerializer;
+    };
+  };
   assert.ok(document, `document exists`);
   assert.ok(window, `window exists`);
   assert.ok(window.DOMParser, `window.DOMParser exists`);

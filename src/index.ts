@@ -23,14 +23,14 @@ export type $ELEMENTS = DOMArray<Element>;
 export type TDOMWRAPPER = typeof $;
 
 export function isDomDom<T extends Node>(
-  obj: TDOMArray<T> | unknown
+  obj: TDOMArray<T> | unknown,
 ): obj is DOMArray<T> {
   return DOMArray.isDOMArray(obj);
 }
 
 export function wrapper(
   baseDocument?: Document,
-  { toHtml, cssAdapter }: Config = {}
+  { toHtml, cssAdapter }: Config = {},
 ) {
   const config: DOMARRAY_CONFIG = {
     get document() {
@@ -44,7 +44,7 @@ export function wrapper(
         ? cssAdapter[contentType].cssSelectAll(
             removeSubsets(nodes),
             selector,
-            defaultConfig.cssSelectAll
+            defaultConfig.cssSelectAll,
           )
         : defaultConfig.cssSelectAll(nodes, selector);
     },
@@ -54,7 +54,7 @@ export function wrapper(
         ? cssAdapter[contentType].cssSelectOne(
             removeSubsets(nodes),
             selector,
-            defaultConfig.cssSelectOne
+            defaultConfig.cssSelectOne,
           )
         : defaultConfig.cssSelectOne(nodes, selector);
     },
@@ -67,13 +67,9 @@ export function wrapper(
   };
 
   function wrapIt(
-    el: Element | Element[] | Iterable<Element>
+    el: Element | Element[] | Iterable<Element> | null | undefined,
   ): DOMArray<Element>;
-  function wrapIt<WHICH extends Node>(
-    node: WHICH | WHICH[] | Iterable<WHICH>
-  ): DOMArray<WHICH>;
   function wrapIt(node: Node | Node[] | Iterable<Node>): DOMArray<Node>;
-  function wrapIt(arg: null | undefined): DOMArray<Element>;
   function wrapIt(html: string): DOMArray<Element>;
   function wrapIt(selector: string): DOMArray<Element>;
   function wrapIt($dom: DOMArray<Node>): DOMArray<Node>;
@@ -86,7 +82,7 @@ export function wrapper(
       | Node[]
       | Iterable<Node>
       | string
-      | null
+      | null,
   ): DOMArray<Element> | DOMArray<Node> {
     if (DOMArray.isDOMArray(arg)) {
       return arg;
@@ -103,7 +99,7 @@ export function wrapper(
       }
       return DOMArray.from<Element>(
         [...config.document.querySelectorAll(arg)],
-        config
+        config,
       );
     }
     if (isIterable<Node>(arg)) {
@@ -131,7 +127,7 @@ export function wrapper(
       }
       return DOMArray.from<Element>(
         [config.document.createElementNS(uri, tagName)],
-        config
+        config,
       );
     },
     query(selector: string): DOMArray<Element> {
@@ -143,7 +139,7 @@ export function wrapper(
     queryAll(selector: string): DOMArray<Element> {
       return DOMArray.from<Element>(
         [...config.document.querySelectorAll(selector)],
-        config
+        config,
       );
     },
     html(thing?: string | DOMArray | Node): string {
@@ -153,7 +149,7 @@ export function wrapper(
       if (typeof thing === 'string') {
         return DOMArray.from(
           [...config.document.querySelectorAll(thing)],
-          config
+          config,
         ).outerHtml();
       }
       if (DOMArray.isDOMArray(thing)) {
@@ -182,10 +178,10 @@ export function wrapper(
       }
       return fragmentToText(config.document);
     },
-    setHtmlAdapter(adapter: TOHTML) {
+    setHtmlAdapter(adapter?: TOHTML) {
       toHtml = adapter;
     },
-    setCssAdapter(adapter: Config['cssAdapter']) {
+    setCssAdapter(adapter?: Config['cssAdapter']) {
       cssAdapter = adapter;
     },
   });
@@ -206,14 +202,14 @@ export function wrapper(
 export const $ = wrapper();
 export function loadHtml(
   html = `<!DOCTYPE html><body></body></html>`,
-  { toHtml, cssAdapter }: Config = {}
+  { toHtml, cssAdapter }: Config = {},
 ) {
   const document = parse(html, contentTypes.html);
   return wrapper(document, { toHtml, cssAdapter });
 }
 export function loadXml(
   xml = `<?xml version="1.0" ?><root />`,
-  { toHtml, cssAdapter }: Config = {}
+  { toHtml, cssAdapter }: Config = {},
 ) {
   const document = parse(xml, contentTypes.xml);
   return wrapper(document, { toHtml, cssAdapter });
@@ -223,6 +219,7 @@ export * from './helpers.js';
 export * from './splice-chars.js';
 export * from './tag-functions.js';
 export * from './is-node.js';
+export type { DOMParserSupportedType } from './dom-types.js';
 
 function isIterable<T>(item: unknown): item is Iterable<T> {
   return (

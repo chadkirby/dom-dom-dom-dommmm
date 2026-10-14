@@ -8,7 +8,7 @@ export function isEl(thing: unknown | undefined): thing is Element {
 
 export function isNode(
   thing: unknown | undefined,
-  targetType = -1
+  targetType = -1,
 ): thing is Node {
   if (thing === undefined || thing === null) {
     return false;

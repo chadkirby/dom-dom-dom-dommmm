@@ -3,17 +3,17 @@ export interface ADAPTER {
   cssSelectAll(
     nodes: Node[],
     selector: string,
-    fallback?: (nodes: Node[], selector: string) => Element[]
+    fallback?: (nodes: Node[], selector: string) => Element[],
   ): Element[];
   cssSelectOne(
     nodes: Node[],
     selector: string,
-    fallback?: (nodes: Element[], selector: string) => Element | null
+    fallback?: (nodes: Element[], selector: string) => Element | null,
   ): Element | null;
   cssIs(
     node: Node,
     selector: string,
-    fallback?: (node: Element, selector: string) => boolean
+    fallback?: (node: Element, selector: string) => boolean,
   ): boolean;
 }
 
@@ -22,7 +22,7 @@ class CSSADAPTER implements ADAPTER {
     return nodes.reduce(
       (matches: Element[], node: Node) =>
         matches.concat(isEl(node) ? [...node.querySelectorAll(selector)] : []),
-      []
+      [],
     );
   }
 
