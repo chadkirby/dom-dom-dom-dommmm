@@ -1,4 +1,3 @@
-/// <reference lib="dom" />
 import { CssAdapter as CSS } from './css-adapter.js';
 
 import {

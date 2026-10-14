@@ -223,6 +223,7 @@ export * from './helpers.js';
 export * from './splice-chars.js';
 export * from './tag-functions.js';
 export * from './is-node.js';
+export type { DOMParserSupportedType } from './dom-types.js';
 
 function isIterable<T>(item: unknown): item is Iterable<T> {
   return (

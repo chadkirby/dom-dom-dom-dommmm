@@ -1,4 +1,5 @@
 import { isEl, isNode, isTextNode } from './is-node.js';
+import type { DOMParserSupportedType } from './dom-types.js';
 /**
  * iterator to collect text nodes from a dom element
  *
