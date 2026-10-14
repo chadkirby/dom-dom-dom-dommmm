@@ -45,7 +45,7 @@ test(`loadXml loads namespaces`, (assert) => {
   </w:numbering>`;
 
   let $ = loadXml(numberingXml);
-  let $lvl = $(`w\\:lvl`);
+  let $lvl = $('lvl');
   assert.equal($lvl.length, 1);
   assert.ok($(`<w:foo />`), 'can wrap namespaced xml');
   $lvl.setAttrNS('xml:space', 'preserve');
@@ -54,13 +54,13 @@ test(`loadXml loads namespaces`, (assert) => {
     { 'w:ilvl': '0', 'xml:space': 'preserve' },
   );
 
-  let $root = $lvl.parents('w\\:numbering');
+  let $root = $lvl.parents('numbering');
   $root.setAttrNS('xmlns:foo', 'bar');
   assert.equal($root.document!.lookupNamespaceURI('foo'), 'bar');
 
   $lvl.setAttrNS('foo:baz', '7');
   assert.deepEqual(
-    { ...$(`w\\:lvl`).attr() },
+    { ...$(`lvl`).attr() },
     { 'w:ilvl': '0', 'xml:space': 'preserve', 'foo:baz': '7' },
   );
 });
