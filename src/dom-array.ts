@@ -33,13 +33,13 @@ export type DOMTYPE = Node;
 export type FILTER_FN<T extends DOMTYPE> = (
   el: T,
   i: number,
-  list: T[]
+  list: T[],
 ) => boolean;
 
 export type TARGET<
   WHICHNODE extends DOMTYPE = DOMTYPE,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  WHICHARRAY extends DOMTYPE = any
+  WHICHARRAY extends DOMTYPE = any,
 > = DOMArray<WHICHARRAY> | WHICHNODE | WHICHNODE[] | string;
 
 type AttrArgsGetOne = [string];
@@ -70,7 +70,7 @@ export const defaultConfig: CONFIG = {
 
 function newDomArray<T extends DOMTYPE = DOMTYPE>(
   config: CONFIG,
-  list: T[]
+  list: T[],
 ): DOMArray<T> {
   const domArray = new DOMArray(list, config);
   return new Proxy(domArray, {
@@ -88,11 +88,14 @@ function newDomArray<T extends DOMTYPE = DOMTYPE>(
 export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   ['constructor']!: typeof DOMArray;
   [index: number]: T | undefined;
-  constructor(protected list: T[] = [], protected config = defaultConfig) {}
+  constructor(
+    protected list: T[] = [],
+    protected config = defaultConfig,
+  ) {}
 
   static from<T extends DOMTYPE = DOMTYPE>(
     list: T[],
-    config = defaultConfig
+    config = defaultConfig,
   ): DOMArray<T> {
     return newDomArray<T>(config, list);
   }
@@ -157,12 +160,12 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   add(content: string): DOMArray<T | Element>;
   add(content: T | T[] | DOMArray<T>): DOMArray<T>;
   add(
-    content: string | T | T[] | DOMArray<T>
+    content: string | T | T[] | DOMArray<T>,
   ): DOMArray<T> | DOMArray<T | Element> {
     if (isSelector(content)) {
       const newElems = this.config.cssSelectAll(
         this.document ? [this.document.body] : [],
-        content
+        content,
       );
       return this.newFromList([...this.list, ...newElems]);
     }
@@ -233,14 +236,14 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
 
   arrayFind(
     predicate: (value: T, index: number, arr: T[]) => boolean,
-    thisArg?: DOMArray<T>
+    thisArg?: DOMArray<T>,
   ): T | undefined {
     return this.list.find(predicate, thisArg);
   }
 
   arrayMap<U>(
     callbackfn: (value: T, index: number, array: T[]) => U,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): U[] {
     return this.list.map(callbackfn, thisArg);
   }
@@ -274,7 +277,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
           throw new Error('use setAttrNS() to set namespaced attributes');
         }
         this.forEach(
-          (el) => isEl(el) && el.setAttribute(name, value.toString())
+          (el) => isEl(el) && el.setAttribute(name, value.toString()),
         );
       }
     }
@@ -310,7 +313,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
   children(selector?: sel): DOMArray<Element> {
     return getSet<T, Element>(this, (el) =>
-      isEl(el) ? el.children : []
+      isEl(el) ? el.children : [],
     ).filter(selector);
   }
   clone({ deep = true } = {}): DOMArray<T> {
@@ -319,7 +322,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
   // jq
   closest(
-    target: TARGET<Element, Element> | FILTER_FN<Element>
+    target: TARGET<Element, Element> | FILTER_FN<Element>,
   ): DOMArray<Element> {
     if (isSelector(target)) {
       return getSet<T, Element>(this, (el: T) => closest(el, target));
@@ -340,7 +343,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   css(propertyName: string, value: string): DOMArray<T>;
   css(
     propertyName?: string,
-    value?: unknown & { toString(): string }
+    value?: unknown & { toString(): string },
   ): string | CSSStyleDeclaration | DOMArray<T> {
     const { HTMLElement } = globalThis.window;
     if (value !== undefined) {
@@ -437,14 +440,14 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
   // Filters the list to those with the given dom node as a descendant
   has(
-    thing: string | Node | Node[] | DOMArray<Element> | DOMArray<Node>
+    thing: string | Node | Node[] | DOMArray<Element> | DOMArray<Node>,
   ): DOMArray<Element> {
     let elements = this.toElements();
     if (isSelector(thing)) {
       // Filter the list to those with a descendant that matches the
       // given selector.
       return this.newFromList<Element>(
-        elements.filter((el) => this.config.cssSelectOne([el], thing) !== null)
+        elements.filter((el) => this.config.cssSelectOne([el], thing) !== null),
       );
     }
     let nodeThing = thing as Node;
@@ -455,7 +458,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       [nodeThing] = thing;
     }
     return this.newFromList(
-      elements.filter((el) => hasDescendant(el, nodeThing))
+      elements.filter((el) => hasDescendant(el, nodeThing)),
     );
   }
   // jq
@@ -495,7 +498,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       | DOMArray<Node>
       | ArrayLike<Element>
       | Element
-      | DOMArray<Element>
+      | DOMArray<Element>,
   ): number {
     if (Array.isArray(target) || DOMArray.isDOMArray(target)) {
       [target] = target;
@@ -539,7 +542,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
 
   map<U extends DOMTYPE>(
-    callback: (el: T, i: number, list: DOMArray<T>) => U
+    callback: (el: T, i: number, list: DOMArray<T>) => U,
   ): DOMArray<U> {
     const list = this.list.map((el, i) => callback.call(el, el, i, this));
     return this.newFromList<U>(list);
@@ -548,14 +551,14 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   // Filters the list to those whose text matches the given target
   matches(
     target: string | RegExp,
-    maybeGetText?: (a: Node, b?: number, c?: DOMArray<T>) => string
+    maybeGetText?: (a: Node, b?: number, c?: DOMArray<T>) => string,
   ): DOMArray<T> {
     const getText = maybeGetText
       ? maybeGetText
       : (el: Node) => el.textContent || '';
 
     return this.arrayFilter(
-      (el, i) => getText(el, i, this).match(target) !== null
+      (el, i) => getText(el, i, this).match(target) !== null,
     );
   }
 
@@ -572,7 +575,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
    */
   next(selector?: sel): DOMArray<Element> {
     return getSet<T, Element>(this, (el) =>
-      isEl(el) ? el.nextElementSibling : null
+      isEl(el) ? el.nextElementSibling : null,
     ).filter(selector);
   }
   nextSibling(): DOMArray<Node> {
@@ -620,7 +623,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   // jq
   parents(selector?: sel | FILTER_FN<Element>): DOMArray<Element> {
     return getSet<T, Element>(this, (el) =>
-      parentsUntil(el, () => false)
+      parentsUntil(el, () => false),
     ).filter(selector);
   }
   // jq
@@ -631,16 +634,16 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
       | Element[]
       | string
       | ((el: Element) => boolean),
-    filter?: sel | FILTER_FN<Element>
+    filter?: sel | FILTER_FN<Element>,
   ): DOMArray<Element> {
     let parents: DOMArray<Element>;
     if (typeof input === 'function') {
       parents = getSet<T, Element>(this, (el) =>
-        parentsUntil(el, (parent) => input(parent))
+        parentsUntil(el, (parent) => input(parent)),
       );
     } else {
       let target: string | Element | Element[] = DOMArray.isDOMArray<Element>(
-        input
+        input,
       )
         ? input.toElements()
         : input;
@@ -662,7 +665,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
    */
   prev(selector?: sel): DOMArray<Element> {
     return getSet(this, (el) =>
-      isEl(el) ? el.previousElementSibling : null
+      isEl(el) ? el.previousElementSibling : null,
     ).filter(selector);
   }
   previousSiblings(selector?: sel): DOMArray<Node> {
@@ -730,7 +733,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   sliceUntil(target: TARGET<Element> | FILTER_FN<T>): DOMArray<T> {
     if (target) {
       const stop = this.list.findIndex((el) =>
-        this.newFromList([el]).is(target)
+        this.newFromList([el]).is(target),
       );
       if (stop > -1) {
         return this.slice(0, stop);
@@ -770,7 +773,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
 
   without(selector: sel): DOMArray<T> {
     return this.arrayFilter(
-      (el) => isEl(el) && !this.config.cssIs(el, selector)
+      (el) => isEl(el) && !this.config.cssIs(el, selector),
     );
   }
 
@@ -800,7 +803,7 @@ export class DOMArray<T extends DOMTYPE = DOMTYPE> {
   }
 
   static isDOMArray<WHICH extends DOMTYPE = DOMTYPE>(
-    thing: unknown
+    thing: unknown,
   ): thing is DOMArray<WHICH> {
     return thing instanceof DOMArray;
   }
@@ -811,10 +814,10 @@ function getEls(config: CONFIG, list: unknown[]): DOMArray<Element> {
 }
 function getElOrText(
   config: CONFIG,
-  list: unknown[]
+  list: unknown[],
 ): DOMArray<Element | Text> {
   let nods = list.filter<Element | Text>(
-    (item): item is Element | Text => isEl(item) || isTextNode(item)
+    (item): item is Element | Text => isEl(item) || isTextNode(item),
   );
   return new DOMArray(nods, config);
 }
@@ -836,8 +839,8 @@ function getSet<IN extends DOMTYPE, OUT extends DOMTYPE>(
   getter: (
     el: IN,
     i: number,
-    list: IN[]
-  ) => OUT | Iterable<OUT> | Generator<OUT> | Array<OUT> | DOMArray<OUT> | null
+    list: IN[],
+  ) => OUT | Iterable<OUT> | Generator<OUT> | Array<OUT> | DOMArray<OUT> | null,
 ): DOMArray<OUT> {
   const set = new Set<OUT>();
   let list = domArray.toArray();
@@ -866,7 +869,7 @@ function getSet<IN extends DOMTYPE, OUT extends DOMTYPE>(
 function each<T extends DOMTYPE>(
   domArray: DOMArray<T>,
   op: keyof T,
-  val: AnyNodable
+  val: AnyNodable,
 ): void {
   for (const item of domArray) {
     if (typeof (item as never)[op] === `function`) {
@@ -884,7 +887,7 @@ function each<T extends DOMTYPE>(
         (el[key] as (...nodes: Array<DOMTYPE>) => unknown)(
           ...content
             .map((item) => thingToNode(item, domArray))
-            .filter((x): x is Element | Text => x !== null)
+            .filter((x): x is Element | Text => x !== null),
         );
       } else {
         const node = thingToNode(content, domArray);
@@ -914,7 +917,7 @@ type AnyNodable =
 function thingToNode<T extends Node>(
   thing: Nodable<T>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  domArray: DOMArray<any>
+  domArray: DOMArray<any>,
 ): Node | null {
   if (DOMArray.isDOMArray(thing)) {
     return thing.nodeAt(0);

@@ -36,29 +36,29 @@ test(`createFragment creates fragment`, (assert) => {
 
 test(`collectTextNodes collects text nodes`, (assert) => {
   let $ = createFragment(
-    `<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`
+    `<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`,
   );
   assert.ok(
-    Array.from(collectTextNodes($)).every((n) => n.nodeName === `#text`)
+    Array.from(collectTextNodes($)).every((n) => n.nodeName === `#text`),
   );
   assert.deepEqual(
     Array.from(collectTextNodes($), (n) => n.textContent),
-    ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
   );
 
   assert.deepEqual(
     Array.from(collectTextNodes($, $.querySelector(`d`)), (n) => n.textContent),
     ['1', '2', '3'],
-    `can specify endNode`
+    `can specify endNode`,
   );
 
   assert.deepEqual(
     Array.from(
       collectTextNodes($, $.querySelector(`foo`)),
-      (n) => n.textContent
+      (n) => n.textContent,
     ),
     ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
-    `non-existent endNode`
+    `non-existent endNode`,
   );
 });
 
@@ -69,13 +69,13 @@ test(`createElement creates element`, (assert) => {
 
   assert.equal(
     createElement(`<span foo='bar'/>`).outerHTML,
-    `<span foo="bar"></span>`
+    `<span foo="bar"></span>`,
   );
 
   assert.equal(
     createElement(` <span foo='bar'></span> `).outerHTML,
     `<span foo="bar"></span>`,
-    `tolerates extra whitespace`
+    `tolerates extra whitespace`,
   );
 
   assert.equal(createElement(`foo`), null);
@@ -83,7 +83,7 @@ test(`createElement creates element`, (assert) => {
   assert.equal(
     createElement(`foo <span />`).outerHTML,
     `<span></span>`,
-    `first element is returned`
+    `first element is returned`,
   );
 });
 
@@ -103,48 +103,48 @@ test(`fragmentToHtml converts fragment to html`, (assert) => {
 
 test(`collectTextNodes collects text nodes`, (assert) => {
   let $ = createFragment(
-    `<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`
+    `<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`,
   );
   let $f = $.querySelector(`f`);
   assert.deepEqual(
     Array.from(parentsUntil($f, `b`), (n) => n.nodeName),
-    [`E`, `D`, `C`]
+    [`E`, `D`, `C`],
   );
   assert.deepEqual(
     Array.from(parentsUntil($f.firstChild, `b`), (n) => n.nodeName),
-    ['F', `E`, `D`, `C`]
+    ['F', `E`, `D`, `C`],
   );
   assert.deepEqual(
     Array.from(parentsUntil($f, $.querySelector(`a`)), (n) => n.nodeName),
-    [`E`, `D`, `C`, `B`]
+    [`E`, `D`, `C`, `B`],
   );
   assert.deepEqual(
     Array.from(parentsUntil($f), (n) => n.nodeName),
-    [`E`, `D`, `C`, `B`, `A`, `H3`]
+    [`E`, `D`, `C`, `B`, `A`, `H3`],
   );
 });
 
 test(`unwrap unwraps`, (assert) => {
   let $ = createFragment(
-    `<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`
+    `<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`,
   );
 
   unwrap($.querySelector('f'));
   assert.deepEqual(
     fragmentToHtml($),
-    `<h3><a>1<b>2<c>3<d>4<e>567</e>8</d>9</c></b></a></h3>`
+    `<h3><a>1<b>2<c>3<d>4<e>567</e>8</d>9</c></b></a></h3>`,
   );
 
   unwrap($.querySelector('d'));
   assert.deepEqual(
     fragmentToHtml($),
-    `<h3><a>1<b>2<c>34<e>567</e>89</c></b></a></h3>`
+    `<h3><a>1<b>2<c>34<e>567</e>89</c></b></a></h3>`,
   );
 
   unwrap($.querySelector('b'));
   assert.deepEqual(
     fragmentToHtml($),
-    `<h3><a>12<c>34<e>567</e>89</c></a></h3>`
+    `<h3><a>12<c>34<e>567</e>89</c></a></h3>`,
   );
 
   unwrap($.querySelector('a'));
@@ -153,7 +153,7 @@ test(`unwrap unwraps`, (assert) => {
 
 test(`closest finds the closest`, (assert) => {
   let $ = createFragment(
-    `<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`
+    `<h3><a>1<b>2<c>3<d>4<e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`,
   );
   let $f = $.querySelector('f');
 
@@ -169,7 +169,7 @@ test(`closest finds the closest`, (assert) => {
   assert.equal(
     closest($.querySelector('foo')),
     null,
-    `returns null on falsy input`
+    `returns null on falsy input`,
   );
 });
 
@@ -178,32 +178,32 @@ test(`filterTextNodes filters text nodes`, (assert) => {
   assert.deepEqual(
     Array.from(
       filterTextNodes($p, (n) => !closest(n, `i`)),
-      (n) => n.textContent
+      (n) => n.textContent,
     ),
     [`abc`, `123`],
-    `italic nodes are filtered out`
+    `italic nodes are filtered out`,
   );
 
   assert.deepEqual(
     Array.from(
       filterTextNodes($p, (n) => closest(n, `b`)),
-      (n) => n.textContent
+      (n) => n.textContent,
     ),
     [`123`, `4`, `5`, `6`],
-    `bold nodes are filtered in`
+    `bold nodes are filtered in`,
   );
 
   // remove nodes 123 and 6 as we iterate
   for (const node of filterTextNodes(
     $p,
-    (n) => parseInt(n.textContent, 10) > 5
+    (n) => parseInt(n.textContent, 10) > 5,
   )) {
     node.remove();
   }
   assert.equal(
     $p.outerHTML,
     `<p>abc<b><i>4<u>5</u></i></b></p>`,
-    `can modify dom during loop`
+    `can modify dom during loop`,
   );
 
   assert.end();
@@ -216,18 +216,18 @@ test(`attr returns attributes as a POJO`, (assert) => {
       foo: 'bar',
       'baz-bat': 'bot',
       id: '123',
-    }
+    },
   );
 
   assert.deepEqual(
     attr(el``),
     Object.create(null),
-    `non-existent element returns empty object`
+    `non-existent element returns empty object`,
   );
   assert.deepEqual(
     attr(el`<p>foo</p>`),
     Object.create(null),
-    `no attributes returns empty object`
+    `no attributes returns empty object`,
   );
 });
 
@@ -240,25 +240,25 @@ test(`previousSiblings iterates over previous siblings`, (assert) => {
   </h3>`;
   assert.deepEqual(
     Array.from(previousSiblings($.querySelector('f')), (n) => n.textContent),
-    ['45', '3', '2', '1']
+    ['45', '3', '2', '1'],
   );
 
   assert.deepEqual(
     Array.from(previousSiblings($.querySelector('e')), (n) => n.textContent),
-    ['4']
+    ['4'],
   );
 
   assert.deepEqual(
     Array.from(previousSiblings($.querySelector('a')), (n) => n.textContent),
-    []
+    [],
   );
 
   assert.deepEqual(
     Array.from(
       previousSiblings($.querySelector('foobar')),
-      (n) => n.textContent
+      (n) => n.textContent,
     ),
-    []
+    [],
   );
 });
 
@@ -271,32 +271,32 @@ test(`nextSiblings iterates over next siblings`, (assert) => {
   </h3>`;
   assert.deepEqual(
     Array.from(nextSiblings($.querySelector('a')), (n) => n.textContent),
-    ['2', '3', '45', '6']
+    ['2', '3', '45', '6'],
   );
 
   assert.deepEqual(
     Array.from(
       nextSiblings($.querySelector('d').firstChild),
-      (n) => n.textContent
+      (n) => n.textContent,
     ),
-    ['5']
+    ['5'],
   );
 
   assert.deepEqual(
     Array.from(nextSiblings($.querySelector('f')), (n) => n.textContent),
-    []
+    [],
   );
 
   assert.deepEqual(
     Array.from(nextSiblings($.querySelector('foobar')), (n) => n.textContent),
-    []
+    [],
   );
 });
 
 test(`splitSearch splits & searches`, (assert) => {
   function makeFragment() {
     return createFragment(
-      `<h3><a>1<b> 2<c>3 <d> 4 <e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`
+      `<h3><a>1<b> 2<c>3 <d> 4 <e>5<f>6</f>7</e>8</d>9</c></b></a></h3>`,
     );
   }
 
@@ -315,7 +315,7 @@ test(`splitSearch splits & searches`, (assert) => {
   assert.deepEqual(
     [...$.querySelector('c').childNodes].map((x) => x.textContent),
     ['3', ' ', ' 4 5678', '9'],
-    'first text node is split in two'
+    'first text node is split in two',
   );
   $ = makeFragment();
   assert.deepEqual(splitSearch($.querySelector('h3'), /567/), [
@@ -325,41 +325,41 @@ test(`splitSearch splits & searches`, (assert) => {
   $ = makeFragment();
   assert.deepEqual(
     splitSearch($.querySelector('h3'), /\d{2}/g).map((res) =>
-      res.map((x) => x.textContent)
+      res.map((x) => x.textContent),
     ),
     [
       ['2', '3'],
       ['5', '6'],
       ['7', '8'],
-    ]
+    ],
   );
 
   $ = makeFragment();
   assert.deepEqual(
     splitSearch($.querySelector('h3'), /[1-3 ]/g).map((res) =>
-      res.map((x) => x.textContent)
+      res.map((x) => x.textContent),
     ),
-    [['1'], [' '], ['2'], ['3'], [' '], [' '], [' ']]
+    [['1'], [' '], ['2'], ['3'], [' '], [' '], [' ']],
   );
 
   assert.deepEqual(
     splitSearch(
       createFragment(`<h3>12345</h3>`).querySelector('h3'),
-      /.{1,2}/g
+      /.{1,2}/g,
     ).map(([x]) => x.textContent),
-    ['12', '34', '5']
+    ['12', '34', '5'],
   );
 
   assert.deepEqual(
     splitSearch(createFragment(`<h3>12345</h3>`).querySelector('h3'), /6/g),
-    []
+    [],
   );
 });
 
 test(`lookupNamespaceURI knows well known URIs`, (assert) => {
   assert.equal(
     lookupNamespaceURI('xml'),
-    'http://www.w3.org/XML/1998/namespace'
+    'http://www.w3.org/XML/1998/namespace',
   );
   assert.equal(lookupNamespaceURI('xmlns'), 'http://www.w3.org/2000/xmlns/');
 });
@@ -371,6 +371,6 @@ test(`fragmentToHtml`, (assert) => {
   assert.equal(
     fragmentToHtml($paragraph),
     '<p>foo<b>&lt;b&gt;bar&lt;/b&gt;</b>baz</p>',
-    'angle brackets are escaped'
+    'angle brackets are escaped',
   );
 });

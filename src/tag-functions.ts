@@ -21,7 +21,7 @@ export function makeDom(baseDocument?: Document) {
     for (const node of collectTextNodes(div)) {
       const trimmed = (node.textContent || '').replace(
         /^\s*\n\s*|\s*\n\s*$/g,
-        ''
+        '',
       );
       if (node.textContent && !trimmed) {
         // remove the node if we just emptied it out
@@ -91,7 +91,7 @@ export function unpretty(x: TemplateStringsArray, ...args: unknown[]): string {
 }
 
 export function unprettyns(
-  namespaces = {}
+  namespaces = {},
 ): (x: TemplateStringsArray, ...args: unknown[]) => string {
   let xml = `<?xml version="1.0" encoding="utf-8" ?><root`;
   for (const [prefix, ns] of Object.entries(namespaces)) {
@@ -100,7 +100,7 @@ export function unprettyns(
   xml += ' />';
   const document = new globalThis.window.DOMParser().parseFromString(
     xml,
-    'text/xml'
+    'text/xml',
   );
   if (document.firstElementChild?.matches('parsererror')) {
     const msg = document.firstElementChild.textContent || '';
@@ -136,7 +136,7 @@ export function outerXml(document: Document, ...els: Node[]): string {
     }
     return document.documentElement.outerHTML.replace(
       RegExp(`.*<${tagName}(?: .+?)?>(.+)</${tagName}>.*`),
-      '$1'
+      '$1',
     );
   } finally {
     tmpContainer.remove();

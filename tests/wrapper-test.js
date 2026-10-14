@@ -22,12 +22,12 @@ test(`$ wraps an element`, (assert) => {
   assert.equal(
     $x.html(),
     `bar`,
-    `html function sets innerHTML & returns the domarray`
+    `html function sets innerHTML & returns the domarray`,
   );
   assert.equal(
     $x.xml(),
     `<span xmlns="http://www.w3.org/1999/xhtml">bar</span>`,
-    `serialize function serializes`
+    `serialize function serializes`,
   );
 
   assert.ok($x.first().is(span));
@@ -43,7 +43,7 @@ test(`$ wraps an html string`, (assert) => {
   assert.deepLooseEqual(
     [...$x.filter(`span`)],
     [span],
-    `can filter element by selector`
+    `can filter element by selector`,
   );
   assert.equal($x.html(), `foo`, `html function exists & returns innerHTML`);
   $x.html(`bar`);
@@ -59,21 +59,21 @@ test(`$.query`, (assert) => {
   assert.equal($x.queryAll(`a`).length, 2);
   assert.equal(
     $x.queryAll(`a`).filter((a) => a.querySelector(`c`) !== null).length,
-    1
+    1,
   );
   assert.equal(
     $x
       .queryAll(`a`)
       .arrayFilter((a) => a.querySelector(`c`) !== null)
       .outerHtml(),
-    '<a>bar<c></c></a>'
+    '<a>bar<c></c></a>',
   );
   assert.equal(
     $x
       .queryAll(`a`)
       .filter((a) => a.querySelector(`c`) !== null)
       .html(),
-    `bar<c></c>`
+    `bar<c></c>`,
   );
   assert.equal($x.queryAll(`a`).first().queryAll(`a`).length, 0);
 });
@@ -88,7 +88,7 @@ test(`$.attr gets`, (assert) => {
   assert.equal(
     $x.find('nonexistant').attr('nonexistant'),
     null,
-    'empty Domlist'
+    'empty Domlist',
   );
   assert.equal($x[0].outerHTML, `<span id="3" foo="bar"></span>`);
   assert.equal($x.is(`[id]`), true);
@@ -142,21 +142,21 @@ test(`$.parentsUntil`, (assert) => {
       .queryAll(`c`)
       .parentsUntil(`a`)
       .arrayMap(({ outerHTML }) => outerHTML),
-    ['<b><c></c></b>']
+    ['<b><c></c></b>'],
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`c`)
       .parentsUntil((p) => p.matches('a'))
       .arrayMap(({ outerHTML }) => outerHTML),
-    ['<b><c></c></b>']
+    ['<b><c></c></b>'],
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`c`)
       .parentsUntil(`div`)
       .arrayMap((p) => p.outerHTML),
-    ['<b><c></c></b>', '<a><b><c></c></b></a>']
+    ['<b><c></c></b>', '<a><b><c></c></b></a>'],
   );
   let $a = $x.queryAll('a');
   assert.equal($x.queryAll(`c`).parentsUntil($a).outerHtml(), '<b><c></c></b>');
@@ -171,25 +171,25 @@ test(`$.next $.nextAll`, (assert) => {
       .queryAll(`a`)
       .nextAll()
       .arrayMap(({ textContent }) => textContent),
-    ['2', '3']
+    ['2', '3'],
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`a`)
       .nextAll('c')
       .arrayMap(({ textContent }) => textContent),
-    ['3']
+    ['3'],
   );
   assert.equal($x.queryAll(`a,b`).next().text(), '23');
   $x = $(
-    `<div><a>1</a><b>2</b><c>3</c></div><div><a>A</a><b>B</b><c>C</c></div>`
+    `<div><a>1</a><b>2</b><c>3</c></div><div><a>A</a><b>B</b><c>C</c></div>`,
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`a`)
       .nextAll()
       .arrayMap(({ textContent }) => textContent),
-    ['2', '3', 'B', 'C']
+    ['2', '3', 'B', 'C'],
   );
 });
 
@@ -203,31 +203,31 @@ test(`$.prev $.prevAll $.prevUntil`, (assert) => {
       .queryAll(`c`)
       .prevAll()
       .arrayMap(({ textContent }) => textContent),
-    ['2', '1']
+    ['2', '1'],
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`c`)
       .prevAll('a')
       .arrayMap(({ textContent }) => textContent),
-    ['1']
+    ['1'],
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`c`)
       .prevUntil('a')
       .arrayMap(({ textContent }) => textContent),
-    ['2']
+    ['2'],
   );
   $x = $(
-    `<div><a>1</a><b>2</b><c>3</c></div><div><a>A</a><b>B</b><c>C</c></div>`
+    `<div><a>1</a><b>2</b><c>3</c></div><div><a>A</a><b>B</b><c>C</c></div>`,
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`c`)
       .prevAll()
       .arrayMap(({ textContent }) => textContent),
-    ['2', '1', 'B', 'A']
+    ['2', '1', 'B', 'A'],
   );
 });
 
@@ -238,21 +238,21 @@ test(`$.siblings`, (assert) => {
       .queryAll(`a`)
       .siblings()
       .arrayMap(({ textContent }) => textContent),
-    ['2', '3']
+    ['2', '3'],
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`b`)
       .siblings()
       .arrayMap(({ textContent }) => textContent),
-    ['1', '3']
+    ['1', '3'],
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`c`)
       .siblings()
       .arrayMap(({ textContent }) => textContent),
-    ['1', '2']
+    ['1', '2'],
   );
 
   assert.deepLooseEqual(
@@ -260,7 +260,7 @@ test(`$.siblings`, (assert) => {
       .queryAll(`a`)
       .siblings(`c`)
       .arrayMap(({ textContent }) => textContent),
-    ['3']
+    ['3'],
   );
 });
 
@@ -271,7 +271,7 @@ test(`$.has`, (assert) => {
       .queryAll(`a,b,c`)
       .has(`c`)
       .arrayMap(({ outerHTML }) => outerHTML),
-    ['<a><b><c></c></b></a>', '<b><c></c></b>']
+    ['<a><b><c></c></b></a>', '<b><c></c></b>'],
   );
 });
 
@@ -283,21 +283,21 @@ test(`$.has`, (assert) => {
       .queryAll(`a,b,c`)
       .has($c)
       .arrayMap(({ outerHTML }) => outerHTML),
-    ['<a><b><c></c></b></a>', '<b><c></c></b>']
+    ['<a><b><c></c></b></a>', '<b><c></c></b>'],
   );
   assert.deepLooseEqual(
     $x
       .find('a,b,c')
       .has($c)
       .arrayMap(({ outerHTML }) => outerHTML),
-    ['<a><b><c></c></b></a>', '<b><c></c></b>']
+    ['<a><b><c></c></b></a>', '<b><c></c></b>'],
   );
   assert.deepLooseEqual(
     $x
       .find('a,b,c')
       .has($c[0])
       .arrayMap(({ outerHTML }) => outerHTML),
-    ['<a><b><c></c></b></a>', '<b><c></c></b>']
+    ['<a><b><c></c></b></a>', '<b><c></c></b>'],
   );
 });
 
@@ -308,15 +308,15 @@ test(`$.toArray`, (assert) => {
       .queryAll(`b,c`)
       .toArray()
       .map(({ outerHTML }) => outerHTML),
-    ['<b><c></c></b>', '<c></c>']
+    ['<b><c></c></b>', '<c></c>'],
   );
   assert.deepLooseEqual(
     $x.queryAll(`b,c`).arrayMap(({ outerHTML }) => outerHTML),
-    ['<b><c></c></b>', '<c></c>']
+    ['<b><c></c></b>', '<c></c>'],
   );
   assert.deepLooseEqual(
     $x.queryAll(`b,c`).arrayMap(({ outerHTML }) => outerHTML),
-    ['<b><c></c></b>', '<c></c>']
+    ['<b><c></c></b>', '<c></c>'],
   );
   assert.ok(Array.isArray($x.queryAll(`b,c`).toArray()));
 });
@@ -328,15 +328,15 @@ test(`$.toElements`, (assert) => {
       .queryAll(`b,c`)
       .toElements()
       .map(({ outerHTML }) => outerHTML),
-    ['<b><c></c></b>', '<c></c>']
+    ['<b><c></c></b>', '<c></c>'],
   );
   assert.deepLooseEqual(
     $x.queryAll(`b,c`).arrayMap(({ outerHTML }) => outerHTML),
-    ['<b><c></c></b>', '<c></c>']
+    ['<b><c></c></b>', '<c></c>'],
   );
   assert.deepLooseEqual(
     $x.queryAll(`b,c`).arrayMap(({ outerHTML }) => outerHTML),
-    ['<b><c></c></b>', '<c></c>']
+    ['<b><c></c></b>', '<c></c>'],
   );
   assert.ok(Array.isArray($x.queryAll(`b,c`).toElements()));
 });
@@ -368,11 +368,11 @@ test(`$.first/last`, (assert) => {
 test(`$.outerHtml`, (assert) => {
   assert.equal(
     $(el`<span><a>foo</a><a>bar</a></span>`).outerHtml(),
-    `<span><a>foo</a><a>bar</a></span>`
+    `<span><a>foo</a><a>bar</a></span>`,
   );
   assert.equal(
     $(`<span><a>foo</a><a>bar</a></span>`).outerHtml(),
-    `<span><a>foo</a><a>bar</a></span>`
+    `<span><a>foo</a><a>bar</a></span>`,
   );
 });
 
@@ -400,7 +400,7 @@ test(`$.append`, (assert) => {
 
   assert.equal(
     $(`<div />`).append($(`<a>foo</a>`), $(`<c>bar</c>`)).html(),
-    `<a>foo</a><c>bar</c>`
+    `<a>foo</a><c>bar</c>`,
   );
 
   $x = $(`<div />`);
@@ -428,7 +428,7 @@ test(`$.prepend`, (assert) => {
 
   assert.equal(
     $(`<div />`).prepend($(`<c>bar</c>`), $(`<a>foo</a>`)).html(),
-    `<a>foo</a><c>bar</c>`
+    `<a>foo</a><c>bar</c>`,
   );
 
   $x = $(`<div />`);
@@ -460,7 +460,7 @@ test(`set text`, (assert) => {
   assert.ok(
     $x[0].childNodes.length,
     1,
-    'an empty text node is inserted when text is set to the empty string'
+    'an empty text node is inserted when text is set to the empty string',
   );
 });
 
@@ -495,7 +495,7 @@ test(`$.parent`, (assert) => {
       $x[0],
       $x[0].ownerDocument.body,
       $x[0].ownerDocument.documentElement,
-    ]
+    ],
   );
   assert.deepLooseEqual(
     [...$x.find('a,c').parents()],
@@ -504,7 +504,7 @@ test(`$.parent`, (assert) => {
       $x[0].ownerDocument.body,
       $x[0].ownerDocument.documentElement,
       $a[0],
-    ]
+    ],
   );
 });
 
@@ -523,7 +523,7 @@ test(`$.children`, (assert) => {
       .first()
       .children()
       .arrayMap((node) => node.outerHTML),
-    ['<a>1</a>', '<b>2</b>', '<c>3<d>4</d></c>']
+    ['<a>1</a>', '<b>2</b>', '<c>3<d>4</d></c>'],
   );
   assert.deepLooseEqual($x.children().children(), $x.find('d'));
   $x.find('a').append('<e>5</e>');
@@ -552,14 +552,14 @@ test(`$.not`, (assert) => {
       .queryAll(`a,b,c`)
       .without(`a,b`)
       .arrayMap((node) => node.outerHTML),
-    ['<c>3</c>']
+    ['<c>3</c>'],
   );
   assert.deepLooseEqual(
     $x
       .queryAll(`a,b,c`)
       .filter((node) => !node.matches(`a,b`))
       .arrayMap((node) => node.outerHTML),
-    ['<c>3</c>']
+    ['<c>3</c>'],
   );
 });
 
@@ -574,28 +574,28 @@ test(`$.contents`, (assert) => {
   let $x = $(`<div>abc<a>1</a>def</div>`);
   assert.deepLooseEqual(
     $x.contents().arrayMap((node) => $(node).text()),
-    ['abc', '1', 'def']
+    ['abc', '1', 'def'],
   );
   assert.deepLooseEqual(
     $x
       .contents()
       .filter('a')
       .arrayMap((node) => $(node).text()),
-    ['1']
+    ['1'],
   );
   assert.deepLooseEqual(
     $x
       .contents()
       .filter((node) => $(node).is('a'))
       .arrayMap((node) => $(node).text()),
-    ['1']
+    ['1'],
   );
   assert.deepLooseEqual(
     $x
       .contents()
       .filter((node) => $(node).isTextNode)
       .arrayMap((node) => $(node).text()),
-    ['abc', 'def']
+    ['abc', 'def'],
   );
 });
 
@@ -615,12 +615,12 @@ test(`$.siblings`, (assert) => {
   assert.equal(
     $b.previousSiblings().outerHtml(),
     'bar<a></a>foo',
-    'previousSiblings'
+    'previousSiblings',
   );
   assert.equal(
     $b.previousSiblings('a').outerHtml(),
     '<a></a>',
-    'previousSiblings with selector'
+    'previousSiblings with selector',
   );
 
   let $foo = $b.previousSiblings().last();
@@ -678,7 +678,7 @@ test(`$.setHtmlAdapter`, (assert) => {
     $('<div>foo</div>')
       .contents()
       .arrayMap((x) => x.textContent),
-    ['foo']
+    ['foo'],
   );
 });
 
@@ -720,7 +720,7 @@ test(`$.addClass`, (assert) => {
   $x.find('b,c').addClass('bar');
   assert.equal(
     $x.html(),
-    `<a class="foo">1<b class="bar">2<c class="bar">3</c></b></a>`
+    `<a class="foo">1<b class="bar">2<c class="bar">3</c></b></a>`,
   );
   $x.find('b,c').removeClass('bar');
   assert.equal($x.html(), `<a class="foo">1<b>2<c>3</c></b></a>`);
@@ -743,7 +743,7 @@ test(`$.find :scope`, (assert) => {
   let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
   assert.equal(
     $x.find('a').find(':scope > b').outerHtml(),
-    $x.find('a > b').outerHtml()
+    $x.find('a > b').outerHtml(),
   );
 });
 
@@ -751,7 +751,7 @@ test(`$.xml`, (assert) => {
   let $x = $(`<div><a>1<b>2<b>3</b></b></a></div>`);
   assert.equal(
     $x.find('a').find(':scope > b').outerHtml(),
-    $x.find('a > b').outerHtml()
+    $x.find('a > b').outerHtml(),
   );
 });
 
@@ -762,7 +762,7 @@ test(`$.not`, (assert) => {
   assert.deepLooseEqual($x.find('a,b,c').not($x.find('a')[0]), $x.find('b,c'));
   assert.deepLooseEqual(
     $x.find('a,b,c').not((_el, i) => i === 1),
-    $x.find('a,c')
+    $x.find('a,c'),
   );
 });
 
@@ -773,7 +773,7 @@ test(`$.matches`, (assert) => {
       .find('a,b')
       .matches(/^\d{2}$/)
       .outerHtml(),
-    $x.findFirst('b').outerHtml()
+    $x.findFirst('b').outerHtml(),
   );
 });
 
@@ -790,17 +790,17 @@ test(`identity`, (assert) => {
 test(`can append XML elements with namespace`, (assert) => {
   let x$ = loadXml(
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <root xmlns:foo="bar"></root>`
+    <root xmlns:foo="bar"></root>`,
   );
   assert.equal(
     x$.document.documentElement.outerHTML,
-    `<root xmlns:foo="bar"/>`
+    `<root xmlns:foo="bar"/>`,
   );
 
   x$(`root`).append(`<foo:bat>Hi</foo:bat>`);
   assert.equal(
     x$.document.documentElement.outerHTML,
-    `<root xmlns:foo="bar"><foo:bat>Hi</foo:bat></root>`
+    `<root xmlns:foo="bar"><foo:bat>Hi</foo:bat></root>`,
   );
 });
 
@@ -822,7 +822,7 @@ test(`$.is`, (assert) => {
   assert.ok($x.find('a').is($x.find('a')[0]), 'Element');
   assert.ok(
     $x.find('a').is(() => true),
-    'Function'
+    'Function',
   );
 });
 

@@ -52,7 +52,7 @@ test(`loadXml loads namespaces`, (assert) => {
   $lvl.setAttrNS('xml:space', 'preserve');
   assert.deepEqual(
     { ...$lvl.attr() },
-    { 'w:ilvl': '0', 'xml:space': 'preserve' }
+    { 'w:ilvl': '0', 'xml:space': 'preserve' },
   );
 
   let $root = $lvl.parents('w\\:numbering');
@@ -62,7 +62,7 @@ test(`loadXml loads namespaces`, (assert) => {
   $lvl.setAttrNS('foo:baz', '7');
   assert.deepEqual(
     { ...$(`w\\:lvl`).attr() },
-    { 'w:ilvl': '0', 'xml:space': 'preserve', 'foo:baz': '7' }
+    { 'w:ilvl': '0', 'xml:space': 'preserve', 'foo:baz': '7' },
   );
 });
 
@@ -71,13 +71,13 @@ test(`loadXml can define namespaces & create namespaced elements`, (assert) => {
 
   assert.throws(
     () => $.createElementNS(`foo:div`),
-    `can't create element in unknown namespace`
+    `can't create element in unknown namespace`,
   );
   $('Pr').defineNamespace('foo', 'bar');
 
   assert.equal(
     $.createElementNS(`foo:div`).outerHtml(),
-    `<foo:div xmlns:foo="bar"/>`
+    `<foo:div xmlns:foo="bar"/>`,
   );
 });
 
@@ -88,7 +88,7 @@ test(`can append XML elements`, (assert) => {
 
   assert.equal(
     $.document.firstElementChild.outerHTML,
-    `<Pr>Hi there!<fooBar>baz</fooBar></Pr>`
+    `<Pr>Hi there!<fooBar>baz</fooBar></Pr>`,
   );
 });
 
@@ -98,6 +98,6 @@ test(`loadXML can load forgivingly`, (assert) => {
   assert.equal(
     $.document.documentElement.outerHTML.slice(0, 28),
     `<uspat:SpecificationDocument`,
-    `can parse a file with forbidden chars`
+    `can parse a file with forbidden chars`,
   );
 });

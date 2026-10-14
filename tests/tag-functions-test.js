@@ -19,13 +19,13 @@ test(`el creates element`, (assert) => {
     el`<span
       foo='bar'
     />`.outerHTML,
-    `<span foo="bar"></span>`
+    `<span foo="bar"></span>`,
   );
 
   assert.equal(
     el` <span foo='bar'></span> `.outerHTML,
     `<span foo="bar"></span>`,
-    `tolerates extra whitespace`
+    `tolerates extra whitespace`,
   );
 
   assert.equal(el`foo`, null);
@@ -33,7 +33,7 @@ test(`el creates element`, (assert) => {
   assert.equal(
     el`foo <span />`.outerHTML,
     `<span></span>`,
-    `first element is returned`
+    `first element is returned`,
   );
 });
 
@@ -46,15 +46,15 @@ test(`dom creates fragment`, (assert) => {
     fragmentToHtml(
       dom`<span
         foo='bar'
-      />`
+      />`,
     ),
-    `<span foo="bar"></span>`
+    `<span foo="bar"></span>`,
   );
 
   assert.equal(
     fragmentToHtml(dom` <span foo='bar'>
     </span> `),
-    ` <span foo="bar"></span> `
+    ` <span foo="bar"></span> `,
   );
 
   assert.equal(fragmentToHtml(dom`foo`), `foo`);
@@ -63,7 +63,7 @@ test(`dom creates fragment`, (assert) => {
     fragmentToHtml(dom`
     foo <span></span> bar
     `),
-    `foo <span></span> bar`
+    `foo <span></span> bar`,
   );
 
   let $doc = dom`
@@ -72,7 +72,7 @@ test(`dom creates fragment`, (assert) => {
   assert.equal(
     $doc.firstChild.nodeName,
     `SPAN`,
-    `firstChild is not empty text node`
+    `firstChild is not empty text node`,
   );
 });
 
@@ -81,7 +81,7 @@ test(`unpretty de-formats an html string`, (assert) => {
     unpretty`<p>
       <span />
     </p>`,
-    `<p><span></span></p>`
+    `<p><span></span></p>`,
   );
   assert.equal(
     unpretty`
@@ -90,7 +90,7 @@ test(`unpretty de-formats an html string`, (assert) => {
       baz='bat'
     />
     `,
-    `<p foo="bar" baz="bat"></p>`
+    `<p foo="bar" baz="bat"></p>`,
   );
 
   assert.equal(
@@ -99,7 +99,7 @@ test(`unpretty de-formats an html string`, (assert) => {
       newlines
     </p>`,
     `<p>Text with
-      newlines</p>`
+      newlines</p>`,
   );
 
   assert.equal(
@@ -114,7 +114,7 @@ test(`unpretty de-formats an html string`, (assert) => {
         bat
       </span>
     </p>`,
-    `<p>foo<span>bar</span>baz<span>bat</span></p>`
+    `<p>foo<span>bar</span>baz<span>bat</span></p>`,
   );
 });
 
@@ -127,7 +127,7 @@ test(`text creates text node`, (assert) => {
     text`
     123
     `.textContent,
-    `\n    123\n    `
+    `\n    123\n    `,
   );
 
   assert.equal(text``.textContent, ``);
@@ -139,12 +139,12 @@ test(`unprettyns de-formats an xml string`, (assert) => {
     unprettyx`<foo:p>
       <foo:span />
     </foo:p>`,
-    `<foo:p><foo:span/></foo:p>`
+    `<foo:p><foo:span/></foo:p>`,
   );
   assert.equal(
     unprettyx`<foo:p baz:id="1">
       <baz:span foo:id="2" />
     </foo:p>`,
-    `<foo:p baz:id="1"><baz:span foo:id="2"/></foo:p>`
+    `<foo:p baz:id="1"><baz:span foo:id="2"/></foo:p>`,
   );
 });
