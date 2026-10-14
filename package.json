@@ -32,23 +32,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chadkirby/splice-chars.git"
+    "url": "git+https://github.com/chadkirby/dom-dom-dom-dommmm.git"
   },
   "author": "Chad Kirby",
   "license": "ISC",
   "devDependencies": {
-    "@types/jsdom": "^21.1.1",
+    "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.5",
-    "jsdom": "^19.0.0",
+    "jsdom": "^30.1.2",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.4"
   },
   "bugs": {
-    "url": "https://github.com/chadkirby/splice-chars/issues"
+    "url": "https://github.com/chadkirby/dom-dom-dom-dommmm/issues"
   },
-  "homepage": "https://github.com/chadkirby/splice-chars#readme",
+  "homepage": "https://github.com/chadkirby/dom-dom-dom-dommmm#readme",
   "directories": {
     "test": "tests"
   },
