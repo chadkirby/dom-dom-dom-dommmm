@@ -4,7 +4,7 @@
   "description": "DOM/JSDOM wrapper",
   "type": "module",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=18.0.0"
   },
   "main": "dist/index.js",
   "exports": {
@@ -23,7 +23,7 @@
     "watch": "tsc --build --watch",
     "test": "pnpm lint && vitest run",
     "test:watch": "vitest",
-    "test:ci": "pnpm compile && pnpm lint && vitest run",
+    "test:ci": "pnpm compile && pnpm typecheck && pnpm lint && vitest run",
     "lint": "oxlint",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
