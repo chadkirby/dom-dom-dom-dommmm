@@ -3,6 +3,7 @@
   "version": "9.1.0",
   "description": "DOM/JSDOM wrapper",
   "type": "module",
+  "packageManager": "pnpm@11.11.0",
   "engines": {
     "node": ">=18.0.0"
   },
