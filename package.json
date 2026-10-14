@@ -18,12 +18,12 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "compile": "rm -rf dist && tsc -p tsconfig.json",
-    "prepublishOnly": "yarn compile",
+    "prepublishOnly": "pnpm compile",
     "watch": "tsc --build --watch",
-    "test": "yarn lint && yarn test:tape:difflet",
-    "test:ci": "yarn compile && yarn lint && yarn test:tape",
+    "test": "pnpm lint && pnpm test:tape:difflet",
+    "test:ci": "pnpm compile && pnpm lint && pnpm test:tape",
     "test:tape": "tape `find tests -name '*-test.js'`",
-    "test:tape:difflet": "yarn test:tape | tap-difflet --pessimistic",
+    "test:tape:difflet": "pnpm test:tape | tap-difflet --pessimistic",
     "lint": "eslint src tests",
     "release": "tp-release",
     "jsdoc": "jsdoc ./src/*.js -d docs/"
